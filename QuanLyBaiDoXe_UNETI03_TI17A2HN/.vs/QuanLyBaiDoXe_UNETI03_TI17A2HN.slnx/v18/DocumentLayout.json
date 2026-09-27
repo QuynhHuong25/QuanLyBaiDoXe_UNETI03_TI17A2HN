@@ -1,0 +1,516 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{A70D5220-0A06-52FA-96DA-FAB09114FD71}|QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj|e:\\.net\\quanlybaidoxe_uneti03_ti17a2hn\\quanlybaidoxe_uneti03_ti17a2hn\\data\\quanlybaidoxe_uneti03_ti17a2hncontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A70D5220-0A06-52FA-96DA-FAB09114FD71}|QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj|solutionrelative:quanlybaidoxe_uneti03_ti17a2hn\\data\\quanlybaidoxe_uneti03_ti17a2hncontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A70D5220-0A06-52FA-96DA-FAB09114FD71}|QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj|e:\\.net\\quanlybaidoxe_uneti03_ti17a2hn\\quanlybaidoxe_uneti03_ti17a2hn\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A70D5220-0A06-52FA-96DA-FAB09114FD71}|QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj|solutionrelative:quanlybaidoxe_uneti03_ti17a2hn\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A70D5220-0A06-52FA-96DA-FAB09114FD71}|QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj|e:\\.net\\quanlybaidoxe_uneti03_ti17a2hn\\quanlybaidoxe_uneti03_ti17a2hn\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{A70D5220-0A06-52FA-96DA-FAB09114FD71}|QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj|solutionrelative:quanlybaidoxe_uneti03_ti17a2hn\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A70D5220-0A06-52FA-96DA-FAB09114FD71}|QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj|e:\\.net\\quanlybaidoxe_uneti03_ti17a2hn\\quanlybaidoxe_uneti03_ti17a2hn\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{A70D5220-0A06-52FA-96DA-FAB09114FD71}|QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj|solutionrelative:quanlybaidoxe_uneti03_ti17a2hn\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A70D5220-0A06-52FA-96DA-FAB09114FD71}|QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj|e:\\.net\\quanlybaidoxe_uneti03_ti17a2hn\\quanlybaidoxe_uneti03_ti17a2hn\\views\\phieuguixes\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{A70D5220-0A06-52FA-96DA-FAB09114FD71}|QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj|solutionrelative:quanlybaidoxe_uneti03_ti17a2hn\\views\\phieuguixes\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A70D5220-0A06-52FA-96DA-FAB09114FD71}|QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj|e:\\.net\\quanlybaidoxe_uneti03_ti17a2hn\\quanlybaidoxe_uneti03_ti17a2hn\\controllers\\phieuguixescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A70D5220-0A06-52FA-96DA-FAB09114FD71}|QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj|solutionrelative:quanlybaidoxe_uneti03_ti17a2hn\\controllers\\phieuguixescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A70D5220-0A06-52FA-96DA-FAB09114FD71}|QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj|e:\\.net\\quanlybaidoxe_uneti03_ti17a2hn\\quanlybaidoxe_uneti03_ti17a2hn\\views\\vitridoxes\\edit.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{A70D5220-0A06-52FA-96DA-FAB09114FD71}|QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj|solutionrelative:quanlybaidoxe_uneti03_ti17a2hn\\views\\vitridoxes\\edit.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A70D5220-0A06-52FA-96DA-FAB09114FD71}|QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj|e:\\.net\\quanlybaidoxe_uneti03_ti17a2hn\\quanlybaidoxe_uneti03_ti17a2hn\\views\\vitridoxes\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{A70D5220-0A06-52FA-96DA-FAB09114FD71}|QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj|solutionrelative:quanlybaidoxe_uneti03_ti17a2hn\\views\\vitridoxes\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A70D5220-0A06-52FA-96DA-FAB09114FD71}|QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj|e:\\.net\\quanlybaidoxe_uneti03_ti17a2hn\\quanlybaidoxe_uneti03_ti17a2hn\\controllers\\vitridoxescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A70D5220-0A06-52FA-96DA-FAB09114FD71}|QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj|solutionrelative:quanlybaidoxe_uneti03_ti17a2hn\\controllers\\vitridoxescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A70D5220-0A06-52FA-96DA-FAB09114FD71}|QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj|e:\\.net\\quanlybaidoxe_uneti03_ti17a2hn\\quanlybaidoxe_uneti03_ti17a2hn\\controllers\\phuongtienscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A70D5220-0A06-52FA-96DA-FAB09114FD71}|QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj|solutionrelative:quanlybaidoxe_uneti03_ti17a2hn\\controllers\\phuongtienscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A70D5220-0A06-52FA-96DA-FAB09114FD71}|QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj|e:\\.net\\quanlybaidoxe_uneti03_ti17a2hn\\quanlybaidoxe_uneti03_ti17a2hn\\views\\chuphuongtiens\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{A70D5220-0A06-52FA-96DA-FAB09114FD71}|QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj|solutionrelative:quanlybaidoxe_uneti03_ti17a2hn\\views\\chuphuongtiens\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A70D5220-0A06-52FA-96DA-FAB09114FD71}|QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj|e:\\.net\\quanlybaidoxe_uneti03_ti17a2hn\\quanlybaidoxe_uneti03_ti17a2hn\\views\\taikhoans\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{A70D5220-0A06-52FA-96DA-FAB09114FD71}|QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj|solutionrelative:quanlybaidoxe_uneti03_ti17a2hn\\views\\taikhoans\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A70D5220-0A06-52FA-96DA-FAB09114FD71}|QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj|e:\\.net\\quanlybaidoxe_uneti03_ti17a2hn\\quanlybaidoxe_uneti03_ti17a2hn\\views\\phuongtiens\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{A70D5220-0A06-52FA-96DA-FAB09114FD71}|QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj|solutionrelative:quanlybaidoxe_uneti03_ti17a2hn\\views\\phuongtiens\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A70D5220-0A06-52FA-96DA-FAB09114FD71}|QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj|e:\\.net\\quanlybaidoxe_uneti03_ti17a2hn\\quanlybaidoxe_uneti03_ti17a2hn\\views\\loaiphuongtiens\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{A70D5220-0A06-52FA-96DA-FAB09114FD71}|QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj|solutionrelative:quanlybaidoxe_uneti03_ti17a2hn\\views\\loaiphuongtiens\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A70D5220-0A06-52FA-96DA-FAB09114FD71}|QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj|e:\\.net\\quanlybaidoxe_uneti03_ti17a2hn\\quanlybaidoxe_uneti03_ti17a2hn\\controllers\\loaiphuongtienscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A70D5220-0A06-52FA-96DA-FAB09114FD71}|QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj|solutionrelative:quanlybaidoxe_uneti03_ti17a2hn\\controllers\\loaiphuongtienscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A70D5220-0A06-52FA-96DA-FAB09114FD71}|QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj|e:\\.net\\quanlybaidoxe_uneti03_ti17a2hn\\quanlybaidoxe_uneti03_ti17a2hn\\models\\phuongtien.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A70D5220-0A06-52FA-96DA-FAB09114FD71}|QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj|solutionrelative:quanlybaidoxe_uneti03_ti17a2hn\\models\\phuongtien.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A70D5220-0A06-52FA-96DA-FAB09114FD71}|QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj|e:\\.net\\quanlybaidoxe_uneti03_ti17a2hn\\quanlybaidoxe_uneti03_ti17a2hn\\models\\loaiphuongtien.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A70D5220-0A06-52FA-96DA-FAB09114FD71}|QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj|solutionrelative:quanlybaidoxe_uneti03_ti17a2hn\\models\\loaiphuongtien.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A70D5220-0A06-52FA-96DA-FAB09114FD71}|QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj|e:\\.net\\quanlybaidoxe_uneti03_ti17a2hn\\quanlybaidoxe_uneti03_ti17a2hn\\controllers\\taikhoanscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A70D5220-0A06-52FA-96DA-FAB09114FD71}|QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj|solutionrelative:quanlybaidoxe_uneti03_ti17a2hn\\controllers\\taikhoanscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A70D5220-0A06-52FA-96DA-FAB09114FD71}|QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj|e:\\.net\\quanlybaidoxe_uneti03_ti17a2hn\\quanlybaidoxe_uneti03_ti17a2hn\\models\\chuphuongtien.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A70D5220-0A06-52FA-96DA-FAB09114FD71}|QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj|solutionrelative:quanlybaidoxe_uneti03_ti17a2hn\\models\\chuphuongtien.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A70D5220-0A06-52FA-96DA-FAB09114FD71}|QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj|e:\\.net\\quanlybaidoxe_uneti03_ti17a2hn\\quanlybaidoxe_uneti03_ti17a2hn\\views\\chuphuongtiens\\delete.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{A70D5220-0A06-52FA-96DA-FAB09114FD71}|QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj|solutionrelative:quanlybaidoxe_uneti03_ti17a2hn\\views\\chuphuongtiens\\delete.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A70D5220-0A06-52FA-96DA-FAB09114FD71}|QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj|e:\\.net\\quanlybaidoxe_uneti03_ti17a2hn\\quanlybaidoxe_uneti03_ti17a2hn\\views\\chuphuongtiens\\create.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{A70D5220-0A06-52FA-96DA-FAB09114FD71}|QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj|solutionrelative:quanlybaidoxe_uneti03_ti17a2hn\\views\\chuphuongtiens\\create.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A70D5220-0A06-52FA-96DA-FAB09114FD71}|QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj|e:\\.net\\quanlybaidoxe_uneti03_ti17a2hn\\quanlybaidoxe_uneti03_ti17a2hn\\views\\chuphuongtiens\\details.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{A70D5220-0A06-52FA-96DA-FAB09114FD71}|QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj|solutionrelative:quanlybaidoxe_uneti03_ti17a2hn\\views\\chuphuongtiens\\details.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A70D5220-0A06-52FA-96DA-FAB09114FD71}|QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj|e:\\.net\\quanlybaidoxe_uneti03_ti17a2hn\\quanlybaidoxe_uneti03_ti17a2hn\\controllers\\chuphuongtienscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A70D5220-0A06-52FA-96DA-FAB09114FD71}|QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj|solutionrelative:quanlybaidoxe_uneti03_ti17a2hn\\controllers\\chuphuongtienscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A70D5220-0A06-52FA-96DA-FAB09114FD71}|QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj|e:\\.net\\quanlybaidoxe_uneti03_ti17a2hn\\quanlybaidoxe_uneti03_ti17a2hn\\quanlybaidoxe_uneti03_ti17a2hn.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{A70D5220-0A06-52FA-96DA-FAB09114FD71}|QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj|solutionrelative:quanlybaidoxe_uneti03_ti17a2hn\\quanlybaidoxe_uneti03_ti17a2hn.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A70D5220-0A06-52FA-96DA-FAB09114FD71}|QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj|e:\\.net\\quanlybaidoxe_uneti03_ti17a2hn\\quanlybaidoxe_uneti03_ti17a2hn\\views\\taikhoans\\create.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{A70D5220-0A06-52FA-96DA-FAB09114FD71}|QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj|solutionrelative:quanlybaidoxe_uneti03_ti17a2hn\\views\\taikhoans\\create.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A70D5220-0A06-52FA-96DA-FAB09114FD71}|QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj|e:\\.net\\quanlybaidoxe_uneti03_ti17a2hn\\quanlybaidoxe_uneti03_ti17a2hn\\models\\taikhoan.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A70D5220-0A06-52FA-96DA-FAB09114FD71}|QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj|solutionrelative:quanlybaidoxe_uneti03_ti17a2hn\\models\\taikhoan.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A70D5220-0A06-52FA-96DA-FAB09114FD71}|QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj|e:\\.net\\quanlybaidoxe_uneti03_ti17a2hn\\quanlybaidoxe_uneti03_ti17a2hn\\models\\phieuguixe.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A70D5220-0A06-52FA-96DA-FAB09114FD71}|QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj|solutionrelative:quanlybaidoxe_uneti03_ti17a2hn\\models\\phieuguixe.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\Migrations\\20260922132008_QuanLyBaiDoXe_UNETI03_TI17A2HN.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:QuanLyBaiDoXe_UNETI03_TI17A2HN\\Migrations\\20260922132008_QuanLyBaiDoXe_UNETI03_TI17A2HN.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A70D5220-0A06-52FA-96DA-FAB09114FD71}|QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj|e:\\.net\\quanlybaidoxe_uneti03_ti17a2hn\\quanlybaidoxe_uneti03_ti17a2hn\\models\\vitridoxe.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A70D5220-0A06-52FA-96DA-FAB09114FD71}|QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj|solutionrelative:quanlybaidoxe_uneti03_ti17a2hn\\models\\vitridoxe.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A70D5220-0A06-52FA-96DA-FAB09114FD71}|QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj|e:\\.net\\quanlybaidoxe_uneti03_ti17a2hn\\quanlybaidoxe_uneti03_ti17a2hn\\migrations\\20260922132702_quanlybaidoxe_uneti03_ti17a2hn.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A70D5220-0A06-52FA-96DA-FAB09114FD71}|QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj|solutionrelative:quanlybaidoxe_uneti03_ti17a2hn\\migrations\\20260922132702_quanlybaidoxe_uneti03_ti17a2hn.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 8,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{b1e99781-ab81-11d0-b683-00aa00a3ee26}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "LoaiPhuongTien.cs",
+              "DocumentMoniker": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\Models\\LoaiPhuongTien.cs",
+              "RelativeDocumentMoniker": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\Models\\LoaiPhuongTien.cs",
+              "ToolTip": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\Models\\LoaiPhuongTien.cs",
+              "RelativeToolTip": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\Models\\LoaiPhuongTien.cs",
+              "ViewState": "AgIAAAgAAAAAAAAAAAAAwAgAAAASAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-21T17:19:13.713Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "PhuongTien.cs",
+              "DocumentMoniker": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\Models\\PhuongTien.cs",
+              "RelativeDocumentMoniker": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\Models\\PhuongTien.cs",
+              "ToolTip": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\Models\\PhuongTien.cs",
+              "RelativeToolTip": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\Models\\PhuongTien.cs",
+              "ViewState": "AgIAABMAAAAAAAAAAAAkwAgAAAASAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-21T17:20:22.94Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\Views\\ChuPhuongTiens\\Index.cshtml",
+              "RelativeDocumentMoniker": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\Views\\ChuPhuongTiens\\Index.cshtml",
+              "ToolTip": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\Views\\ChuPhuongTiens\\Index.cshtml",
+              "RelativeToolTip": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\Views\\ChuPhuongTiens\\Index.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAdAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-09-22T15:06:48.581Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\Views\\TaiKhoans\\Index.cshtml",
+              "RelativeDocumentMoniker": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\Views\\TaiKhoans\\Index.cshtml",
+              "ToolTip": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\Views\\TaiKhoans\\Index.cshtml",
+              "RelativeToolTip": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\Views\\TaiKhoans\\Index.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAbAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-09-22T15:25:10.076Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "PhuongTiensController.cs",
+              "DocumentMoniker": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\Controllers\\PhuongTiensController.cs",
+              "RelativeDocumentMoniker": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\Controllers\\PhuongTiensController.cs",
+              "ToolTip": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\Controllers\\PhuongTiensController.cs",
+              "RelativeToolTip": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\Controllers\\PhuongTiensController.cs",
+              "ViewState": "AgIAAG8AAAAAAAAAAAAowHoAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-21T17:43:21.621Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Program.cs",
+              "DocumentMoniker": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\Program.cs",
+              "RelativeDocumentMoniker": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\Program.cs",
+              "ToolTip": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\Program.cs",
+              "RelativeToolTip": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAlAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-21T17:36:50.907Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "QuanLyBaiDoXe_UNETI03_TI17A2HNContext.cs",
+              "DocumentMoniker": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\Data\\QuanLyBaiDoXe_UNETI03_TI17A2HNContext.cs",
+              "RelativeDocumentMoniker": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\Data\\QuanLyBaiDoXe_UNETI03_TI17A2HNContext.cs",
+              "ToolTip": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\Data\\QuanLyBaiDoXe_UNETI03_TI17A2HNContext.cs",
+              "RelativeToolTip": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\Data\\QuanLyBaiDoXe_UNETI03_TI17A2HNContext.cs",
+              "ViewState": "AgIAAEIAAAAAAAAAAAAIwAQAAAAlAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-21T17:40:58.061Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "_Layout.cshtml",
+              "DocumentMoniker": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\Views\\Shared\\_Layout.cshtml",
+              "RelativeDocumentMoniker": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\Views\\Shared\\_Layout.cshtml",
+              "ToolTip": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\Views\\Shared\\_Layout.cshtml",
+              "RelativeToolTip": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\Views\\Shared\\_Layout.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAMYAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-09-25T13:31:45.545Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{74946827-37a0-11d2-a273-00c04f8ef4ff}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\appsettings.json",
+              "RelativeDocumentMoniker": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\appsettings.json",
+              "ToolTip": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\appsettings.json",
+              "RelativeToolTip": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-09-22T14:01:22.012Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "Edit.cshtml",
+              "DocumentMoniker": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\Views\\ViTriDoXes\\Edit.cshtml",
+              "RelativeDocumentMoniker": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\Views\\ViTriDoXes\\Edit.cshtml",
+              "ToolTip": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\Views\\ViTriDoXes\\Edit.cshtml",
+              "RelativeToolTip": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\Views\\ViTriDoXes\\Edit.cshtml",
+              "ViewState": "AgIAABIAAAAAAAAAAAAAAB4AAAAkAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-09-22T16:39:03.116Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\Views\\PhieuGuiXes\\Index.cshtml",
+              "RelativeDocumentMoniker": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\Views\\PhieuGuiXes\\Index.cshtml",
+              "ToolTip": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\Views\\PhieuGuiXes\\Index.cshtml",
+              "RelativeToolTip": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\Views\\PhieuGuiXes\\Index.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAADEAAAAUAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-09-22T16:42:18.993Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "PhieuGuiXesController.cs",
+              "DocumentMoniker": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\Controllers\\PhieuGuiXesController.cs",
+              "RelativeDocumentMoniker": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\Controllers\\PhieuGuiXesController.cs",
+              "ToolTip": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\Controllers\\PhieuGuiXesController.cs",
+              "RelativeToolTip": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\Controllers\\PhieuGuiXesController.cs",
+              "ViewState": "AgIAAHkAAAAAAAAAAAAAAJwAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-21T17:42:34.36Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\Views\\ViTriDoXes\\Index.cshtml",
+              "RelativeDocumentMoniker": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\Views\\ViTriDoXes\\Index.cshtml",
+              "ToolTip": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\Views\\ViTriDoXes\\Index.cshtml",
+              "RelativeToolTip": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\Views\\ViTriDoXes\\Index.cshtml",
+              "ViewState": "AgIAAAEAAAAAAAAAAAAAAEIAAAAIAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-09-22T16:37:50.186Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "ViTriDoXesController.cs",
+              "DocumentMoniker": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\Controllers\\ViTriDoXesController.cs",
+              "RelativeDocumentMoniker": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\Controllers\\ViTriDoXesController.cs",
+              "ToolTip": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\Controllers\\ViTriDoXesController.cs",
+              "RelativeToolTip": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\Controllers\\ViTriDoXesController.cs",
+              "ViewState": "AgIAAHYAAAAAAAAAAAAAAJkAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-21T17:44:11.312Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "LoaiPhuongTiensController.cs",
+              "DocumentMoniker": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\Controllers\\LoaiPhuongTiensController.cs",
+              "RelativeDocumentMoniker": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\Controllers\\LoaiPhuongTiensController.cs",
+              "ToolTip": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\Controllers\\LoaiPhuongTiensController.cs",
+              "RelativeToolTip": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\Controllers\\LoaiPhuongTiensController.cs",
+              "ViewState": "AgIAAHUAAAAAAAAAAAAgwJkAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-21T17:41:52.844Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\Views\\PhuongTiens\\Index.cshtml",
+              "RelativeDocumentMoniker": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\Views\\PhuongTiens\\Index.cshtml",
+              "ToolTip": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\Views\\PhuongTiens\\Index.cshtml",
+              "RelativeToolTip": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\Views\\PhuongTiens\\Index.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAADkAAAARAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-09-22T15:40:28.067Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\Views\\LoaiPhuongTiens\\Index.cshtml",
+              "RelativeDocumentMoniker": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\Views\\LoaiPhuongTiens\\Index.cshtml",
+              "ToolTip": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\Views\\LoaiPhuongTiens\\Index.cshtml",
+              "RelativeToolTip": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\Views\\LoaiPhuongTiens\\Index.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAADQAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-09-22T15:42:57.107Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 18,
+              "Title": "ChuPhuongTien.cs",
+              "DocumentMoniker": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\Models\\ChuPhuongTien.cs",
+              "RelativeDocumentMoniker": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\Models\\ChuPhuongTien.cs",
+              "ToolTip": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\Models\\ChuPhuongTien.cs",
+              "RelativeToolTip": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\Models\\ChuPhuongTien.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACMAAAA8AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-21T17:19:55.459Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 22,
+              "Title": "ChuPhuongTiensController.cs",
+              "DocumentMoniker": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\Controllers\\ChuPhuongTiensController.cs",
+              "RelativeDocumentMoniker": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\Controllers\\ChuPhuongTiensController.cs",
+              "ToolTip": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\Controllers\\ChuPhuongTiensController.cs",
+              "RelativeToolTip": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\Controllers\\ChuPhuongTiensController.cs",
+              "ViewState": "AgIAAA0AAAAAAAAAAAAcwBMAAAApAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-22T09:44:34.55Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 17,
+              "Title": "TaiKhoansController.cs",
+              "DocumentMoniker": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\Controllers\\TaiKhoansController.cs",
+              "RelativeDocumentMoniker": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\Controllers\\TaiKhoansController.cs",
+              "ToolTip": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\Controllers\\TaiKhoansController.cs",
+              "RelativeToolTip": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\Controllers\\TaiKhoansController.cs",
+              "ViewState": "AgIAAHIAAAAAAAAAAAAAAJUAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-21T17:38:17.175Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 20,
+              "Title": "Create.cshtml",
+              "DocumentMoniker": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\Views\\ChuPhuongTiens\\Create.cshtml",
+              "RelativeDocumentMoniker": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\Views\\ChuPhuongTiens\\Create.cshtml",
+              "ToolTip": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\Views\\ChuPhuongTiens\\Create.cshtml",
+              "RelativeToolTip": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\Views\\ChuPhuongTiens\\Create.cshtml",
+              "ViewState": "AgIAABIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-09-22T15:07:17.394Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 19,
+              "Title": "Delete.cshtml",
+              "DocumentMoniker": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\Views\\ChuPhuongTiens\\Delete.cshtml",
+              "RelativeDocumentMoniker": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\Views\\ChuPhuongTiens\\Delete.cshtml",
+              "ToolTip": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\Views\\ChuPhuongTiens\\Delete.cshtml",
+              "RelativeToolTip": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\Views\\ChuPhuongTiens\\Delete.cshtml",
+              "ViewState": "AgIAAB4AAAAAAAAAAAAAAFAAAAAGAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-09-22T15:07:19.868Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 21,
+              "Title": "Details.cshtml",
+              "DocumentMoniker": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\Views\\ChuPhuongTiens\\Details.cshtml",
+              "RelativeDocumentMoniker": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\Views\\ChuPhuongTiens\\Details.cshtml",
+              "ToolTip": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\Views\\ChuPhuongTiens\\Details.cshtml",
+              "RelativeToolTip": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\Views\\ChuPhuongTiens\\Details.cshtml",
+              "ViewState": "AgIAADwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-09-22T15:07:36.009Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 23,
+              "Title": "QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj",
+              "DocumentMoniker": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj",
+              "RelativeDocumentMoniker": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj",
+              "ToolTip": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj",
+              "RelativeToolTip": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN.csproj",
+              "ViewState": "AgIAAAIAAAAAAAAAAAAowBwAAAAKAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2026-09-22T12:57:32.408Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 24,
+              "Title": "Create.cshtml",
+              "DocumentMoniker": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\Views\\TaiKhoans\\Create.cshtml",
+              "RelativeDocumentMoniker": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\Views\\TaiKhoans\\Create.cshtml",
+              "ToolTip": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\Views\\TaiKhoans\\Create.cshtml",
+              "RelativeToolTip": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\Views\\TaiKhoans\\Create.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-09-22T14:21:39.326Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 25,
+              "Title": "TaiKhoan.cs",
+              "DocumentMoniker": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\Models\\TaiKhoan.cs",
+              "RelativeDocumentMoniker": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\Models\\TaiKhoan.cs",
+              "ToolTip": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\Models\\TaiKhoan.cs",
+              "RelativeToolTip": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\Models\\TaiKhoan.cs",
+              "ViewState": "AgIAABkAAAAAAAAAAAAmwA8AAAAsAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-21T17:19:01.79Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 29,
+              "Title": "20260922132702_QuanLyBaiDoXe_UNETI03_TI17A2HN.cs",
+              "DocumentMoniker": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\Migrations\\20260922132702_QuanLyBaiDoXe_UNETI03_TI17A2HN.cs",
+              "RelativeDocumentMoniker": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\Migrations\\20260922132702_QuanLyBaiDoXe_UNETI03_TI17A2HN.cs",
+              "ToolTip": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\Migrations\\20260922132702_QuanLyBaiDoXe_UNETI03_TI17A2HN.cs",
+              "RelativeToolTip": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\Migrations\\20260922132702_QuanLyBaiDoXe_UNETI03_TI17A2HN.cs",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-22T13:27:02.304Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 27,
+              "Title": "20260922132008_QuanLyBaiDoXe_UNETI03_TI17A2HN.cs",
+              "DocumentMoniker": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\Migrations\\20260922132008_QuanLyBaiDoXe_UNETI03_TI17A2HN.cs",
+              "RelativeDocumentMoniker": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\Migrations\\20260922132008_QuanLyBaiDoXe_UNETI03_TI17A2HN.cs",
+              "ToolTip": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\Migrations\\20260922132008_QuanLyBaiDoXe_UNETI03_TI17A2HN.cs",
+              "RelativeToolTip": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\Migrations\\20260922132008_QuanLyBaiDoXe_UNETI03_TI17A2HN.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-22T13:20:09.45Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 26,
+              "Title": "PhieuGuiXe.cs",
+              "DocumentMoniker": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\Models\\PhieuGuiXe.cs",
+              "RelativeDocumentMoniker": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\Models\\PhieuGuiXe.cs",
+              "ToolTip": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\Models\\PhieuGuiXe.cs",
+              "RelativeToolTip": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\Models\\PhieuGuiXe.cs",
+              "ViewState": "AgIAABwAAAAAAAAAAAA/wCwAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-21T17:20:51.916Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 28,
+              "Title": "ViTriDoXe.cs",
+              "DocumentMoniker": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\Models\\ViTriDoXe.cs",
+              "RelativeDocumentMoniker": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\Models\\ViTriDoXe.cs",
+              "ToolTip": "E:\\.NET\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\QuanLyBaiDoXe_UNETI03_TI17A2HN\\Models\\ViTriDoXe.cs",
+              "RelativeToolTip": "QuanLyBaiDoXe_UNETI03_TI17A2HN\\Models\\ViTriDoXe.cs",
+              "ViewState": "AgIAAA8AAAAAAAAAAAAYwAgAAAASAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-21T17:19:23.883Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

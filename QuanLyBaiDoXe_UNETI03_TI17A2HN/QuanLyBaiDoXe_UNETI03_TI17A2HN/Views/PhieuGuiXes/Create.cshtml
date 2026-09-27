@@ -1,0 +1,96 @@
+@model QuanLyBaiDoXe_UNETI03_TI17A2HN.Models.PhieuGuiXe
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>PhieuGuiXe</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group">
+                <label asp-for="MaPhuongTien" class="control-label"></label>
+                <input asp-for="MaPhuongTien" class="form-control" />
+                <span asp-validation-for="MaPhuongTien" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="MaViTri" class="control-label"></label>
+                <input asp-for="MaViTri" class="form-control" />
+                <span asp-validation-for="MaViTri" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="NgayDangKy" class="control-label"></label>
+                <input asp-for="NgayDangKy" class="form-control" />
+                <span asp-validation-for="NgayDangKy" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="ThoiGianDuKienVao" class="control-label"></label>
+                <input asp-for="ThoiGianDuKienVao" class="form-control" />
+                <span asp-validation-for="ThoiGianDuKienVao" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="ThoiGianDuKienRa" class="control-label"></label>
+                <input asp-for="ThoiGianDuKienRa" class="form-control" />
+                <span asp-validation-for="ThoiGianDuKienRa" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="ThoiGianVaoThucTe" class="control-label"></label>
+                <input asp-for="ThoiGianVaoThucTe" class="form-control" />
+                <span asp-validation-for="ThoiGianVaoThucTe" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="ThoiGianRaThucTe" class="control-label"></label>
+                <input asp-for="ThoiGianRaThucTe" class="form-control" />
+                <span asp-validation-for="ThoiGianRaThucTe" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="DonGiaTheoGio" class="control-label"></label>
+                <input asp-for="DonGiaTheoGio" class="form-control" />
+                <span asp-validation-for="DonGiaTheoGio" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="ThanhTien" class="control-label"></label>
+                <input asp-for="ThanhTien" class="form-control" />
+                <span asp-validation-for="ThanhTien" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="TrangThai" class="control-label"></label>
+                <input asp-for="TrangThai" class="form-control" />
+                <span asp-validation-for="TrangThai" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="PhuongTien" class="control-label"></label>
+                <input asp-for="PhuongTien" class="form-control" />
+                <span asp-validation-for="PhuongTien" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="ViTriDoXe" class="control-label"></label>
+                <input asp-for="ViTriDoXe" class="form-control" />
+                <span asp-validation-for="ViTriDoXe" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>

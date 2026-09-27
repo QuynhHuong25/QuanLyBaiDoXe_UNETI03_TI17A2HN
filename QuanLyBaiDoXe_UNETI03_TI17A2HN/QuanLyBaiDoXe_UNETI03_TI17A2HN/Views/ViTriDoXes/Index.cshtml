@@ -1,0 +1,67 @@
+@model IEnumerable<QuanLyBaiDoXe_UNETI03_TI17A2HN.Models.ViTriDoXe>
+
+@{
+    ViewData["Title"] = "Quản lý Vị trí đỗ xe";
+}
+
+<h1>Danh sách Vị trí đỗ xe</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Tạo mới</a>
+</p>
+<table class="table table-striped table-bordered">
+    <thead>
+        <tr>
+            <th>
+                Tên vị trí
+            </th>
+            <th>
+                Khu vực
+            </th>
+            <th>
+                Tầng
+            </th>
+            <th>
+                Loại phương tiện
+            </th>
+            <th>
+                Trạng thái
+            </th>
+            <th>
+                Mô tả
+            </th>
+            <th>
+                Thao tác
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.TenViTri)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.KhuVuc)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Tang)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.LoaiPhuongTien.TenLoaiPhuongTien)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TrangThai)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MoTa)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-mavitri="@item.MaViTri">Sửa</a> |
+                <a asp-action="Details" asp-route-mavitri="@item.MaViTri">Chi tiết</a> |
+                <a asp-action="Delete" asp-route-mavitri="@item.MaViTri">Xóa</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

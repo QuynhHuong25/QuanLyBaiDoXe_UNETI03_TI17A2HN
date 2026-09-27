@@ -1,0 +1,55 @@
+@model IEnumerable<QuanLyBaiDoXe_UNETI03_TI17A2HN.Models.LoaiPhuongTien>
+
+@{
+    ViewData["Title"] = "Quản lý Loại phương tiện";
+}
+
+<h1>Danh sách Loại phương tiện</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Tạo mới</a>
+</p>
+<table class="table table-striped table-bordered">
+    <thead>
+        <tr>
+            <th>
+                Tên loại phương tiện
+            </th>
+            <th>
+                Đơn giá theo giờ
+            </th>
+            <th>
+                Mô tả
+            </th>
+            <th>
+                Trạng thái
+            </th>
+            <th>
+                Thao tác
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.TenLoaiPhuongTien)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DonGiaTheoGio)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MoTa)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TrangThai)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-maloaiphuongtien="@item.MaLoaiPhuongTien">Sửa</a> |
+                <a asp-action="Details" asp-route-maloaiphuongtien="@item.MaLoaiPhuongTien">Chi tiết</a> |
+                <a asp-action="Delete" asp-route-maloaiphuongtien="@item.MaLoaiPhuongTien">Xóa</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

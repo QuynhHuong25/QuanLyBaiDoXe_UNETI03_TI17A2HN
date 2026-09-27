@@ -1,0 +1,71 @@
+@model IEnumerable<QuanLyBaiDoXe_UNETI03_TI17A2HN.Models.TaiKhoan>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Danh sách tài khoản</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Tạo mới</a>
+</p>
+<table class="table table-striped table-bordered">
+    <thead>
+        <tr>
+            <th>
+                Tên đăng nhập
+            </th>
+            <th>
+                Mật khẩu
+            </th>
+            <th>
+                Họ tên
+            </th>
+            <th>
+                Email
+            </th>
+            <th>
+                Vai trò
+            </th>
+            <th>
+                Trạng thái
+            </th>
+            <th>
+                Chủ phương tiện
+            </th>
+            <th>Thao tác</th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.TenDangNhap)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MatKhau)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.HoTen)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Email)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.VaiTro)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TrangThai)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ChuPhuongTien.HoTen)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-mataikhoan="@item.MaTaiKhoan">Sửa</a> |
+                <a asp-action="Details" asp-route-mataikhoan="@item.MaTaiKhoan">Chi tiết</a> |
+                <a asp-action="Delete" asp-route-mataikhoan="@item.MaTaiKhoan">Xóa</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
