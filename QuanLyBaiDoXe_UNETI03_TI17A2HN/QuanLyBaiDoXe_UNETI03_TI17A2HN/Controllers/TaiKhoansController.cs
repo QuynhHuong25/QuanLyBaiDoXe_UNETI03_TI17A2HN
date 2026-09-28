@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QuanLyBaiDoXe_UNETI03_TI17A2HN.Models;
 
+//Lương Thị Quỳnh Hương - 23103100064
+
 namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
 {
     public class TaiKhoansController : Controller
@@ -125,6 +127,182 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             }
 
             return View(taikhoan);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> DangNhap()
+        {
+            if (Request.Cookies.TryGetValue("SavedUsername", out string savedUsername))
+            {
+                ViewBag.SavedUsername = savedUsername;
+            }
+
+            await Task.CompletedTask;
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DangNhap(string tenDangNhap, string matKhau, bool ghiNho)
+        {
+            if (string.IsNullOrEmpty(tenDangNhap) || string.IsNullOrEmpty(matKhau))
+            {
+                ViewBag.Error = "Vui lòng nhập đầy đủ Tên đăng nhập và Mật khẩu!";
+                return View();
+            }
+
+            var taiKhoan = await _context.TaiKhoan
+                .FirstOrDefaultAsync(t => t.TenDangNhap == tenDangNhap && t.MatKhau == matKhau);
+
+            if (taiKhoan == null)
+            {
+                ViewBag.Error = "Tên đăng nhập hoặc mật khẩu không chính xác!";
+                return View();
+            }
+
+            if (taiKhoan.TrangThai == false)
+            {
+                ViewBag.Error = "Tài khoản của bạn đã bị khóa!";
+                return View();
+            }
+
+            CookieOptions cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                IsEssential = true
+            };
+
+            if (ghiNho)
+            {
+                cookieOptions.Expires = DateTime.Now.AddDays(30);
+                Response.Cookies.Append("SavedUsername", tenDangNhap, cookieOptions);
+            }
+            else
+            {
+                Response.Cookies.Delete("SavedUsername");
+            }
+
+            HttpContext.Session.SetString("MaTaiKhoan", taiKhoan.MaTaiKhoan.ToString());
+            HttpContext.Session.SetString("TenDangNhap", taiKhoan.TenDangNhap);
+            HttpContext.Session.SetString("HoTen", taiKhoan.HoTen ?? taiKhoan.TenDangNhap);
+            HttpContext.Session.SetString("VaiTro", taiKhoan.VaiTro ?? "Khach");
+
+            return RedirectToAction("Index", "Home");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> DangXuat()
+        {
+            HttpContext.Session.Clear();
+            await Task.CompletedTask;
+            return RedirectToAction("DangNhap", "TaiKhoans");
+        }
+
+        [HttpGet]
+        public IActionResult DangKy()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DangKy(string tenDangNhap, string matKhau, string xacNhanMatKhau)
+        {
+            if (string.IsNullOrEmpty(tenDangNhap) || string.IsNullOrEmpty(matKhau))
+            {
+                ViewBag.Error = "Vui lòng nhập đầy đủ Tên đăng nhập và Mật khẩu!";
+                return View();
+            }
+
+            if (matKhau != xacNhanMatKhau)
+            {
+                ViewBag.Error = "Mật khẩu xác nhận không khớp!";
+                return View();
+            }
+
+            var taiKhoanDaTonTai = await _context.TaiKhoan
+                .AnyAsync(t => t.TenDangNhap == tenDangNhap);
+
+            if (taiKhoanDaTonTai)
+            {
+                ViewBag.Error = "Tên đăng nhập này đã tồn tại!";
+                return View();
+            }
+
+            var taiKhoanMoi = new TaiKhoan();
+            taiKhoanMoi.TenDangNhap = tenDangNhap;
+            taiKhoanMoi.MatKhau = matKhau;
+            taiKhoanMoi.HoTen = tenDangNhap;
+            taiKhoanMoi.Email = $"{tenDangNhap.ToLower().Trim()}@gmail.com";
+            taiKhoanMoi.VaiTro = "Khách hàng";
+            taiKhoanMoi.TrangThai = true; 
+
+            try
+            {
+                _context.TaiKhoan.Add(taiKhoanMoi);
+                await _context.SaveChangesAsync();
+
+                TempData["Success"] = "Đăng ký tài khoản thành công! Vui lòng đăng nhập.";
+                return RedirectToAction("DangNhap");
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Error = "Lỗi lưu dữ liệu: " + (ex.InnerException != null ? ex.InnerException.Message : ex.Message);
+                return View();
+            }
+        }
+
+        [HttpGet]
+        public IActionResult QuenMatKhau()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> QuenMatKhau(string tenDangNhap, string matKhauMoi, string xacNhanMatKhauMoi)
+        {
+            if (string.IsNullOrEmpty(tenDangNhap) || string.IsNullOrEmpty(matKhauMoi))
+            {
+                ViewBag.Error = "Vui lòng nhập đầy đủ thông tin!";
+                return View();
+            }
+
+            if (matKhauMoi != xacNhanMatKhauMoi)
+            {
+                ViewBag.Error = "Mật khẩu xác nhận không khớp!";
+                return View();
+            }
+
+            var taiKhoan = await _context.TaiKhoan
+                .FirstOrDefaultAsync(t => t.TenDangNhap == tenDangNhap);
+
+            if (taiKhoan == null)
+            {
+                ViewBag.Error = "Tên đăng nhập không tồn tại trên hệ thống!";
+                return View();
+            }
+
+            if (taiKhoan.MatKhau == matKhauMoi)
+            {
+                ViewBag.Error = "Mật khẩu mới không được trùng với mật khẩu cũ!";
+                return View();
+            }
+            taiKhoan.MatKhau = matKhauMoi;
+
+            try
+            {
+                _context.Update(taiKhoan);
+                await _context.SaveChangesAsync();
+
+                TempData["Success"] = "Đổi mật khẩu thành công! Vui lòng đăng nhập bằng mật khẩu mới.";
+                return RedirectToAction("DangNhap");
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Error = "Lỗi cập nhật dữ liệu: " + (ex.InnerException != null ? ex.InnerException.Message : ex.Message);
+                return View();
+            }
         }
 
         // POST: TAIKHOANS/Delete/5
