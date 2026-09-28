@@ -9,7 +9,7 @@ builder.Services.AddDbContext<QuanLyBaiDoXe_UNETI03_TI17A2HNContext>(options =>
     options.UseSqlServer(connectionString));
 
 builder.Services.AddControllersWithViews();
-
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
