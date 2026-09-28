@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using QuanLyBaiDoXe_UNETI03_TI17A2HN.Models;
+using System.Net.Http.Headers;
 
 namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
 {
@@ -12,14 +14,26 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
         {
             _context = context;
         }
-
-        // GET: VITRIDOXES
-        public async Task<IActionResult> Index()
+        //Kiem tra quyen Admin tu Session
+        private bool IsAdmin()
         {
-            var listViTriDoXe = _context.ViTriDoXe
-                .Include(v => v.LoaiPhuongTien);
+            var vaiTro = HttpContext.Session.GetString("VaiTro");
+            return !string.IsNullOrEmpty(vaiTro) && vaiTro.Equals("Admin", StringComparison.OrdinalIgnoreCase);
+        }
+        // GET: VITRIDOXES
+        public async Task<IActionResult> Index(string searchString)
+        {///tim kiem
+            ViewData["CurrentSearch"] = searchString;
+            var query = _context.ViTriDoXe
+                .Include(v => v.LoaiPhuongTien)
+                .AsQueryable();
 
-            return View(await listViTriDoXe.ToListAsync());
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                query = query.Where(v => v.TenViTri.Contains(searchString) || v.KhuVuc.Contains(searchString));
+            }
+
+            return View(await query.ToListAsync());
         }
 
         // GET: VITRIDOXES/Details/5
@@ -42,9 +56,11 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             return View(vitridoxe);
         }
 
-        // GET: VITRIDOXES/Create
-        public IActionResult Create()
+        // GET: VITRIDOXES/Create (Admin moi duoc vao)
+        public async Task<IActionResult> Create()
         {
+            if (!IsAdmin()) return RedirectToAction("AccessDenied", "TaiKhoan");
+            ViewData["MaLoaiPhuongTien"] = new SelectList(await _context.LoaiPhuongTien.ToListAsync(), "MaLoaiPhuongTien", "TenLoaiPhuongTien");
             return View();
         }
 
@@ -53,18 +69,29 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("MaViTri,TenViTri,MaLoaiPhuongTien,KhuVuc,Tang,TrangThai,MoTa")] ViTriDoXe vitridoxe)
         {
+            if(!IsAdmin()) return RedirectToAction("AccessDenied", "TaiKhoan");
+            //ten vi tri khong duoc trung
+            if (await _context.ViTriDoXe.AnyAsync(v => v.TenViTri.ToLower() == vitridoxe.TenViTri.ToLower()))
+            {
+                ModelState.AddModelError("TenViTri", "Tên vị trí đỗ xe đã tồn tại trong hệ thống!");
+            }
+
             if (ModelState.IsValid)
             {
                 _context.Add(vitridoxe);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+
+            ViewData["MaLoaiPhuongTien"] = new SelectList(await _context.LoaiPhuongTien.ToListAsync(), "MaLoaiPhuongTien", "TenLoaiPhuongTien", vitridoxe.MaLoaiPhuongTien);
             return View(vitridoxe);
         }
 
-        // GET: VITRIDOXES/Edit/5
+        // GET: VITRIDOXES/Edit/5 chi admin moi dc
         public async Task<IActionResult> Edit(int? mavitri)
         {
+            ////admin
+            if (!IsAdmin()) return RedirectToAction("AccessDenied", "TaiKhoan");
             if (mavitri == null)
             {
                 return NotFound();
@@ -75,19 +102,25 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             {
                 return NotFound();
             }
+            ViewData["MaLoaiPhuongTien"] = new SelectList(await _context.LoaiPhuongTien.ToListAsync(), "MaLoaiPhuongTien", "TenLoaiPhuongTien", vitridoxe.MaLoaiPhuongTien);
             return View(vitridoxe);
         }
 
-        // POST: VITRIDOXES/Edit/5
+        // POST: VITRIDOXES/Edit/5 admin cap nhap
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int? mavitri, [Bind("MaViTri,TenViTri,MaLoaiPhuongTien,KhuVuc,Tang,TrangThai,MoTa")] ViTriDoXe vitridoxe)
         {
+            if (!IsAdmin()) return RedirectToAction("AccessDenied", "TaiKhoan");
             if (mavitri != vitridoxe.MaViTri)
             {
                 return NotFound();
             }
-
+            //valid ten vi tri khong dc trung ngoai tru vi tri dang sua
+            if (await _context.ViTriDoXe.AnyAsync(v => v.TenViTri.ToLower() == vitridoxe.TenViTri.ToLower() && v.MaViTri != vitridoxe.MaViTri))
+            {
+                ModelState.AddModelError("TenViTri", "Tên vị trí đỗ xe đã tồn tại trong hệ thống!");
+            }
             if (ModelState.IsValid)
             {
                 try
@@ -114,6 +147,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
         // GET: VITRIDOXES/Delete/5
         public async Task<IActionResult> Delete(int? mavitri)
         {
+            if (!IsAdmin()) return RedirectToAction("AccessDenied", "TaiKhoan");
             if (mavitri == null)
             {
                 return NotFound();
@@ -136,6 +170,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int? mavitri)
         {
+            if (!IsAdmin()) return RedirectToAction("AccessDenied", "TaiKhoan");
             var vitridoxe = await _context.ViTriDoXe.FindAsync(mavitri);
             if (vitridoxe != null)
             {
