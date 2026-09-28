@@ -1,0 +1,267 @@
+﻿@* Lương Thị Quỳnh Hương - 23103100064 *@
+@{
+    Layout = null;
+    ViewData["Title"] = "Đăng ký tài khoản";
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Đăng ký - Hệ thống quản lý bãi đỗ xe</title>
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" />
+
+    <style>
+        body {
+            background-color: #eef5ff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            overflow: hidden;
+            max-width: 1100px;
+            width: 100%;
+            border: none;
+        }
+
+        .login-left {
+            padding: 48px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .login-right {
+            padding: 48px;
+            background: #ffffff;
+            border-left: 1px solid #f0f4f8;
+        }
+
+        .brand-icon {
+            width: 48px;
+            height: 48px;
+            background-color: #0d6efd;
+            color: #ffffff;
+            font-weight: bold;
+            font-size: 1.5rem;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .feature-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #e8f1ff;
+            color: #0d6efd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        .form-control-custom {
+            height: 48px;
+            border-radius: 10px;
+            border: 1px solid #dee2e6;
+            padding-left: 42px;
+        }
+
+        .input-icon-wrapper {
+            position: relative;
+        }
+
+        .input-icon-wrapper i.input-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+            font-size: 1.1rem;
+        }
+
+        .input-icon-wrapper i.toggle-password {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+            cursor: pointer;
+        }
+
+        .btn-primary-custom {
+            height: 48px;
+            background-color: #1a73e8;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .btn-primary-custom:hover {
+            background-color: #1557b0;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            color: #8c98a4;
+            font-size: 0.85rem;
+            margin: 24px 0;
+        }
+
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .divider span {
+            padding: 0 12px;
+        }
+
+        .hero-img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 12px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card login-card">
+        <div class="row g-0">
+
+            <div class="col-lg-7 login-left">
+                <div>
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="brand-icon me-3">P</div>
+                        <div>
+                            <h4 class="fw-bold mb-0 text-dark">Quản lý bãi đỗ xe</h4>
+                            <span class="text-secondary small">Đăng ký gửi xe</span>
+                        </div>
+                    </div>
+
+                    <p class="text-secondary mb-4">
+                        Giải pháp thông minh cho việc quản lý bãi đỗ xe và đăng ký gửi xe nhanh chóng, thuận tiện.
+                    </p>
+
+                    <div class="text-center my-4">
+                        <img src="~/css/Image/BaiDoXe.png"
+                             asp-append-version="true"
+                             alt="Bãi đỗ xe thông minh"
+                             class="hero-img img-fluid" />
+                    </div>
+                </div>
+
+                <div class="row text-center pt-3 border-top">
+                    <div class="col-4">
+                        <div class="d-flex flex-column align-items-center">
+                            <div class="feature-icon"><i class="bi bi-shield-check"></i></div>
+                            <strong class="small">An toàn</strong>
+                            <small class="text-muted" style="font-size: 11px;">Bảo mật thông tin người dùng</small>
+                        </div>
+                    </div>
+                    <div class="col-4 border-start border-end">
+                        <div class="d-flex flex-column align-items-center">
+                            <div class="feature-icon"><i class="bi bi-lightning-charge"></i></div>
+                            <strong class="small">Nhanh chóng</strong>
+                            <small class="text-muted" style="font-size: 11px;">Thủ tục đơn giản, tiết kiệm thời gian</small>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="d-flex flex-column align-items-center">
+                            <div class="feature-icon"><i class="bi bi-heart"></i></div>
+                            <strong class="small">Tiện lợi</strong>
+                            <small class="text-muted" style="font-size: 11px;">Đăng ký và quản lý mọi lúc, mọi nơi</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-5 login-right d-flex flex-column justify-content-between">
+                <div>
+                    <h3 class="fw-bold text-dark mb-1">Đăng ký</h3>
+                    <p class="text-secondary small mb-4">Vui lòng điền thông tin để tạo tài khoản mới</p>
+
+                    @if (ViewBag.Error != null)
+                    {
+                        <div class="alert alert-danger py-2 small rounded-3" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill me-1"></i> @ViewBag.Error
+                        </div>
+                    }
+
+                    <form asp-controller="TaiKhoans" asp-action="DangKy" method="post">
+
+                        <div class="mb-3 input-icon-wrapper">
+                            <i class="bi bi-person input-icon"></i>
+                            <input type="text" name="tenDangNhap" class="form-control form-control-custom" placeholder="Tên đăng nhập" required />
+                        </div>
+
+                        <div class="mb-3 input-icon-wrapper">
+                            <i class="bi bi-lock input-icon"></i>
+                            <input type="password" id="passwordInput" name="matKhau" class="form-control form-control-custom" placeholder="Mật khẩu" required />
+                            <i class="bi bi-eye-slash toggle-password" onclick="togglePasswordVisibility('passwordInput', this)"></i>
+                        </div>
+
+                        <div class="mb-4 input-icon-wrapper">
+                            <i class="bi bi-shield-lock input-icon"></i>
+                            <input type="password" id="confirmPasswordInput" name="xacNhanMatKhau" class="form-control form-control-custom" placeholder="Xác nhận mật khẩu" required />
+                            <i class="bi bi-eye-slash toggle-password" onclick="togglePasswordVisibility('confirmPasswordInput', this)"></i>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-primary-custom w-100 text-white d-flex align-items-center justify-content-center gap-2">
+                            Đăng ký tài khoản <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </form>
+
+                    <div class="divider">
+                        <span>Hoặc</span>
+                    </div>
+
+                    <div class="d-grid gap-2 mt-3">
+                        <a asp-controller="TaiKhoans" asp-action="DangNhap" class="btn btn-outline-secondary py-2 fw-medium text-decoration-none text-center">
+                            <i class="bi bi-box-arrow-in-right me-1"></i> Đã có tài khoản? Đăng nhập
+                        </a>
+                    </div>
+                </div>
+
+                <div class="text-center mt-4">
+                    <small class="text-muted" style="font-size: 12px;">&copy; 2026 Quản lý bãi đỗ xe. Tất cả quyền được bảo lưu.</small>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function togglePasswordVisibility(inputId, toggleIcon) {
+            const input = document.getElementById(inputId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                toggleIcon.classList.remove('bi-eye-slash');
+                toggleIcon.classList.add('bi-eye');
+            } else {
+                input.type = 'password';
+                toggleIcon.classList.remove('bi-eye');
+                toggleIcon.classList.add('bi-eye-slash');
+            }
+        }
+    </script>
+</body>
+</html>
