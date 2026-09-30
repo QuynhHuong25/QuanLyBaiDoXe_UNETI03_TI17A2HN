@@ -6,9 +6,13 @@
     string hoTen = Context.Session?.GetString("HoTen");
     string tenDangNhap = Context.Session?.GetString("TenDangNhap");
 
-    string tenHienThi = !string.IsNullOrEmpty(hoTen) 
-                        ? hoTen 
+    string tenHienThi = !string.IsNullOrEmpty(hoTen)
+                        ? hoTen
                         : (!string.IsNullOrEmpty(tenDangNhap) ? tenDangNhap : "Khách hàng");
+
+    // Lấy tên Controller và Action hiện tại để active menu
+    string currentController = ViewContext.RouteData.Values["Controller"]?.ToString() ?? "";
+    string currentAction = ViewContext.RouteData.Values["Action"]?.ToString() ?? "";
 }
 <!DOCTYPE html>
 <html lang="vi" class="h-100">
@@ -16,97 +20,97 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - QuanLyBaiDoXe_UNETI03_TI17A2HN</title>
-    
+
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/QuanLyBaiDoXe_UNETI03_TI17A2HN.styles.css" asp-append-version="true" />
 
     <style>
-        html, body {
-            height: 100%;
-            background-color: #f4f6f9;
-        }
+            html, body {
+                height: 100%;
+                background-color: #f4f6f9;
+            }
 
-        .layout-wrapper {
-            display: flex;
-            min-height: 100vh;
-            width: 100%;
-            overflow-x: hidden;
-        }
+            .layout-wrapper {
+                display: flex;
+                min-height: 100vh;
+                width: 100%;
+                overflow-x: hidden;
+            }
 
-        .sidebar-desktop {
-            width: 260px;
-            flex-shrink: 0;
-            background-color: #ffffff;
-            border-right: 1px solid #dee2e6;
-            padding: 1.25rem;
-        }
+            .sidebar-desktop {
+                width: 260px;
+                flex-shrink: 0;
+                background-color: #ffffff;
+                border-right: 1px solid #dee2e6;
+                padding: 1.25rem;
+            }
 
-        .content-wrapper {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            min-width: 0;
-        }
+            .content-wrapper {
+                flex-grow: 1;
+                display: flex;
+                flex-direction: column;
+                min-width: 0;
+            }
 
-        .sidebar nav a {
-            color: #333;
-            text-decoration: none;
-            padding: 10px 14px;
-            display: flex;
-            align-items: center;
-            border-radius: 8px;
-            transition: all 0.2s ease-in-out;
-        }
+            .sidebar nav a {
+                color: #333;
+                text-decoration: none;
+                padding: 10px 14px;
+                display: flex;
+                align-items: center;
+                border-radius: 8px;
+                transition: all 0.2s ease-in-out;
+            }
 
-        .sidebar nav a:hover, .sidebar nav a.active {
-            background-color: #e8f1ff;
-            color: #0d6efd;
-            font-weight: 600;
-        }
+                .sidebar nav a:hover, .sidebar nav a.active {
+                    background-color: #e8f1ff;
+                    color: #0d6efd;
+                    font-weight: 600;
+                }
 
-        .top-bar {
-            background-color: #ffffff;
-            border-bottom: 1px solid #dee2e6;
-            padding: 12px 24px;
-        }
+            .top-bar {
+                background-color: #ffffff;
+                border-bottom: 1px solid #dee2e6;
+                padding: 12px 24px;
+            }
 
-        .main-footer {
-            background-color: #ffffff;
-            border-top: 1px solid #e2e8f0;
-            font-size: 13px;
-            color: #6c757d;
-        }
+            .main-footer {
+                background-color: #ffffff;
+                border-top: 1px solid #e2e8f0;
+                font-size: 13px;
+                color: #6c757d;
+            }
 
-        .main-footer h6 {
-            color: #212529;
-            font-weight: 700;
-            font-size: 14px;
-            margin-bottom: 12px;
-        }
+                .main-footer h6 {
+                    color: #212529;
+                    font-weight: 700;
+                    font-size: 14px;
+                    margin-bottom: 12px;
+                }
 
-        .main-footer a {
-            color: #6c757d;
-            text-decoration: none;
-            display: block;
-            margin-bottom: 6px;
-        }
+                .main-footer a {
+                    color: #6c757d;
+                    text-decoration: none;
+                    display: block;
+                    margin-bottom: 6px;
+                }
 
-        .main-footer a:hover {
-            color: #0d6efd;
-        }
+                    .main-footer a:hover {
+                        color: #0d6efd;
+                    }
 
-        .social-icons a {
-            display: inline-block;
-            font-size: 18px;
-            margin-right: 12px;
-            color: #495057;
-        }
+            .social-icons a {
+                display: inline-block;
+                font-size: 18px;
+                margin-right: 12px;
+                color: #495057;
+            }
 
-        .social-icons a:hover {
-            color: #0d6efd;
-        }
+                .social-icons a:hover {
+                    color: #0d6efd;
+                }
     </style>
 </head>
 <body class="h-100">
@@ -124,28 +128,28 @@
             </div>
 
             <nav class="nav flex-column gap-1">
-                <a class="nav-link active" asp-area="" asp-controller="Home" asp-action="Index">
+                <a class="nav-link @(currentController == "Home" ? "active" : "")" asp-area="" asp-controller="Home" asp-action="Index">
                     <i class="bi bi-house-door me-2"></i>Trang chủ
                 </a>
 
                 @if (vaiTro == "Admin")
                 {
                     <div class="text-muted small fw-bold mt-2 mb-1 px-2">QUẢN TRỊ</div>
-                    <a class="nav-link" asp-controller="LoaiPhuongTiens" asp-action="Index"><i class="bi bi-tags me-2"></i>Loại phương tiện</a>
-                    <a class="nav-link" asp-controller="ViTriDoXes" asp-action="Index"><i class="bi bi-p-square me-2"></i>Vị trí đỗ xe</a>
-                    <a class="nav-link" asp-controller="ChuPhuongTiens" asp-action="Index"><i class="bi bi-people me-2"></i>Chủ phương tiện</a>
-                    <a class="nav-link" asp-controller="PhuongTiens" asp-action="Index"><i class="bi bi-car-front me-2"></i>Quản lý phương tiện</a>
-                    <a class="nav-link" asp-controller="PhieuGuiXes" asp-action="Index"><i class="bi bi-card-checklist me-2"></i>Quản lý phiếu gửi</a>
-                    <a class="nav-link" asp-controller="VaoRa" asp-action="Index"><i class="bi bi-door-open me-2"></i>Vào/Ra</a>
-                    <a class="nav-link" asp-controller="ThongKe" asp-action="Index"><i class="bi bi-bar-chart-line me-2"></i>Thống kê</a>
+                    <a class="nav-link @(currentController == "LoaiPhuongTiens" ? "active" : "")" asp-controller="LoaiPhuongTiens" asp-action="Index"><i class="bi bi-tags me-2"></i>Loại phương tiện</a>
+                    <a class="nav-link @(currentController == "ViTriDoXes" ? "active" : "")" asp-controller="ViTriDoXes" asp-action="Index"><i class="bi bi-p-square me-2"></i>Vị trí đỗ xe</a>
+                    <a class="nav-link @(currentController == "ChuPhuongTiens" ? "active" : "")" asp-controller="ChuPhuongTiens" asp-action="Index"><i class="bi bi-people me-2"></i>Chủ phương tiện</a>
+                    <a class="nav-link @(currentController == "PhuongTiens" ? "active" : "")" asp-controller="PhuongTiens" asp-action="Index"><i class="bi bi-car-front me-2"></i>Quản lý phương tiện</a>
+                    <a class="nav-link @(currentController == "PhieuGuiXes" ? "active" : "")" asp-controller="PhieuGuiXes" asp-action="Index"><i class="bi bi-card-checklist me-2"></i>Quản lý phiếu gửi</a>
+                    <a class="nav-link @(currentController == "VaoRa" ? "active" : "")" asp-controller="VaoRa" asp-action="Index"><i class="bi bi-door-open me-2"></i>Vào/Ra</a>
+                    <a class="nav-link @(currentController == "ThongKe" ? "active" : "")" asp-controller="ThongKe" asp-action="Index"><i class="bi bi-bar-chart-line me-2"></i>Thống kê</a>
                 }
                 else
                 {
-                    <a class="nav-link" asp-controller="PhieuGuiXes" asp-action="Create"><i class="bi bi-car-front me-2"></i>Đăng ký gửi xe</a>
-                    <a class="nav-link" asp-controller="PhuongTiens" asp-action="Index"><i class="bi bi-card-heading me-2"></i>Quản lý xe</a>
-                    <a class="nav-link" asp-controller="ViTriDoXes" asp-action="Index"><i class="bi bi-p-square me-2"></i>Bãi đỗ xe</a>
-                    <a class="nav-link" asp-controller="ChuPhuongTiens" asp-action="Index"><i class="bi bi-person me-2"></i>Khách hàng</a>
-                    <a class="nav-link" asp-controller="PhieuGuiXes" asp-action="Index"><i class="bi bi-clock-history me-2"></i>Lịch sử gửi xe</a>
+                    <a class="nav-link @(currentController == "PhieuGuiXes" && currentAction == "Create" ? "active" : "")" asp-controller="PhieuGuiXes" asp-action="Create"><i class="bi bi-car-front me-2"></i>Đăng ký gửi xe</a>
+                    <a class="nav-link @(currentController == "PhuongTiens" ? "active" : "")" asp-controller="PhuongTiens" asp-action="Index"><i class="bi bi-card-heading me-2"></i>Quản lý xe</a>
+                    <a class="nav-link @(currentController == "ViTriDoXes" ? "active" : "")" asp-controller="ViTriDoXes" asp-action="Index"><i class="bi bi-p-square me-2"></i>Bãi đỗ xe</a>
+                    <a class="nav-link @(currentController == "ChuPhuongTiens" ? "active" : "")" asp-controller="ChuPhuongTiens" asp-action="Index"><i class="bi bi-person me-2"></i>Khách hàng</a>
+                    <a class="nav-link @(currentController == "PhieuGuiXes" && currentAction == "Index" ? "active" : "")" asp-controller="PhieuGuiXes" asp-action="Index"><i class="bi bi-clock-history me-2"></i>Lịch sử gửi xe</a>
                 }
             </nav>
         </aside>
@@ -166,35 +170,35 @@
                 </div>
 
                 <nav class="nav flex-column gap-1">
-                    <a class="nav-link active" asp-area="" asp-controller="Home" asp-action="Index">
+                    <a class="nav-link @(currentController == "Home" ? "active" : "")" asp-area="" asp-controller="Home" asp-action="Index">
                         <i class="bi bi-house-door me-2"></i>Trang chủ
                     </a>
 
                     @if (vaiTro == "Admin")
                     {
                         <div class="text-muted small fw-bold mt-2 mb-1 px-2">QUẢN TRỊ</div>
-                        <a class="nav-link" asp-controller="LoaiPhuongTiens" asp-action="Index"><i class="bi bi-tags me-2"></i>Loại phương tiện</a>
-                        <a class="nav-link" asp-controller="ViTriDoXes" asp-action="Index"><i class="bi bi-p-square me-2"></i>Vị trí đỗ xe</a>
-                        <a class="nav-link" asp-controller="ChuPhuongTiens" asp-action="Index"><i class="bi bi-people me-2"></i>Chủ phương tiện</a>
-                        <a class="nav-link" asp-controller="PhuongTiens" asp-action="Index"><i class="bi bi-car-front me-2"></i>Quản lý phương tiện</a>
-                        <a class="nav-link" asp-controller="PhieuGuiXes" asp-action="Index"><i class="bi bi-card-checklist me-2"></i>Quản lý phiếu gửi</a>
-                        <a class="nav-link" asp-controller="VaoRa" asp-action="Index"><i class="bi bi-door-open me-2"></i>Vào/Ra</a>
-                        <a class="nav-link" asp-controller="ThongKe" asp-action="Index"><i class="bi bi-bar-chart-line me-2"></i>Thống kê</a>
+                        <a class="nav-link @(currentController == "LoaiPhuongTiens" ? "active" : "")" asp-controller="LoaiPhuongTiens" asp-action="Index"><i class="bi bi-tags me-2"></i>Loại phương tiện</a>
+                        <a class="nav-link @(currentController == "ViTriDoXes" ? "active" : "")" asp-controller="ViTriDoXes" asp-action="Index"><i class="bi bi-p-square me-2"></i>Vị trí đỗ xe</a>
+                        <a class="nav-link @(currentController == "ChuPhuongTiens" ? "active" : "")" asp-controller="ChuPhuongTiens" asp-action="Index"><i class="bi bi-people me-2"></i>Khách hàng</a>
+                        <a class="nav-link @(currentController == "PhuongTiens" ? "active" : "")" asp-controller="PhuongTiens" asp-action="Index"><i class="bi bi-car-front me-2"></i>Quản lý phương tiện</a>
+                        <a class="nav-link @(currentController == "PhieuGuiXes" ? "active" : "")" asp-controller="PhieuGuiXes" asp-action="Index"><i class="bi bi-card-checklist me-2"></i>Quản lý phiếu gửi</a>
+                        <a class="nav-link @(currentController == "VaoRa" ? "active" : "")" asp-controller="VaoRa" asp-action="Index"><i class="bi bi-door-open me-2"></i>Vào/Ra</a>
+                        <a class="nav-link @(currentController == "ThongKe" ? "active" : "")" asp-controller="ThongKe" asp-action="Index"><i class="bi bi-bar-chart-line me-2"></i>Thống kê</a>
                     }
                     else
                     {
-                        <a class="nav-link" asp-controller="PhieuGuiXes" asp-action="Create"><i class="bi bi-car-front me-2"></i>Đăng ký gửi xe</a>
-                        <a class="nav-link" asp-controller="PhuongTiens" asp-action="Index"><i class="bi bi-card-heading me-2"></i>Quản lý xe</a>
-                        <a class="nav-link" asp-controller="ViTriDoXes" asp-action="Index"><i class="bi bi-p-square me-2"></i>Bãi đỗ xe</a>
-                        <a class="nav-link" asp-controller="ChuPhuongTiens" asp-action="Index"><i class="bi bi-person me-2"></i>Khách hàng</a>
-                        <a class="nav-link" asp-controller="PhieuGuiXes" asp-action="Index"><i class="bi bi-clock-history me-2"></i>Lịch sử gửi xe</a>
+                        <a class="nav-link @(currentController == "PhieuGuiXes" && currentAction == "Create" ? "active" : "")" asp-controller="PhieuGuiXes" asp-action="Create"><i class="bi bi-car-front me-2"></i>Đăng ký gửi xe</a>
+                        <a class="nav-link @(currentController == "PhuongTiens" ? "active" : "")" asp-controller="PhuongTiens" asp-action="Index"><i class="bi bi-card-heading me-2"></i>Quản lý xe</a>
+                        <a class="nav-link @(currentController == "ViTriDoXes" ? "active" : "")" asp-controller="ViTriDoXes" asp-action="Index"><i class="bi bi-p-square me-2"></i>Bãi đỗ xe</a>
+                        <a class="nav-link @(currentController == "ChuPhuongTiens" ? "active" : "")" asp-controller="ChuPhuongTiens" asp-action="Index"><i class="bi bi-person me-2"></i>Khách hàng</a>
+                        <a class="nav-link @(currentController == "PhieuGuiXes" && currentAction == "Index" ? "active" : "")" asp-controller="PhieuGuiXes" asp-action="Index"><i class="bi bi-clock-history me-2"></i>Lịch sử gửi xe</a>
                     }
                 </nav>
             </div>
         </div>
 
         <div class="content-wrapper">
-            
+
             <header class="top-bar d-flex justify-content-between align-items-center">
                 <button class="btn btn-light border d-lg-none me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileSidebar" aria-label="Mở menu">
                     <i class="bi bi-list fs-5"></i>
@@ -204,9 +208,9 @@
                     <i class="bi bi-bell text-secondary fs-5" style="cursor:pointer;" title="Thông báo"></i>
 
                     <div class="dropdown">
-                        <button class="btn btn-light dropdown-toggle d-flex align-items-center gap-2 border-0 bg-transparent p-0" 
-                                type="button" 
-                                data-bs-toggle="dropdown" 
+                        <button class="btn btn-light dropdown-toggle d-flex align-items-center gap-2 border-0 bg-transparent p-0"
+                                type="button"
+                                data-bs-toggle="dropdown"
                                 aria-expanded="false">
                             <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width:34px; height:34px;">
                                 <i class="bi bi-person"></i>
