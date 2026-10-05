@@ -1,3 +1,7 @@
+// Họ và tên: Tăng Hoàng Giang
+// Mã sinh viên: 23103100031
+// Nội dung thực hiện: Quản lý phiếu gửi xe, Lọc, Tìm kiếm, Hủy phiếu (Module 4)
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QuanLyBaiDoXe_UNETI03_TI17A2HN.Models;
@@ -13,30 +17,6 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
         public PhieuGuiXesController(QuanLyBaiDoXe_UNETI03_TI17A2HNContext context)
         {
             _context = context;
-        }
-
-        // GET: PHIEUGUIXES
-        public async Task<IActionResult> Index()
-        {
-            var vaiTro = HttpContext.Session.GetString("VaiTro");
-            var maTaiKhoanStr = HttpContext.Session.GetString("MaTaiKhoan");
-
-            if (vaiTro == "Khách hàng" && int.TryParse(maTaiKhoanStr, out int maTaiKhoan))
-            {
-                var myPhieu = await _context.PhieuGuiXe
-                    .Include(p => p.PhuongTien)
-                    .ThenInclude(pt => pt.ChuPhuongTien)
-                    .Include(p => p.ViTriDoXe)
-                    .Where(p => p.PhuongTien.ChuPhuongTien.MaTaiKhoan == maTaiKhoan)
-                    .ToListAsync();
-                return View(myPhieu);
-            }
-
-            var listPhieu = _context.PhieuGuiXe
-                .Include(p => p.PhuongTien)
-                .Include(p => p.ViTriDoXe);
-
-            return View(await listPhieu.ToListAsync());
         }
 
         // GET: PHIEUGUIXES/Details/5
@@ -183,6 +163,107 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
         private bool PhieuGuiXeExists(int? maphieu)
         {
             return _context.PhieuGuiXe.Any(e => e.MaPhieu == maphieu);
+        }
+
+
+        // QUẢN LÝ DANH SÁCH, LỌC VÀ TÌM KIẾM (Module 4)
+        // GET: PHIEUGUIXES
+        public async Task<IActionResult> Index(string searchBienSo, string searchTenChuXe, string filterTrangThai, string filterLoaiXe, DateTime? filterNgayDangKy)
+        {
+            ViewData["searchBienSo"] = searchBienSo;
+            ViewData["searchTenChuXe"] = searchTenChuXe;
+            ViewData["filterTrangThai"] = filterTrangThai;
+            ViewData["filterLoaiXe"] = filterLoaiXe;
+            ViewData["filterNgayDangKy"] = filterNgayDangKy?.ToString("yyyy-MM-dd");
+            
+            ViewBag.LoaiXeList = await _context.LoaiPhuongTien.ToListAsync();
+
+            var vaiTro = HttpContext.Session.GetString("VaiTro");
+            var maTaiKhoanStr = HttpContext.Session.GetString("MaTaiKhoan");
+
+            var query = _context.PhieuGuiXe
+                .Include(p => p.PhuongTien)
+                    .ThenInclude(pt => pt.ChuPhuongTien)
+                .Include(p => p.PhuongTien)
+                    .ThenInclude(pt => pt.LoaiPhuongTien)
+                .Include(p => p.ViTriDoXe)
+                .AsQueryable();
+
+            if (vaiTro == "Khách hàng" && int.TryParse(maTaiKhoanStr, out int maTaiKhoan))
+            {
+                query = query.Where(p => p.PhuongTien.ChuPhuongTien.MaTaiKhoan == maTaiKhoan);
+            }
+
+            // Tìm kiếm theo Biển số xe (Contains = tìm kiếm tương đối)
+            if (!string.IsNullOrEmpty(searchBienSo))
+            {
+                query = query.Where(p => p.PhuongTien.BienSoXe.Contains(searchBienSo));
+            }
+            // Tìm kiếm theo Tên chủ xe
+            if (!string.IsNullOrEmpty(searchTenChuXe))
+            {
+                query = query.Where(p => p.PhuongTien.ChuPhuongTien.HoTen.Contains(searchTenChuXe));
+            }
+            
+            // Lọc chính xác theo Trạng thái phiếu
+            if (!string.IsNullOrEmpty(filterTrangThai))
+            {
+                query = query.Where(p => p.TrangThai == filterTrangThai);
+            }
+            // Lọc chính xác theo Loại xe
+            if (!string.IsNullOrEmpty(filterLoaiXe))
+            {
+                query = query.Where(p => p.PhuongTien.LoaiPhuongTien.TenLoaiPhuongTien == filterLoaiXe);
+            }
+            // Lọc chính xác theo Ngày đăng ký
+            if (filterNgayDangKy.HasValue)
+            {
+                query = query.Where(p => p.NgayDangKy.Date == filterNgayDangKy.Value.Date);
+            }
+
+            // Sắp xếp các phiếu mới nhất (vừa đăng ký) lên đầu bảng để dễ quản lý
+            query = query.OrderByDescending(p => p.NgayDangKy);
+
+            return View(await query.ToListAsync());
+        }
+
+        // HỦY PHIẾU (Module 4)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> HuyPhieu(int id)
+        {
+            var phieu = await _context.PhieuGuiXe.FindAsync(id);
+            if (phieu == null) return NotFound();
+
+            // Phân quyền: Đảm bảo Khách hàng KHÔNG thể dùng Inspect HTML để sửa ID và hủy phiếu của người khác
+            var vaiTro = HttpContext.Session.GetString("VaiTro");
+            var maTaiKhoanStr = HttpContext.Session.GetString("MaTaiKhoan");
+            if (vaiTro == "Khách hàng" && int.TryParse(maTaiKhoanStr, out int maTaiKhoan))
+            {
+                var phuongTien = await _context.PhuongTien
+                    .Include(pt => pt.ChuPhuongTien)
+                    .FirstOrDefaultAsync(pt => pt.MaPhuongTien == phieu.MaPhuongTien);
+                    
+                if (phuongTien?.ChuPhuongTien?.MaTaiKhoan != maTaiKhoan)
+                {
+                    return Unauthorized(); 
+                }
+            }
+
+            // Chỉ phiếu chưa được xác nhận vào bãi mới được hủy
+            if (phieu.TrangThai != "Chờ xác nhận")
+            {
+                TempData["ErrorMessage"] = "Chỉ có thể hủy phiếu đang ở trạng thái 'Chờ xác nhận'.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            // Thực hiện đổi trạng thái thành Đã hủy (Soft delete - Không xóa hẳn khỏi database)
+            phieu.TrangThai = "Đã hủy";
+            _context.Update(phieu);
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Đã hủy phiếu thành công!";
+            return RedirectToAction(nameof(Index));
         }
     }
 }

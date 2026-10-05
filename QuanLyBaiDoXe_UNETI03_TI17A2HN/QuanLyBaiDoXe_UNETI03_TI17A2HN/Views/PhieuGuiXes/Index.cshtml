@@ -1,71 +1,183 @@
+@* Họ và tên: Tăng Hoàng Giang *@
+@* Mã sinh viên: 23103100031 *@
+@* Nội dung thực hiện: Quản lý danh sách, Tìm kiếm, Lọc phiếu gửi xe (Module 4) *@
+
+@using Microsoft.AspNetCore.Http
 @model IEnumerable<QuanLyBaiDoXe_UNETI03_TI17A2HN.Models.PhieuGuiXe>
 
 @{
     ViewData["Title"] = "Quản lý Phiếu gửi xe";
+    var vaiTro = Context.Session.GetString("VaiTro");
 }
 
-<h1>Danh sách Phiếu gửi xe</h1>
+<h2 class="mb-4">@((vaiTro == "Khách hàng") ? "Lịch sử gửi xe của tôi" : "Quản lý Phiếu gửi xe")</h2>
 
+<!-- VÙNG HIỂN THỊ THÔNG BÁO THÀNH CÔNG / LỖI -->
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<!-- VÙNG TÌM KIẾM VÀ LỌC (Module 4) -->
+<div class="card mb-4 shadow-sm border-0">
+    <div class="card-body bg-light rounded">
+        <form asp-action="Index" method="get" class="row g-3 align-items-end">
+            <!-- Tìm kiếm theo biển số -->
+            <div class="col-md-2">
+                <label class="form-label fw-bold">Biển số xe</label>
+                <input type="text" name="searchBienSo" value="@ViewData["searchBienSo"]" class="form-control" placeholder="Nhập biển số..." />
+            </div>
+            
+            <!-- Admin mới được quyền tìm kiếm theo tên chủ xe -->
+            @if (vaiTro == "Admin")
+            {
+                <div class="col-md-2">
+                    <label class="form-label fw-bold">Tên chủ xe</label>
+                    <input type="text" name="searchTenChuXe" value="@ViewData["searchTenChuXe"]" class="form-control" placeholder="Nhập tên chủ xe..." />
+                </div>
+            }
+            
+            <!-- Lọc theo Ngày đăng ký -->
+            <div class="col-md-2">
+                <label class="form-label fw-bold">Ngày đăng ký</label>
+                <input type="date" name="filterNgayDangKy" value="@ViewData["filterNgayDangKy"]" class="form-control" />
+            </div>
+            
+            <!-- Lọc theo Loại phương tiện (đổ dữ liệu từ ViewBag) -->
+            <div class="col-md-2">
+                <label class="form-label fw-bold">Loại phương tiện</label>
+                <select name="filterLoaiXe" class="form-select">
+                    <option value="">-- Tất cả --</option>
+                    @if (ViewBag.LoaiXeList != null)
+                    {
+                        foreach (var loai in ViewBag.LoaiXeList)
+                        {
+                            if (ViewData["filterLoaiXe"]?.ToString() == loai.TenLoaiPhuongTien)
+                            {
+                                <option value="@loai.TenLoaiPhuongTien" selected>@loai.TenLoaiPhuongTien</option>
+                            }
+                            else
+                            {
+                                <option value="@loai.TenLoaiPhuongTien">@loai.TenLoaiPhuongTien</option>
+                            }
+                        }
+                    }
+                </select>
+            </div>
+            
+            <!-- Lọc theo Trạng thái -->
+            <div class="col-md-2">
+                <label class="form-label fw-bold">Trạng thái</label>
+                <select name="filterTrangThai" class="form-select">
+                    <option value="">-- Tất cả --</option>
+                    @{
+                        string[] trangThais = { "Chờ xác nhận", "Đang gửi", "Đã lấy xe", "Đã hủy" };
+                        foreach (var tt in trangThais)
+                        {
+                            if (ViewData["filterTrangThai"]?.ToString() == tt)
+                            {
+                                <option value="@tt" selected>@tt</option>
+                            }
+                            else
+                            {
+                                <option value="@tt">@tt</option>
+                            }
+                        }
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search me-1"></i> Tìm / Lọc</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Nút chức năng Đăng ký gửi xe -->
 <p>
-    <a asp-action="Create" class="btn btn-primary">Tạo mới</a>
+    @if (vaiTro == "Khách hàng")
+    {
+        <a asp-action="Create" class="btn btn-success"><i class="bi bi-plus-circle me-1"></i> Đăng ký gửi xe mới</a>
+    }
 </p>
-<div class="table-responsive">
+
+<!-- DANH SÁCH KẾT QUẢ PHIẾU GỬI XE -->
+<div class="table-responsive bg-white rounded shadow-sm p-3">
     <table class="table table-striped table-bordered align-middle">
-        <thead>
+        <thead class="table-dark">
             <tr>
                 <th>Biển số xe</th>
+                @if (vaiTro == "Admin") { <th>Chủ xe</th> }
+                <th>Loại xe</th>
                 <th>Vị trí đỗ</th>
-                <th>Ngày đăng ký</th>
-                <th>Dự kiến vào</th>
-                <th>Dự kiến ra</th>
-                <th>Vào thực tế</th>
-                <th>Ra thực tế</th>
-                <th>Đơn giá / giờ</th>
+                <th>Ngày ĐK</th>
+                <th>Vào/Ra dự kiến</th>
                 <th>Thành tiền</th>
                 <th>Trạng thái</th>
                 <th>Thao tác</th>
             </tr>
         </thead>
         <tbody>
-@foreach (var item in Model) {
-            <tr>
-                <td>
-                    @(item.PhuongTien != null ? item.PhuongTien.BienSoXe : item.MaPhuongTien.ToString())
-                </td>
-                <td>
-                    @(item.ViTriDoXe != null ? item.ViTriDoXe.TenViTri : item.MaViTri.ToString())
-                </td>
-                <td>
-                    @item.NgayDangKy.ToString("dd/MM/yyyy")
-                </td>
-                <td>
-                    @item.ThoiGianDuKienVao.ToString("dd/MM/yyyy HH:mm")
-                </td>
-                <td>
-                    @item.ThoiGianDuKienRa.ToString("dd/MM/yyyy HH:mm")
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.ThoiGianVaoThucTe)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.ThoiGianRaThucTe)
-                </td>
-                <td>
-                    @item.DonGiaTheoGio.ToString("N0") VNĐ
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.ThanhTien)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.TrangThai)
-                </td>
-                <td>
-                    <a asp-action="Edit" asp-route-maphieu="@item.MaPhieu">Sửa</a> |
-                    <a asp-action="Details" asp-route-maphieu="@item.MaPhieu">Chi tiết</a> |
-                    <a asp-action="Delete" asp-route-maphieu="@item.MaPhieu">Xóa</a>
-                </td>
-            </tr>
-}
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td class="fw-bold">@item.PhuongTien?.BienSoXe</td>
+                    @if (vaiTro == "Admin") { <td>@item.PhuongTien?.ChuPhuongTien?.HoTen</td> }
+                    <td>@item.PhuongTien?.LoaiPhuongTien?.TenLoaiPhuongTien</td>
+                    <td class="text-primary fw-bold">@item.ViTriDoXe?.TenViTri</td>
+                    <td>@item.NgayDangKy.ToString("dd/MM/yyyy")</td>
+                    <td style="font-size: 0.9em;">
+                        Vào: @item.ThoiGianDuKienVao.ToString("dd/MM HH:mm") <br/>
+                        Ra: @item.ThoiGianDuKienRa.ToString("dd/MM HH:mm")
+                    </td>
+                    <td class="text-danger fw-bold">
+                        @(item.ThanhTien?.ToString("N0") ?? "0") đ
+                    </td>
+                    
+                    <!-- Tô màu Badge trạng thái để dễ nhìn (Module 4) -->
+                    <td>
+                        @if (item.TrangThai == "Chờ xác nhận")
+                        {
+                            <span class="badge bg-warning text-dark">@item.TrangThai</span>
+                        }
+                        else if (item.TrangThai == "Đang gửi")
+                        {
+                            <span class="badge bg-success">@item.TrangThai</span>
+                        }
+                        else if (item.TrangThai == "Đã lấy xe")
+                        {
+                            <span class="badge bg-primary">@item.TrangThai</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">@item.TrangThai</span>
+                        }
+                    </td>
+                    
+                    <td>
+                        <a asp-action="Details" asp-route-maphieu="@item.MaPhieu" class="btn btn-sm btn-info text-white mb-1">Chi tiết</a>
+                        
+                        <!-- Nút Hủy Phiếu: Gọi Action HuyPhieu (Module 4) -->
+                        @if (item.TrangThai == "Chờ xác nhận")
+                        {
+                            <form asp-action="HuyPhieu" method="post" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn hủy phiếu gửi xe này?');">
+                                <input type="hidden" name="id" value="@item.MaPhieu" />
+                                <button type="submit" class="btn btn-sm btn-danger mb-1">Hủy</button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
         </tbody>
     </table>
 </div>
