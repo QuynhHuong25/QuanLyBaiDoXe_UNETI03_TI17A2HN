@@ -1,9 +1,14 @@
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
 @model QuanLyBaiDoXe_UNETI03_TI17A2HN.Models.ViTriDoXe
 
 @{
     ViewData["Title"] = "Chi tiết Vị trí đỗ xe";
+    //chỉ có admin mới có thể hiện phần sửa chi tiết
+    var vaiTro = HttpContextAccessor.HttpContext?.Session.GetString("VaiTro");
+    bool isAdmin = !string.IsNullOrEmpty(vaiTro) &&
+                  (vaiTro.Equals("Admin", StringComparison.OrdinalIgnoreCase) );
 }
-
 <div class="container mt-4">
     <div class="card shadow">
         <div class="card-header bg-primary text-white">
@@ -52,10 +57,13 @@
 
             </dl>
         </div>
-        <div class="card-footer text-end">
-     
-            <a asp-action="Edit" asp-route-mavitri="@Model?.MaViTri" class="btn btn-warning"><i class="bi bi-pencil-square"></i> Sửa vị trí này</a>
-            <a asp-action="Index" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Trở về danh sách</a>
-        </div>
+            <div class="card-footer text-end">
+                @* --- chỉ admin mới có thể hiện phần này và sửa --- *@
+                @if (isAdmin)
+                {
+                    <a asp-action="Edit" asp-route-mavitri="@Model?.MaViTri" class="btn btn-warning"><i class="bi bi-pencil-square"></i> Sửa vị trí này</a>
+                }
+                <a asp-action="Index" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Trở về danh sách</a>
+            </div>
     </div>
 </div>
