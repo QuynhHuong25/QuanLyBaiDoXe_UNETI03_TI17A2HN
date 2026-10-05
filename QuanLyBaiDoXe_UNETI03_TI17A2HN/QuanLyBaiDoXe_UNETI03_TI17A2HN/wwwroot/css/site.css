@@ -1,31 +1,74 @@
 html {
-  font-size: 14px;
+    font-size: 14px;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 60px;
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
+.form-floating > .form-control-plaintext::placeholder,
+.form-floating > .form-control::placeholder {
+    color: var(--bs-secondary-color);
+    text-align: end;
 }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
+.form-floating > .form-control-plaintext:focus::placeholder,
+.form-floating > .form-control:focus::placeholder {
+    text-align: start;
 }
+
+/* ==========================================
+   TÙY CHỈNH THANH CUỘN NGANG CHO BẢNG (TABLE)
+   ================================---------- */
+.table-responsive-custom,
+.table-responsive-scroll {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 1rem;
+}
+
+    /* Ép bảng giữ nguyên độ rộng theo nội dung, ngăn chặn việc cột bị co ép */
+    .table-responsive-custom table,
+    .table-responsive-scroll table {
+        width: max-content !important;
+        min-width: 1100px;
+    }
+
+    /* Tùy chỉnh giao diện thanh cuộn ngang */
+    .table-responsive-custom::-webkit-scrollbar,
+    .table-responsive-scroll::-webkit-scrollbar {
+        height: 8px;
+    }
+
+    .table-responsive-custom::-webkit-scrollbar-track,
+    .table-responsive-scroll::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+    }
+
+    .table-responsive-custom::-webkit-scrollbar-thumb,
+    .table-responsive-scroll::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 4px;
+    }
+
+        .table-responsive-custom::-webkit-scrollbar-thumb:hover,
+        .table-responsive-scroll::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
