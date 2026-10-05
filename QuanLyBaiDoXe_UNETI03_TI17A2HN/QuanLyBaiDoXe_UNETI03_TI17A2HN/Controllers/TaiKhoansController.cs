@@ -150,54 +150,78 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DangNhap(string tenDangNhap, string matKhau, bool ghiNho)
-        {
-            if (string.IsNullOrEmpty(tenDangNhap) || string.IsNullOrEmpty(matKhau))
-            {
-                ViewBag.Error = "Vui lòng nhập đầy đủ Tên đăng nhập và Mật khẩu!";
-                return View();
-            }
+ [ValidateAntiForgeryToken]
+ public async Task<IActionResult> DangNhap( string tenDangNhap,string matKhau, bool ghiNho)
+ {
+     if (string.IsNullOrWhiteSpace(tenDangNhap) ||
+         string.IsNullOrWhiteSpace(matKhau))
+     {
+         ViewBag.Error = "Vui lòng nhập đầy đủ Tên đăng nhập và Mật khẩu!";
+         return View();
+     }
 
-            var taiKhoan = await _context.TaiKhoan
-                .FirstOrDefaultAsync(t => t.TenDangNhap == tenDangNhap && t.MatKhau == matKhau);
+     // Tìm tài khoản bằng tên đăng nhập
+     var taiKhoan = await _context.TaiKhoan
+         .FirstOrDefaultAsync(t => t.TenDangNhap == tenDangNhap);
 
-            if (taiKhoan == null)
-            {
-                ViewBag.Error = "Tên đăng nhập hoặc mật khẩu không chính xác!";
-                return View();
-            }
+     if (taiKhoan == null)
+     {
+         ViewBag.Error = "Tên đăng nhập hoặc mật khẩu không chính xác!";
+         return View();
+     }
 
-            if (taiKhoan.TrangThai == false)
-            {
-                ViewBag.Error = "Tài khoản của bạn đã bị khóa!";
-                return View();
-            }
+     // QUAN TRỌNG: kiểm tra trạng thái trước khi kiểm tra mật khẩu
+     if (!taiKhoan.TrangThai)
+     {
+         ViewBag.Error = "Tài khoản của bạn đã bị khóa!";
+         return View();
+     }
 
-            CookieOptions cookieOptions = new CookieOptions
-            {
-                HttpOnly = true,
-                IsEssential = true
-            };
+     // Kiểm tra mật khẩu
+     if (taiKhoan.MatKhau != matKhau)
+     {
+         ViewBag.Error = "Tên đăng nhập hoặc mật khẩu không chính xác!";
+         return View();
+     }
 
-            if (ghiNho)
-            {
-                cookieOptions.Expires = DateTime.Now.AddDays(30);
-                Response.Cookies.Append("SavedUsername", tenDangNhap, cookieOptions);
-            }
-            else
-            {
-                Response.Cookies.Delete("SavedUsername");
-            }
+     CookieOptions cookieOptions = new CookieOptions
+     {
+         HttpOnly = true,
+         IsEssential = true
+     };
 
-            HttpContext.Session.SetString("MaTaiKhoan", taiKhoan.MaTaiKhoan.ToString());
-            HttpContext.Session.SetString("TenDangNhap", taiKhoan.TenDangNhap);
-            HttpContext.Session.SetString("HoTen", taiKhoan.HoTen ?? taiKhoan.TenDangNhap);
-            HttpContext.Session.SetString("VaiTro", string.IsNullOrEmpty(taiKhoan.VaiTro) ? "Khách hàng" : taiKhoan.VaiTro);
+     if (ghiNho)
+     {
+         cookieOptions.Expires = DateTime.Now.AddDays(30);
 
-            return RedirectToAction("Index", "Home");
-        }
+         Response.Cookies.Append(
+             "SavedUsername",
+             tenDangNhap,
+             cookieOptions);
+     }
+     else
+     {
+         Response.Cookies.Delete("SavedUsername");
+     }
 
+     HttpContext.Session.SetString(
+         "MaTaiKhoan",
+         taiKhoan.MaTaiKhoan.ToString());
+
+     HttpContext.Session.SetString(
+         "TenDangNhap",
+         taiKhoan.TenDangNhap);
+
+     HttpContext.Session.SetString(
+         "HoTen",
+         taiKhoan.HoTen ?? taiKhoan.TenDangNhap);
+
+     HttpContext.Session.SetString(
+         "VaiTro",
+         taiKhoan.VaiTro ?? "Khach");
+
+     return RedirectToAction("Index", "Home");
+ }
         [HttpGet]
         public async Task<IActionResult> DangXuat()
         {
