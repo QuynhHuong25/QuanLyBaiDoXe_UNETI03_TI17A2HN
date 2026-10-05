@@ -1,89 +1,171 @@
 @model IEnumerable<QuanLyBaiDoXe_UNETI03_TI17A2HN.Models.ChuPhuongTien>
 
 @{
-    ViewData["Title"] = "Index";
+    bool isAdmin = (ViewBag.UserRole as string) == "Admin";
+    ViewData["Title"] = isAdmin ? "Danh sách chủ phương tiện" : "Thông tin cá nhân";
+
+    string? keyword = ViewBag.CurrentFilter as string;
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int totalPages = ViewBag.TotalPages ?? 1;
+    int total = ViewBag.Total ?? 0;
 }
 
-<h1>Danh sách chủ phương tiện</h1>
+<div class="container-fluid px-4 py-3">
 
-<p>
-    <a asp-action="Create" class="btn btn-primary">Tạo mới</a>
-</p>
-<table class="table table-striped table-bordered">
-    <thead>
-        <tr>
-            <th>
-                Mã tài khoản
-            </th>
-            <th>
-                Họ tên
-            </th>
-            <th>
-                Ngày sinh
-            </th>
-            <th>
-                Giới tính
-            </th>
-            <th>
-                Số điện thoại
-            </th>
-            <th>
-                Email
-            </th>
-            <th>
-                Địa chỉ
-            </th>
-            <th>
-                Ngày đăng ký
-            </th>
-            <th>
-                Trạng thái 
-            </th>
-            <th>
-                Tên đăng nhập
-            </th>
-            <th>Thao tác</th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.MaTaiKhoan)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.HoTen)
-            </td>
-            <td>
-                @string.Format("{0:dd/MM/yyyy}", item.NgaySinh)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.GioiTinh)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.SoDienThoai)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Email)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DiaChi)
-            </td>
-            <td>
-                @string.Format("{0:dd/MM/yyyy}", item.NgayDangKy)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.TrangThai)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.TaiKhoan.TenDangNhap)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-machuphuongtien="@item.MaChuPhuongTien">Sửa</a> |
-                <a asp-action="Details" asp-route-machuphuongtien="@item.MaChuPhuongTien">Chi tiết</a> |
-                <a asp-action="Delete" asp-route-machuphuongtien="@item.MaChuPhuongTien">Xóa</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+    <h2 class="text-dark fw-bold mb-4">@ViewData["Title"]</h2>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (isAdmin)
+    {
+        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+            <div class="d-flex align-items-center gap-3">
+                <a asp-action="Create" class="btn btn-primary px-3 py-2 rounded-2 shadow-sm">
+                    <i class="bi bi-plus-circle me-1"></i> Tạo mới
+                </a>
+                <span class="text-muted">Tổng: <strong>@total</strong> chủ phương tiện</span>
+            </div>
+
+            <form asp-action="Index" method="get" class="d-flex gap-2">
+                <div class="input-group">
+                    <input type="text" name="searchString" value="@keyword" class="form-control"
+                           placeholder="Tìm theo họ tên hoặc SĐT..." style="min-width: 260px;" />
+                    <button class="btn btn-success px-3" type="submit">
+                        <i class="bi bi-search me-1"></i> Tìm kiếm
+                    </button>
+                    <a asp-action="Index" class="btn btn-outline-secondary">Đặt lại</a>
+                </div>
+            </form>
+        </div>
+    }
+
+    <div class="card shadow-sm border-0 rounded-3 p-3 bg-white">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-dark text-nowrap">
+                    <tr>
+                        <th class="py-3">Mã CPT</th>
+                        <th class="py-3">Mã tài khoản</th>
+                        <th class="py-3">Họ tên</th>
+                        <th class="py-3">Ngày sinh</th>
+                        <th class="py-3">Giới tính</th>
+                        <th class="py-3">Số điện thoại</th>
+                        <th class="py-3">Email</th>
+                        <th class="py-3">Địa chỉ</th>
+                        <th class="py-3">Ngày đăng ký</th>
+                        <th class="py-3">Trạng thái</th>
+                        <th class="py-3 text-center">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="fw-semibold">@item.MaChuPhuongTien</td>
+                                <td>@item.MaTaiKhoan</td>
+                                <td class="fw-medium text-dark">@item.HoTen</td>
+                                <td>@item.NgaySinh?.ToString("dd/MM/yyyy")</td>
+                                <td>@(item.GioiTinh ? "Nam" : "Nữ")</td>
+                                <td>@item.SoDienThoai</td>
+                                <td>@item.Email</td>
+                                <td>@item.DiaChi</td>
+                                <td>@item.NgayDangKy?.ToString("dd/MM/yyyy")</td>
+                                <td>
+                                    @if (item.TrangThai)
+                                    {
+                                        <span class="badge bg-success">Kích hoạt</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">Khóa</span>
+                                    }
+                                </td>
+                                <td class="text-center text-nowrap">
+                                    <!-- Nút Chi tiết dùng chung cho cả Admin và Khách hàng -->
+                                    <a asp-action="Details" asp-route-machuphuongtien="@item.MaChuPhuongTien"
+                                           class="btn btn-info btn-sm text-white text-decoration-none me-1" title="Xem chi tiết">
+                                        <i class="bi bi-eye"></i> Chi tiết
+                                    </a>
+
+                                    @if (isAdmin)
+                                    {
+                                        <!-- Form đổi trạng thái (Khóa / Kích hoạt) nhanh tại danh sách cho Admin -->
+                                        <form asp-action="CapNhatTrangThai" method="post" class="d-inline"
+                                              onsubmit="return confirm('@(item.TrangThai ? "Bạn có chắc muốn khóa chủ phương tiện này?" : "Bạn có muốn kích hoạt lại chủ phương tiện này?");');">
+                                            <input type="hidden" name="id" value="@item.MaChuPhuongTien" />
+                                            <input type="hidden" name="trangThai" value="@((!item.TrangThai).ToString().ToLower())" />
+                                            <input type="hidden" name="searchString" value="@keyword" />
+                                            <input type="hidden" name="page" value="@currentPage" />
+                                            
+                                            @if (item.TrangThai)
+                                            {
+                                                <button type="submit" class="btn btn-sm btn-outline-danger me-1" title="Khóa tài khoản">
+                                                    <i class="bi bi-lock"></i> Khóa
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <button type="submit" class="btn btn-sm btn-outline-success me-1" title="Mở khóa tài khoản">
+                                                    <i class="bi bi-unlock"></i> Kích hoạt
+                                                </button>
+                                            }
+                                        </form>
+
+                                        <!-- Nút Xóa dành cho Admin -->
+                                        <a asp-action="Delete" asp-route-machuphuongtien="@item.MaChuPhuongTien"
+                                               class="btn btn-danger btn-sm text-decoration-none" title="Xóa bản ghi">
+                                            <i class="bi bi-trash"></i> Xóa
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <!-- Nút Sửa dành cho Khách hàng (chỉ sửa thông tin của chính mình) -->
+                                        <a asp-action="Edit" asp-route-machuphuongtien="@item.MaChuPhuongTien"
+                                               class="btn btn-warning btn-sm text-white text-decoration-none" title="Cập nhật thông tin cá nhân">
+                                            <i class="bi bi-pencil-square"></i> Sửa
+                                        </a>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="11" class="text-center py-4 text-muted">
+                                @(isAdmin ? "Không có dữ liệu chủ phương tiện nào." : "Chưa có thông tin cá nhân gắn với tài khoản của bạn.")
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        @if (isAdmin && totalPages > 1)
+        {
+            <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center mb-0">
+                    <li class="page-item @(currentPage <= 1 ? "disabled" : "")">
+                        <a class="page-link" asp-action="Index" asp-route-page="@(currentPage - 1)" asp-route-searchString="@keyword">Trước</a>
+                    </li>
+                    @for (int i = 1; i <= totalPages; i++)
+                    {
+                        <li class="page-item @(currentPage == i ? "active" : "")">
+                            <a class="page-link" asp-action="Index" asp-route-page="@i" asp-route-searchString="@keyword">@i</a>
+                        </li>
+                    }
+                    <li class="page-item @(currentPage >= totalPages ? "disabled" : "")">
+                        <a class="page-link" asp-action="Index" asp-route-page="@(currentPage + 1)" asp-route-searchString="@keyword">Sau</a>
+                    </li>
+                </ul>
+            </nav>
+        }
+    </div>
+</div>
