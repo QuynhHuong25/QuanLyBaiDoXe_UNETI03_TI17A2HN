@@ -1,9 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QuanLyBaiDoXe_UNETI03_TI17A2HN.Models;
+using QuanLyBaiDoXe_UNETI03_TI17A2HN.Lọc;
+
+//23103100064 - Lương Thị Quỳnh Hương
 
 namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
 {
+    [PhanQuyen("Admin")]
     public class LoaiPhuongTiensController : Controller
     {
         private readonly QuanLyBaiDoXe_UNETI03_TI17A2HNContext _context;
