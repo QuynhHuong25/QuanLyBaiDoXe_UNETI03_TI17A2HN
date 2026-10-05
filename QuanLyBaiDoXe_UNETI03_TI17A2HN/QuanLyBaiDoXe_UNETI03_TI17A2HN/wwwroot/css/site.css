@@ -32,9 +32,7 @@ body {
     text-align: start;
 }
 
-/* ==========================================
-   TÙY CHỈNH THANH CUỘN NGANG CHO BẢNG (TABLE)
-   ================================---------- */
+
 .table-responsive-custom,
 .table-responsive-scroll {
     width: 100%;
@@ -43,14 +41,12 @@ body {
     margin-bottom: 1rem;
 }
 
-    /* Ép bảng giữ nguyên độ rộng theo nội dung, ngăn chặn việc cột bị co ép */
     .table-responsive-custom table,
     .table-responsive-scroll table {
         width: max-content !important;
         min-width: 1100px;
     }
 
-    /* Tùy chỉnh giao diện thanh cuộn ngang */
     .table-responsive-custom::-webkit-scrollbar,
     .table-responsive-scroll::-webkit-scrollbar {
         height: 8px;
@@ -72,7 +68,6 @@ body {
         .table-responsive-scroll::-webkit-scrollbar-thumb:hover {
             background: #a8a8a8;
         }
-/* Giao diện nút thao tác dạng viên thuốc bo tròn nhỏ gọn trong bảng */
 .btn-action-detail {
     background-color: #0dcaf0;
     color: #000;
@@ -118,7 +113,7 @@ body {
         color: #fff;
     }
 
-/* Badge trạng thái tùy chỉnh */
+
 .badge-status-active {
     background-color: #198754 !important;
     color: #fff;
