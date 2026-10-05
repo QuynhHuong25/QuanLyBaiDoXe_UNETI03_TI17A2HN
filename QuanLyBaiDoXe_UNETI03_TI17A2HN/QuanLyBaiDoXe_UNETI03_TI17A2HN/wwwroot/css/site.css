@@ -72,3 +72,67 @@ body {
         .table-responsive-scroll::-webkit-scrollbar-thumb:hover {
             background: #a8a8a8;
         }
+/* Giao diện nút thao tác dạng viên thuốc bo tròn nhỏ gọn trong bảng */
+.btn-action-detail {
+    background-color: #0dcaf0;
+    color: #000;
+    font-size: 0.85rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 4px;
+    font-weight: 500;
+    border: none;
+}
+
+    .btn-action-detail:hover {
+        background-color: #31d2f2;
+        color: #000;
+    }
+
+.btn-action-edit {
+    background-color: #ffc107;
+    color: #000;
+    font-size: 0.85rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 4px;
+    font-weight: 500;
+    border: none;
+}
+
+    .btn-action-edit:hover {
+        background-color: #ffca2c;
+        color: #000;
+    }
+
+.btn-action-delete {
+    background-color: #dc3545;
+    color: #fff;
+    font-size: 0.85rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 4px;
+    font-weight: 500;
+    border: none;
+}
+
+    .btn-action-delete:hover {
+        background-color: #bb2d3b;
+        color: #fff;
+    }
+
+/* Badge trạng thái tùy chỉnh */
+.badge-status-active {
+    background-color: #198754 !important;
+    color: #fff;
+    padding: 0.35em 0.65em;
+    border-radius: 4px;
+    font-weight: 500;
+    font-size: 0.8rem;
+}
+
+.badge-status-inactive {
+    background-color: #dc3545 !important;
+    color: #fff;
+    padding: 0.35em 0.65em;
+    border-radius: 4px;
+    font-weight: 500;
+    font-size: 0.8rem;
+}
