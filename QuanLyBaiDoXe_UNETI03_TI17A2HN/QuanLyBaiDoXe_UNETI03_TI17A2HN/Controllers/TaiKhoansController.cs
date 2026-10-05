@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QuanLyBaiDoXe_UNETI03_TI17A2HN.Models;
+using QuanLyBaiDoXe_UNETI03_TI17A2HN.Lọc;
 
 //Lương Thị Quỳnh Hương - 23103100064
 
@@ -16,6 +17,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
         }
 
         // GET: TAIKHOANS
+        [PhanQuyen("Admin")]
         public async Task<IActionResult> Index()
         {
             var quanLyBaiDoXe_UNETI03_TI17A2HNContext = _context.TaiKhoan.Include(t => t.ChuPhuongTien);
@@ -23,6 +25,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
         }
 
         // GET: TAIKHOANS/Details/5
+        [PhanQuyen("Admin")]
         public async Task<IActionResult> Details(int? mataikhoan)
         {
             if (mataikhoan == null)
@@ -42,6 +45,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
         }
 
         // GET: TAIKHOANS/Create
+        [PhanQuyen("Admin")]
         public IActionResult Create()
         {
             return View();
@@ -50,6 +54,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
         // POST: TAIKHOANS/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [PhanQuyen("Admin")]
         public async Task<IActionResult> Create([Bind("MaTaiKhoan,TenDangNhap,MatKhau,HoTen,Email,VaiTro,TrangThai,ChuPhuongTien")] TaiKhoan taikhoan)
         {
             if (ModelState.IsValid)
@@ -62,6 +67,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
         }
 
         // GET: TAIKHOANS/Edit/5
+        [PhanQuyen("Admin")]
         public async Task<IActionResult> Edit(int? mataikhoan)
         {
             if (mataikhoan == null)
@@ -80,6 +86,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
         // POST: TAIKHOANS/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [PhanQuyen("Admin")]
         public async Task<IActionResult> Edit(int? mataikhoan, [Bind("MaTaiKhoan,TenDangNhap,MatKhau,HoTen,Email,VaiTro,TrangThai,ChuPhuongTien")] TaiKhoan taikhoan)
         {
             if (mataikhoan != taikhoan.MaTaiKhoan)
@@ -111,6 +118,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
         }
 
         // GET: TAIKHOANS/Delete/5
+        [PhanQuyen("Admin")]
         public async Task<IActionResult> Delete(int? mataikhoan)
         {
             if (mataikhoan == null)
@@ -185,7 +193,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             HttpContext.Session.SetString("MaTaiKhoan", taiKhoan.MaTaiKhoan.ToString());
             HttpContext.Session.SetString("TenDangNhap", taiKhoan.TenDangNhap);
             HttpContext.Session.SetString("HoTen", taiKhoan.HoTen ?? taiKhoan.TenDangNhap);
-            HttpContext.Session.SetString("VaiTro", taiKhoan.VaiTro ?? "Khach");
+            HttpContext.Session.SetString("VaiTro", string.IsNullOrEmpty(taiKhoan.VaiTro) ? "Khách hàng" : taiKhoan.VaiTro);
 
             return RedirectToAction("Index", "Home");
         }
@@ -235,7 +243,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             taiKhoanMoi.HoTen = tenDangNhap;
             taiKhoanMoi.Email = $"{tenDangNhap.ToLower().Trim()}@gmail.com";
             taiKhoanMoi.VaiTro = "Khách hàng";
-            taiKhoanMoi.TrangThai = true; 
+            taiKhoanMoi.TrangThai = true;
 
             try
             {
@@ -308,6 +316,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
         // POST: TAIKHOANS/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [PhanQuyen("Admin")]
         public async Task<IActionResult> DeleteConfirmed(int? mataikhoan)
         {
             var taikhoan = await _context.TaiKhoan.FindAsync(mataikhoan);
