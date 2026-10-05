@@ -1,94 +1,76 @@
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
 @model QuanLyBaiDoXe_UNETI03_TI17A2HN.Models.ChuPhuongTien
 
 @{
-    ViewData["Title"] = "Details";
+    // Lấy vai trò từ Session để kiểm tra phân quyền hiển thị
+    var vaiTro = HttpContextAccessor.HttpContext?.Session.GetString("VaiTro");
+    bool isAdmin = !string.IsNullOrEmpty(vaiTro) && vaiTro.Equals("Admin", StringComparison.OrdinalIgnoreCase);
+
+    ViewData["Title"] = isAdmin ? "Chi tiết chủ phương tiện" : "Thông tin cá nhân";
 }
 
-<h1>Details</h1>
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0"><i class="bi bi-info-circle"></i> @ViewData["Title"]: @Model.HoTen</h4>
+        </div>
+        <div class="card-body">
+            <dl class="row mb-0">
 
-<div>
-    <h4>ChuPhuongTien</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.MaTaiKhoan)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.MaTaiKhoan)
-        </dd>
-    </dl>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.HoTen)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.HoTen)
-        </dd>
-    </dl>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.NgaySinh)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.NgaySinh)
-        </dd>
-    </dl>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.GioiTinh)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.GioiTinh)
-        </dd>
-    </dl>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.SoDienThoai)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.SoDienThoai)
-        </dd>
-    </dl>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Email)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Email)
-        </dd>
-    </dl>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.DiaChi)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.DiaChi)
-        </dd>
-    </dl>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.NgayDangKy)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.NgayDangKy)
-        </dd>
-    </dl>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.TrangThai)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.TrangThai)
-        </dd>
-    </dl>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.TaiKhoan)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.TaiKhoan)
-        </dd>
-    </dl>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.PhuongTiens)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.PhuongTiens)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.MaChuPhuongTien">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+                <dt class="col-sm-3 font-weight-bold py-2">Mã chủ phương tiện:</dt>
+                <dd class="col-sm-9 text-primary font-weight-bold py-2">@Html.DisplayFor(model => model.MaChuPhuongTien)</dd>
+
+                <dt class="col-sm-3 font-weight-bold py-2">Mã tài khoản:</dt>
+                <dd class="col-sm-9 py-2">@Html.DisplayFor(model => model.MaTaiKhoan)</dd>
+
+                <dt class="col-sm-3 font-weight-bold py-2">Họ tên:</dt>
+                <dd class="col-sm-9 font-weight-bold py-2">@Html.DisplayFor(model => model.HoTen)</dd>
+
+                <dt class="col-sm-3 font-weight-bold py-2">Ngày sinh:</dt>
+                <dd class="col-sm-9 py-2">@(Model.NgaySinh?.ToString("dd/MM/yyyy") ?? "Chưa cập nhật")</dd>
+
+                <dt class="col-sm-3 font-weight-bold py-2">Giới tính:</dt>
+                <dd class="col-sm-9 py-2">
+                    <span class="badge @(Model.GioiTinh ? "bg-info text-dark" : "bg-secondary")">
+                        @(Model.GioiTinh ? "Nam" : "Nữ")
+                    </span>
+                </dd>
+
+                <dt class="col-sm-3 font-weight-bold py-2">Số điện thoại:</dt>
+                <dd class="col-sm-9 py-2">@Html.DisplayFor(model => model.SoDienThoai)</dd>
+
+                <dt class="col-sm-3 font-weight-bold py-2">Email:</dt>
+                <dd class="col-sm-9 py-2">@Html.DisplayFor(model => model.Email)</dd>
+
+                <dt class="col-sm-3 font-weight-bold py-2">Địa chỉ:</dt>
+                <dd class="col-sm-9 py-2">@(string.IsNullOrEmpty(Model.DiaChi) ? "Chưa cập nhật" : Model.DiaChi)</dd>
+
+                <dt class="col-sm-3 font-weight-bold py-2">Ngày đăng ký:</dt>
+                <dd class="col-sm-9 py-2">@(Model.NgayDangKy?.ToString("dd/MM/yyyy HH:mm") ?? "Chưa xác định")</dd>
+
+                <dt class="col-sm-3 font-weight-bold py-2">Trạng thái tài khoản:</dt>
+                <dd class="col-sm-9 py-2">
+                    @if (Model.TrangThai)
+                    {
+                        <span class="badge bg-success">Kích hoạt</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger">Khóa</span>
+                    }
+                </dd>
+
+            </dl>
+        </div>
+        <div class="card-footer text-end">
+            @* Khách hàng hoặc Admin đều có quyền chỉnh sửa thông tin (Khách hàng sửa của mình, Admin sửa tùy ý theo Controller) *@
+            <a asp-action="Edit" asp-route-machuphuongtien="@Model?.MaChuPhuongTien" class="btn btn-warning">
+                <i class="bi bi-pencil-square"></i> Sửa thông tin này
+            </a>
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Trở về danh sách
+            </a>
+        </div>
+    </div>
 </div>
