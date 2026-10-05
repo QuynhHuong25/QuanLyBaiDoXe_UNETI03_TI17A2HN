@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QuanLyBaiDoXe_UNETI03_TI17A2HN.Models;
+using QuanLyBaiDoXe_UNETI03_TI17A2HN.Lọc;
 
 namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
 {
+    [PhanQuyen("Admin", "Khách hàng")]
     public class PhieuGuiXesController : Controller
     {
         private readonly QuanLyBaiDoXe_UNETI03_TI17A2HNContext _context;
@@ -16,6 +18,20 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
         // GET: PHIEUGUIXES
         public async Task<IActionResult> Index()
         {
+            var vaiTro = HttpContext.Session.GetString("VaiTro");
+            var maTaiKhoanStr = HttpContext.Session.GetString("MaTaiKhoan");
+
+            if (vaiTro == "Khách hàng" && int.TryParse(maTaiKhoanStr, out int maTaiKhoan))
+            {
+                var myPhieu = await _context.PhieuGuiXe
+                    .Include(p => p.PhuongTien)
+                    .ThenInclude(pt => pt.ChuPhuongTien)
+                    .Include(p => p.ViTriDoXe)
+                    .Where(p => p.PhuongTien.ChuPhuongTien.MaTaiKhoan == maTaiKhoan)
+                    .ToListAsync();
+                return View(myPhieu);
+            }
+
             var listPhieu = _context.PhieuGuiXe
                 .Include(p => p.PhuongTien)
                 .Include(p => p.ViTriDoXe);
@@ -33,12 +49,23 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
 
             var phieuguixe = await _context.PhieuGuiXe
                 .Include(p => p.PhuongTien)
+                .ThenInclude(pt => pt.ChuPhuongTien)
                 .Include(p => p.ViTriDoXe)
                 .FirstOrDefaultAsync(m => m.MaPhieu == maphieu);
 
             if (phieuguixe == null)
             {
                 return NotFound();
+            }
+
+            var vaiTro = HttpContext.Session.GetString("VaiTro");
+            var maTaiKhoanStr = HttpContext.Session.GetString("MaTaiKhoan");
+            if (vaiTro == "Khách hàng" && int.TryParse(maTaiKhoanStr, out int maTaiKhoan))
+            {
+                if (phieuguixe.PhuongTien?.ChuPhuongTien?.MaTaiKhoan != maTaiKhoan)
+                {
+                    return RedirectToAction(nameof(Index));
+                }
             }
 
             return View(phieuguixe);
@@ -65,6 +92,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
         }
 
         // GET: PHIEUGUIXES/Edit/5
+        [PhanQuyen("Admin")]
         public async Task<IActionResult> Edit(int? maphieu)
         {
             if (maphieu == null)
@@ -83,6 +111,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
         // POST: PHIEUGUIXES/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [PhanQuyen("Admin")]
         public async Task<IActionResult> Edit(int? maphieu, [Bind("MaPhieu,MaPhuongTien,MaViTri,NgayDangKy,ThoiGianDuKienVao,ThoiGianDuKienRa,ThoiGianVaoThucTe,ThoiGianRaThucTe,DonGiaTheoGio,ThanhTien,TrangThai")] PhieuGuiXe phieuguixe)
         {
             if (maphieu != phieuguixe.MaPhieu)
@@ -114,6 +143,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
         }
 
         // GET: PHIEUGUIXES/Delete/5
+        [PhanQuyen("Admin")]
         public async Task<IActionResult> Delete(int? maphieu)
         {
             if (maphieu == null)
@@ -137,6 +167,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
         // POST: PHIEUGUIXES/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [PhanQuyen("Admin")]
         public async Task<IActionResult> DeleteConfirmed(int? maphieu)
         {
             var phieuguixe = await _context.PhieuGuiXe.FindAsync(maphieu);
