@@ -1,81 +1,70 @@
 @model QuanLyBaiDoXe_UNETI03_TI17A2HN.Models.ChuPhuongTien
 
 @{
-    ViewData["Title"] = "Delete";
+    ViewData["Title"] = "Xóa Chủ phương tiện";
 }
 
-<h1>Delete</h1>
+<div class="row justify-content-center mt-0">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow border-danger">
+            <div class="card-header bg-danger text-white text-center">
+                <h3 class="mb-0">Cảnh báo: Xác nhận xóa chủ phương tiện?</h3>
+            </div>
+            <div class="card-body">
+                <p class="text-danger font-weight-bold text-center">Bạn có chắc chắn muốn xóa chủ phương tiện này khỏi hệ thống không?</p>
+                
+                <dl class="row mb-0">
+                    <dt class="col-sm-4 font-weight-bold py-1">Mã chủ phương tiện:</dt>
+                    <dd class="col-sm-8 text-primary font-weight-bold py-1">@Html.DisplayFor(model => model.MaChuPhuongTien)</dd>
 
-<h3>Are you sure you want to delete this?</h3>
-<div>
-    <h4>ChuPhuongTien</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.MaTaiKhoan)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.MaTaiKhoan)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.HoTen)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.HoTen)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.NgaySinh)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.NgaySinh)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.GioiTinh)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.GioiTinh)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.SoDienThoai)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.SoDienThoai)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Email)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Email)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.DiaChi)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.DiaChi)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.NgayDangKy)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.NgayDangKy)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.TrangThai)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.TrangThai)
-        </dd>
-        <dt class = "col-sm-2">
-            Tên đăng nhập
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.TaiKhoan.TenDangNhap)
-        </dd>
-    </dl>
-    
-    <form asp-action="Delete">
-        <input type="hidden" asp-for="MaChuPhuongTien" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-action="Index">Back to List</a>
-    </form>
+                    <dt class="col-sm-4 font-weight-bold py-1">Mã tài khoản:</dt>
+                    <dd class="col-sm-8 py-1">@Html.DisplayFor(model => model.MaTaiKhoan)</dd>
+
+                    <dt class="col-sm-4 font-weight-bold py-1">Họ tên:</dt>
+                    <dd class="col-sm-8 font-weight-bold py-1">@Html.DisplayFor(model => model.HoTen)</dd>
+
+                    <dt class="col-sm-4 font-weight-bold py-1">Ngày sinh:</dt>
+                    <dd class="col-sm-8 py-1">@(Model.NgaySinh?.ToString("dd/MM/yyyy") ?? "Chưa cập nhật")</dd>
+
+                    <dt class="col-sm-4 font-weight-bold py-1">Giới tính:</dt>
+                    <dd class="col-sm-8 py-1">
+                        <span class="badge @(Model.GioiTinh ? "bg-info text-dark" : "bg-secondary")">
+                            @(Model.GioiTinh ? "Nam" : "Nữ")
+                        </span>
+                    </dd>
+
+                    <dt class="col-sm-4 font-weight-bold py-1">Số điện thoại:</dt>
+                    <dd class="col-sm-8 py-1">@Html.DisplayFor(model => model.SoDienThoai)</dd>
+
+                    <dt class="col-sm-4 font-weight-bold py-1">Email:</dt>
+                    <dd class="col-sm-8 py-1">@Html.DisplayFor(model => model.Email)</dd>
+
+                    <dt class="col-sm-4 font-weight-bold py-1">Địa chỉ:</dt>
+                    <dd class="col-sm-8 py-1">@(string.IsNullOrEmpty(Model.DiaChi) ? "Chưa cập nhật" : Model.DiaChi)</dd>
+
+                    <dt class="col-sm-4 font-weight-bold py-1">Trạng thái:</dt>
+                    <dd class="col-sm-8 py-1">
+                        @if (Model.TrangThai)
+                        {
+                            <span class="badge bg-success">Kích hoạt</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">Khóa</span>
+                        }
+                    </dd>
+                </dl>
+
+                <form asp-action="Delete" class="mt-4">
+                    <!-- Truyền đúng tên khóa chính để Controller nhận diện khi POST -->
+                    <input type="hidden" asp-for="MaChuPhuongTien" />
+                    
+                    <div class="d-flex justify-content-between">
+                        <a asp-action="Index" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Trở về danh sách</a>
+                        <button type="submit" class="btn btn-danger px-4"><i class="bi bi-trash"></i> Xác nhận xóa</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
