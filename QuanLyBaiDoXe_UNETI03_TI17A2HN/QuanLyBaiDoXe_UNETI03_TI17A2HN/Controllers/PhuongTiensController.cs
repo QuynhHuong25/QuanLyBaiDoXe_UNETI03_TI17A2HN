@@ -2,9 +2,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using QuanLyBaiDoXe_UNETI03_TI17A2HN.Models;
+using QuanLyBaiDoXe_UNETI03_TI17A2HN.Lọc;
 
 namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
 {
+    [PhanQuyen("Admin", "Khách hàng")]
     public class PhuongTiensController : Controller
     {
         private readonly QuanLyBaiDoXe_UNETI03_TI17A2HNContext _context;
@@ -17,6 +19,19 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
         // GET: PHUONGTIENS
         public async Task<IActionResult> Index()
         {
+            var vaiTro = HttpContext.Session.GetString("VaiTro");
+            var maTaiKhoanStr = HttpContext.Session.GetString("MaTaiKhoan");
+
+            if (vaiTro == "Khách hàng" && int.TryParse(maTaiKhoanStr, out int maTaiKhoan))
+            {
+                var myVehicles = await _context.PhuongTien
+                    .Include(p => p.ChuPhuongTien)
+                    .Include(p => p.LoaiPhuongTien)
+                    .Where(p => p.ChuPhuongTien.MaTaiKhoan == maTaiKhoan)
+                    .ToListAsync();
+                return View(myVehicles);
+            }
+
             var quanLyBaiDoXeContext = _context.PhuongTien
                 .Include(p => p.ChuPhuongTien)
                 .Include(p => p.LoaiPhuongTien);
@@ -39,6 +54,16 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             if (phuongtien == null)
             {
                 return NotFound();
+            }
+
+            var vaiTro = HttpContext.Session.GetString("VaiTro");
+            var maTaiKhoanStr = HttpContext.Session.GetString("MaTaiKhoan");
+            if (vaiTro == "Khách hàng" && int.TryParse(maTaiKhoanStr, out int maTaiKhoan))
+            {
+                if (phuongtien.ChuPhuongTien?.MaTaiKhoan != maTaiKhoan)
+                {
+                    return RedirectToAction(nameof(Index));
+                }
             }
 
             return View(phuongtien);
@@ -76,11 +101,25 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                 return NotFound();
             }
 
-            var phuongtien = await _context.PhuongTien.FindAsync(maphuongtien);
+            var phuongtien = await _context.PhuongTien
+                .Include(p => p.ChuPhuongTien)
+                .FirstOrDefaultAsync(p => p.MaPhuongTien == maphuongtien);
+
             if (phuongtien == null)
             {
                 return NotFound();
             }
+
+            var vaiTro = HttpContext.Session.GetString("VaiTro");
+            var maTaiKhoanStr = HttpContext.Session.GetString("MaTaiKhoan");
+            if (vaiTro == "Khách hàng" && int.TryParse(maTaiKhoanStr, out int maTaiKhoan))
+            {
+                if (phuongtien.ChuPhuongTien?.MaTaiKhoan != maTaiKhoan)
+                {
+                    return RedirectToAction(nameof(Index));
+                }
+            }
+
             ViewData["MaChuPhuongTien"] = new SelectList(_context.ChuPhuongTien, "MaChuPhuongTien", "HoTen", phuongtien.MaChuPhuongTien);
             ViewData["MaLoaiPhuongTien"] = new SelectList(_context.LoaiPhuongTien, "MaLoaiPhuongTien", "TenLoaiPhuongTien", phuongtien.MaLoaiPhuongTien);
             return View(phuongtien);
@@ -122,6 +161,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
         }
 
         // GET: PHUONGTIENS/Delete/5
+        [PhanQuyen("Admin")]
         public async Task<IActionResult> Delete(int? maphuongtien)
         {
             if (maphuongtien == null)
@@ -145,6 +185,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
         // POST: PHUONGTIENS/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [PhanQuyen("Admin")]
         public async Task<IActionResult> DeleteConfirmed(int? maphuongtien)
         {
             var phuongtien = await _context.PhuongTien.FindAsync(maphuongtien);
