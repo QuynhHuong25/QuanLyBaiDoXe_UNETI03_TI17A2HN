@@ -5,11 +5,8 @@
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 
-		<!-- Tắt chế độ coi Warning thành Error -->
 		<TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-		<!-- Bỏ qua cảnh báo lỗ hổng bảo mật NuGet NU1901 -> NU1904 -->
 		<NoWarn>$(NoWarn);NU1901;NU1902;NU1903;NU1904</NoWarn>
-		<!-- Tắt tự động audit gói NuGet khi Build -->
 		<NuGetAudit>false</NuGetAudit>
 	</PropertyGroup>
 
