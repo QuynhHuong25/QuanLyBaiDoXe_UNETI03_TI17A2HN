@@ -27,17 +27,17 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                 .Include(c => c.TaiKhoan)
                 .AsQueryable();
 
-            // Lấy thông tin phân quyền của user đang đăng nhập (Giả sử lưu Role và UserId trong Claims)
+            
             var role = User.FindFirstValue(ClaimTypes.Role);
             var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            // Nếu không phải Admin, khách hàng chỉ được xem dữ liệu của chính mình
+           
             if (role != "Admin" && !string.IsNullOrEmpty(userIdStr) && int.TryParse(userIdStr, out int currentUserId))
             {
                 query = query.Where(c => c.MaTaiKhoan == currentUserId);
             }
 
-            // Xử lý tìm kiếm theo Họ tên hoặc Số điện thoại
+           
             if (!string.IsNullOrEmpty(searchString))
             {
                 query = query.Where(c => c.HoTen!.Contains(searchString) || c.SoDienThoai!.Contains(searchString));
@@ -82,13 +82,13 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("MaChuPhuongTien,MaTaiKhoan,HoTen,NgaySinh,GioiTinh,SoDienThoai,Email,DiaChi,NgayDangKy,TrangThai,TaiKhoan,PhuongTiens")] ChuPhuongTien chuPhuongTien)
         {
-            // Tự động gán ngày đăng ký bằng thời gian hiện tại nếu chưa có
+            
             if (chuPhuongTien.NgayDangKy == null)
             {
                 chuPhuongTien.NgayDangKy = DateTime.Now;
             }
 
-            // Kiểm tra xem Mã tài khoản này đã có chủ phương tiện nào sở hữu chưa
+           
             bool daTonTaiTaiKhoan = await _context.ChuPhuongTien
                 .AnyAsync(c => c.MaTaiKhoan == chuPhuongTien.MaTaiKhoan);
 
