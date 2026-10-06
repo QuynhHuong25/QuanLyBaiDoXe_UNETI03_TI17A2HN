@@ -1,79 +1,146 @@
 @model QuanLyBaiDoXe_UNETI03_TI17A2HN.Models.PhuongTien
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Sửa phương tiện";
 }
 
-<h1>Edit</h1>
+<div class="container py-4">
 
-<h4>PhuongTien</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="MaPhuongTien" />
-            <div class="form-group">
-                <label asp-for="MaChuPhuongTien" class="control-label"></label>
-                <input asp-for="MaChuPhuongTien" class="form-control" />
-                <span asp-validation-for="MaChuPhuongTien" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="MaLoaiPhuongTien" class="control-label"></label>
-                <input asp-for="MaLoaiPhuongTien" class="form-control" />
-                <span asp-validation-for="MaLoaiPhuongTien" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="BienSoXe" class="control-label"></label>
-                <input asp-for="BienSoXe" class="form-control" />
-                <span asp-validation-for="BienSoXe" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="NhanHieu" class="control-label"></label>
-                <input asp-for="NhanHieu" class="form-control" />
-                <span asp-validation-for="NhanHieu" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="MauSac" class="control-label"></label>
-                <input asp-for="MauSac" class="form-control" />
-                <span asp-validation-for="MauSac" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="MoTa" class="control-label"></label>
-                <input asp-for="MoTa" class="form-control" />
-                <span asp-validation-for="MoTa" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="TrangThai" class="control-label"></label>
-                <input asp-for="TrangThai" class="form-check-input" />
-                <span asp-validation-for="TrangThai" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ChuPhuongTien" class="control-label"></label>
-                <input asp-for="ChuPhuongTien" class="form-control" />
-                <span asp-validation-for="ChuPhuongTien" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="LoaiPhuongTien" class="control-label"></label>
-                <input asp-for="LoaiPhuongTien" class="form-control" />
-                <span asp-validation-for="LoaiPhuongTien" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="PhieuGuiXes" class="control-label"></label>
-                <input asp-for="PhieuGuiXes" class="form-control" />
-                <span asp-validation-for="PhieuGuiXes" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+    <!-- TIÊU ĐỀ -->
+    <div class="mb-4">
+        <h2 class="fw-bold">
+            <i class="bi bi-pencil-square me-2"></i>
+            Sửa phương tiện
+        </h2>
+        <p class="text-muted mb-0">
+            Cập nhật thông tin và trạng thái phương tiện.
+        </p>
     </div>
-</div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
+    <!-- FORM -->
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-4">
+            <form asp-action="Edit" method="post">
+                @Html.AntiForgeryToken()
+
+                <!-- ID -->
+                <input type="hidden" asp-for="MaPhuongTien" />
+
+                <!-- VALIDATION -->
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                <!-- CHỦ PHƯƠNG TIỆN -->
+                <div class="mb-3">
+                    <label asp-for="MaChuPhuongTien" class="form-label fw-semibold">
+                        Chủ phương tiện
+                    </label>
+                    <select asp-for="MaChuPhuongTien"
+                            asp-items="ViewBag.MaChuPhuongTien"
+                            class="form-select">
+                        <option value="">-- Chọn chủ phương tiện --</option>
+                    </select>
+                    <span asp-validation-for="MaChuPhuongTien" class="text-danger"></span>
+                </div>
+
+                <!-- LOẠI PHƯƠNG TIỆN -->
+                <div class="mb-3">
+                    <label asp-for="MaLoaiPhuongTien" class="form-label fw-semibold">
+                        Loại phương tiện
+                        <span class="text-danger">*</span>
+                    </label>
+                    <select asp-for="MaLoaiPhuongTien"
+                            asp-items="ViewBag.MaLoaiPhuongTien"
+                            class="form-select">
+                        <option value="">-- Chọn loại phương tiện --</option>
+                    </select>
+                    <span asp-validation-for="MaLoaiPhuongTien" class="text-danger"></span>
+                </div>
+
+                <div class="row">
+                    <!-- BIỂN SỐ -->
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="BienSoXe" class="form-label fw-semibold">
+                            Biển số xe
+                            <span class="text-danger">*</span>
+                        </label>
+                        <input asp-for="BienSoXe"
+                               class="form-control"
+                               autocomplete="off"
+                               placeholder="Ví dụ: 29A-12345" />
+                        <span asp-validation-for="BienSoXe" class="text-danger"></span>
+                    </div>
+
+                    <!-- NHÃN HIỆU -->
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="NhanHieu" class="form-label fw-semibold">
+                            Nhãn hiệu
+                        </label>
+                        <input asp-for="NhanHieu"
+                               class="form-control"
+                               placeholder="Ví dụ: Honda, Toyota..." />
+                        <span asp-validation-for="NhanHieu" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <!-- MÀU SẮC -->
+                <div class="mb-3">
+                    <label asp-for="MauSac" class="form-label fw-semibold">
+                        Màu sắc
+                    </label>
+                    <input asp-for="MauSac"
+                           class="form-control"
+                           placeholder="Ví dụ: Đen, Trắng, Đỏ..." />
+                    <span asp-validation-for="MauSac" class="text-danger"></span>
+                </div>
+
+                <!-- MÔ TẢ -->
+                <div class="mb-3">
+                    <label asp-for="MoTa" class="form-label fw-semibold">
+                        Mô tả
+                    </label>
+                    <textarea asp-for="MoTa"
+                              class="form-control"
+                              rows="4"
+                              placeholder="Nhập mô tả phương tiện..."></textarea>
+                    <span asp-validation-for="MoTa" class="text-danger"></span>
+                </div>
+
+                <!-- TRẠNG THÁI -->
+                <div class="mb-4">
+                    <label asp-for="TrangThai" class="form-label fw-semibold">
+                        Trạng thái
+                        <span class="text-danger">*</span>
+                    </label>
+                    <select asp-for="TrangThai" class="form-select">
+                        <option value="true">Hoạt động</option>
+                        <option value="false">Ngừng hoạt động</option>
+                    </select>
+                    <span asp-validation-for="TrangThai" class="text-danger"></span>
+                    <div class="form-text">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Xe đang gửi trong bãi không thể chuyển sang trạng thái Ngừng hoạt động.
+                    </div>
+                </div>
+
+                <!-- BUTTON -->
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save me-1"></i>
+                        Lưu thay đổi
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left me-1"></i>
+                        Quay lại
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
