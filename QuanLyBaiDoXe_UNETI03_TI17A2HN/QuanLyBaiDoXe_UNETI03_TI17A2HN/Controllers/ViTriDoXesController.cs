@@ -37,9 +37,9 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                 .Include(v => v.LoaiPhuongTien)
                 .AsQueryable();
 
-            query = TimKiem(query, searchString);                            
-            query = LocDaDieuKien(query, maLoaiPhuongTien, khuVuc, tang, trangThai); 
-            query = SapXep(query, sortOrder);                            
+            query = TimKiem(query, searchString);
+            query = LocDaDieuKien(query, maLoaiPhuongTien, khuVuc, tang, trangThai);
+            query = SapXep(query, sortOrder);
 
             return View(await query.ToListAsync());
         }
@@ -81,7 +81,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             return query;
         }
 
-     //Sắp xếp
+        //Sắp xếp
         private IQueryable<ViTriDoXe> SapXep(IQueryable<ViTriDoXe> query, string sortOrder)
         {
             switch (sortOrder)
@@ -89,12 +89,12 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                 case "name_desc":
                     return query.OrderByDescending(v => v.TenViTri);
                 case "tang_asc":
-                    return query.OrderBy(v => v.Tang);              
+                    return query.OrderBy(v => v.Tang);
                 case "tang_desc":
-                    return query.OrderByDescending(v => v.Tang);     
+                    return query.OrderByDescending(v => v.Tang);
                 case "name_asc":
                 default:
-                    return query.OrderBy(v => v.TenViTri);          
+                    return query.OrderBy(v => v.TenViTri);
             }
         }
 
