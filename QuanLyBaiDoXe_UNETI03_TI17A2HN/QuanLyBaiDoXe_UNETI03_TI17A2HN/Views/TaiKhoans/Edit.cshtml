@@ -1,64 +1,78 @@
+@* Lương Thị Quỳnh Hương - 23103100064 *@
 @model QuanLyBaiDoXe_UNETI03_TI17A2HN.Models.TaiKhoan
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Cập nhật thông tin cá nhân";
 }
 
-<h1>Edit</h1>
+<style>
+    .card-custom {
+        background-color: #ffffff;
+        border: 1px solid #eaedf1;
+        border-radius: 1rem;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.03);
+    }
+</style>
 
-<h4>TaiKhoan</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="MaTaiKhoan" />
-            <div class="form-group">
-                <label asp-for="TenDangNhap" class="control-label"></label>
-                <input asp-for="TenDangNhap" class="form-control" />
-                <span asp-validation-for="TenDangNhap" class="text-danger"></span>
+<div class="container-fluid px-0">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1 small text-muted">
+                    <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-decoration-none text-secondary">Trang chủ</a></li>
+                    <li class="breadcrumb-item"><a asp-action="Details" asp-route-id="@Model.MaTaiKhoan" class="text-decoration-none text-secondary">Chi tiết</a></li>
+                    <li class="breadcrumb-item active text-dark" aria-current="page">Chỉnh sửa</li>
+                </ol>
+            </nav>
+            <h4 class="fw-bold m-0 text-dark">Chỉnh Sửa Thông Tin Cá Nhân</h4>
+        </div>
+        <a asp-action="Details" asp-route-id="@Model.MaTaiKhoan" class="btn btn-light border btn-sm px-3 rounded-pill text-secondary shadow-sm">
+            <i class="bi bi-arrow-left"></i> Hủy & Quay lại
+        </a>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+            <div class="card card-custom p-4">
+                <form asp-action="Edit" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <input type="hidden" asp-for="MaTaiKhoan" />
+                    <input type="hidden" asp-for="TenDangNhap" />
+                    <input type="hidden" asp-for="MatKhau" />
+                    <input type="hidden" asp-for="VaiTro" />
+                    <input type="hidden" asp-for="TrangThai" />
+
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-medium">Tên đăng nhập</label>
+                        <input value="@Model.TenDangNhap" class="form-control bg-light" disabled />
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="HoTen" class="form-label fw-medium">Họ và tên</label>
+                        <input asp-for="HoTen" class="form-control" placeholder="Nhập họ và tên" />
+                        <span asp-validation-for="HoTen" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label fw-medium">Email</label>
+                        <input asp-for="Email" type="email" class="form-control" placeholder="Nhập địa chỉ email" />
+                        <span asp-validation-for="Email" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-medium">Mật khẩu mới <small class="text-muted fw-normal">(Bỏ trống nếu không muốn đổi)</small></label>
+                        <input type="password" name="MatKhauMoi" class="form-control" placeholder="••••••••" />
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        <a asp-action="Details" asp-route-id="@Model.MaTaiKhoan" class="btn btn-light border rounded-pill px-4">Hủy</a>
+                        <button type="submit" class="btn btn-primary rounded-pill px-4">
+                            <i class="bi bi-check-lg me-1"></i> Lưu thay đổi
+                        </button>
+                    </div>
+                </form>
             </div>
-            <div class="form-group">
-                <label asp-for="MatKhau" class="control-label"></label>
-                <input asp-for="MatKhau" class="form-control" />
-                <span asp-validation-for="MatKhau" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="HoTen" class="control-label"></label>
-                <input asp-for="HoTen" class="form-control" />
-                <span asp-validation-for="HoTen" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Email" class="control-label"></label>
-                <input asp-for="Email" class="form-control" />
-                <span asp-validation-for="Email" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="VaiTro" class="control-label"></label>
-                <input asp-for="VaiTro" class="form-control" />
-                <span asp-validation-for="VaiTro" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="TrangThai" class="control-label"></label>
-                <input asp-for="TrangThai" class="form-check-input" />
-                <span asp-validation-for="TrangThai" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ChuPhuongTien" class="control-label"></label>
-                <input asp-for="ChuPhuongTien" class="form-control" />
-                <span asp-validation-for="ChuPhuongTien" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
 </div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}

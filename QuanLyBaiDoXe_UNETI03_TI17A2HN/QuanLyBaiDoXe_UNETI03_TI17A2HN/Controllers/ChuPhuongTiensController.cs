@@ -22,13 +22,11 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             int pageSize = 10;
             int pageNumber = page ?? 1;
 
-            ViewBag.CurrentFilter = searchString;
-
             var query = _context.ChuPhuongTien
                 .Include(c => c.TaiKhoan)
                 .AsQueryable();
 
-            // Kiểm tra phân quyền truy cập dữ liệu
+           
             var vaiTro = HttpContext.Session.GetString("VaiTro");
             var maTaiKhoanStr = HttpContext.Session.GetString("MaTaiKhoan");
 
@@ -38,10 +36,13 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                 query = query.Where(c => c.MaTaiKhoan == maTaiKhoan);
             }
 
-            // Xử lý tìm kiếm theo Họ tên hoặc Số điện thoại
+          
             if (!string.IsNullOrEmpty(searchString))
             {
-                query = query.Where(c => c.HoTen!.Contains(searchString) || c.SoDienThoai!.Contains(searchString));
+                query = query.Where(c =>
+                    (c.HoTen != null && c.HoTen.Contains(searchString)) ||
+                    (c.SoDienThoai != null && c.SoDienThoai.Contains(searchString))
+                );
             }
 
             int totalItems = await query.CountAsync();
@@ -53,8 +54,11 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                 .Take(pageSize)
                 .ToListAsync();
 
+            ViewBag.UserRole = vaiTro;
+            ViewBag.Total = totalItems;
             ViewBag.CurrentPage = pageNumber;
             ViewBag.TotalPages = totalPages;
+            ViewBag.CurrentFilter = searchString;
 
             return View(items);
         }
@@ -171,7 +175,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
         // POST: CHUPHUONGTIENS/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int? machuphuongtien, [Bind("MaChuPhuongTien,MaTaiKhoan,HoTen,NgaySinh,GioiTinh,SoDienThoai,Email,DiaChi,NgayDangKy,TrangThai,TaiKhoan,PhuongTiens")] ChuPhuongTien chuphuongtien)
+        public async Task<IActionResult> Edit(int? machuphuongtien, [Bind("MaChuPhuongTien,MaTaiKhoan,HoTen,NgaySinh,GioiTinh,SoDienThoai,Email,DiaChi,NgayDangKy")] ChuPhuongTien chuphuongtien)
         {
             if (machuphuongtien != chuphuongtien.MaChuPhuongTien)
             {
@@ -215,6 +219,58 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             return View(chuphuongtien);
         }
 
+
+        [HttpPost]
+         [ValidateAntiForgeryToken]
+         [PhanQuyen("Admin")]
+         public async Task<IActionResult> CapNhatTrangThai(
+             int id,
+             bool trangThai,
+             string? searchString,
+             int page = 1)
+         {
+             var chuPhuongTien = await _context.ChuPhuongTien
+                 .Include(c => c.TaiKhoan)
+                 .FirstOrDefaultAsync(c => c.MaChuPhuongTien == id);
+        
+             if (chuPhuongTien == null)
+             {
+                 return NotFound();
+             }
+        
+             // Cập nhật trạng thái chủ phương tiện
+             chuPhuongTien.TrangThai = trangThai;
+        
+             // Cập nhật trạng thái tài khoản đăng nhập
+             if (chuPhuongTien.TaiKhoan != null)
+             {
+                 chuPhuongTien.TaiKhoan.TrangThai = trangThai;
+             }
+        
+             await _context.SaveChangesAsync();
+        
+             // Kiểm tra lại dữ liệu sau khi lưu
+             var taiKhoanKiemTra = await _context.TaiKhoan
+                 .FirstOrDefaultAsync(t => t.MaTaiKhoan == chuPhuongTien.MaTaiKhoan);
+        
+             if (taiKhoanKiemTra == null)
+             {
+                 TempData["SuccessMessage"] =
+                     "Đã cập nhật chủ phương tiện nhưng không tìm thấy tài khoản liên kết!";
+             }
+             else
+             {
+                 TempData["SuccessMessage"] =
+                     $"Đã {(trangThai ? "kích hoạt" : "khóa")} tài khoản thành công! " +
+                     $"Trạng thái tài khoản: {taiKhoanKiemTra.TrangThai}";
+             }
+        
+             return RedirectToAction(nameof(Index), new
+             {
+                 page,
+                 searchString
+             });
+         }
         // GET: CHUPHUONGTIENS/Delete/5
         [PhanQuyen("Admin")]
         public async Task<IActionResult> Delete(int? machuphuongtien)

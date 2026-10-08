@@ -24,21 +24,39 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             return View(await quanLyBaiDoXe_UNETI03_TI17A2HNContext.ToListAsync());
         }
 
-        // GET: TAIKHOANS/Details/5
-        [PhanQuyen("Admin")]
+        // GET: TAIKHOANS/Details
         public async Task<IActionResult> Details(int? mataikhoan)
         {
             if (mataikhoan == null)
             {
-                return NotFound();
+                var maTaiKhoanStr = HttpContext.Session.GetString("MaTaiKhoan");
+                if (int.TryParse(maTaiKhoanStr, out int currentId))
+                {
+                    mataikhoan = currentId;
+                }
+                else
+                {
+                    return RedirectToAction("DangNhap", "TaiKhoan");
+                }
             }
 
             var taikhoan = await _context.TaiKhoan
                 .Include(t => t.ChuPhuongTien)
                 .FirstOrDefaultAsync(m => m.MaTaiKhoan == mataikhoan);
+
             if (taikhoan == null)
             {
                 return NotFound();
+            }
+
+            var vaiTro = HttpContext.Session.GetString("VaiTro");
+            var currentMaTaiKhoanStr = HttpContext.Session.GetString("MaTaiKhoan");
+            if (vaiTro == "Khách hàng" && int.TryParse(currentMaTaiKhoanStr, out int myId))
+            {
+                if (taikhoan.MaTaiKhoan != myId)
+                {
+                    return RedirectToAction("Index", "Home");
+                }
             }
 
             return View(taikhoan);
@@ -66,30 +84,45 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             return View(taikhoan);
         }
 
-        // GET: TAIKHOANS/Edit/5
-        [PhanQuyen("Admin")]
-        public async Task<IActionResult> Edit(int? mataikhoan)
+        // GET: TaiKhoans/Edit/5
+        public async Task<IActionResult> Edit(int? id)
         {
-            if (mataikhoan == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            var taikhoan = await _context.TaiKhoan.FindAsync(mataikhoan);
-            if (taikhoan == null)
+            var taiKhoan = await _context.TaiKhoan.FindAsync(id);
+            if (taiKhoan == null)
             {
                 return NotFound();
             }
-            return View(taikhoan);
+
+            // Lấy thông tin đăng nhập từ Session
+            string vaiTro = HttpContext.Session.GetString("VaiTro") ?? "";
+            string tenDangNhapSession = HttpContext.Session.GetString("TenDangNhap") ?? "";
+            int? maTaiKhoanSession = HttpContext.Session.GetInt32("MaTaiKhoan");
+
+            // Kiểm tra quyền: Chỉ chính tài khoản đó hoặc Admin mới được phép chỉnh sửa
+            bool isChinhToi = (maTaiKhoanSession != null && taiKhoan.MaTaiKhoan == maTaiKhoanSession)
+                           || (!string.IsNullOrEmpty(tenDangNhapSession) && taiKhoan.TenDangNhap == tenDangNhapSession)
+                           || (vaiTro == "Admin");
+
+            if (!isChinhToi)
+            {
+                TempData["ErrorMessage"] = "Bạn không có quyền chỉnh sửa tài khoản này!";
+                return RedirectToAction(nameof(Details), new { id = id });
+            }
+
+            return View(taiKhoan);
         }
 
-        // POST: TAIKHOANS/Edit/5
+        // POST: TaiKhoans/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [PhanQuyen("Admin")]
-        public async Task<IActionResult> Edit(int? mataikhoan, [Bind("MaTaiKhoan,TenDangNhap,MatKhau,HoTen,Email,VaiTro,TrangThai,ChuPhuongTien")] TaiKhoan taikhoan)
+        public async Task<IActionResult> Edit(int id, [Bind("MaTaiKhoan,TenDangNhap,MatKhau,HoTen,Email,VaiTro,TrangThai")] TaiKhoan taiKhoan, string? MatKhauMoi)
         {
-            if (mataikhoan != taikhoan.MaTaiKhoan)
+            if (id != taiKhoan.MaTaiKhoan)
             {
                 return NotFound();
             }
@@ -98,12 +131,31 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             {
                 try
                 {
-                    _context.Update(taikhoan);
+                    var userInDb = await _context.TaiKhoan.FindAsync(id);
+                    if (userInDb == null) return NotFound();
+
+                    // Cập nhật các thông tin cơ bản
+                    userInDb.HoTen = taiKhoan.HoTen;
+                    userInDb.Email = taiKhoan.Email;
+
+                    // Đổi mật khẩu nếu người dùng nhập mật khẩu mới
+                    if (!string.IsNullOrEmpty(MatKhauMoi))
+                    {
+                        userInDb.MatKhau = MatKhauMoi;
+                    }
+
+                    _context.Update(userInDb);
                     await _context.SaveChangesAsync();
+
+                    // Cập nhật lại Session Họ Tên nếu có thay đổi
+                    HttpContext.Session.SetString("HoTen", userInDb.HoTen ?? userInDb.TenDangNhap);
+
+                    TempData["SuccessMessage"] = "Cập nhật thông tin thành công!";
+                    return RedirectToAction(nameof(Details), new { id = userInDb.MaTaiKhoan });
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!TaiKhoanExists(taikhoan.MaTaiKhoan))
+                    if (!TaiKhoanExists(taiKhoan.MaTaiKhoan))
                     {
                         return NotFound();
                     }
@@ -112,9 +164,13 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
             }
-            return View(taikhoan);
+            return View(taiKhoan);
+        }
+
+        private bool TaiKhoanExists(int id)
+        {
+            return _context.TaiKhoan.Any(e => e.MaTaiKhoan == id);
         }
 
         // GET: TAIKHOANS/Delete/5
