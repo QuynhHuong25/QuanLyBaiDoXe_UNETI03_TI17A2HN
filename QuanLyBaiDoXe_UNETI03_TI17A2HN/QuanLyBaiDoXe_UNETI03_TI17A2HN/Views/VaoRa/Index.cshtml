@@ -1,0 +1,107 @@
+@* Họ và tên: Tăng Hoàng Giang *@
+@* Mã sinh viên: 23103100031 *@
+@* Nội dung thực hiện: Giao diện Quản lý xe Vào / Ra (Module 4) *@
+
+@model IEnumerable<QuanLyBaiDoXe_UNETI03_TI17A2HN.Models.PhieuGuiXe>
+
+@{
+    ViewData["Title"] = "Điều phối Xe Vào/Ra";
+}
+
+<h2 class="mb-4">Điều phối Xe Vào/Ra</h2>
+
+<!-- VÙNG HIỂN THỊ THÔNG BÁO THÀNH CÔNG / LỖI -->
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<!-- VÙNG TÌM KIẾM THEO BIỂN SỐ -->
+<div class="card mb-4 shadow-sm border-0">
+    <div class="card-body bg-light rounded">
+        <form asp-action="Index" method="get" class="row g-3">
+            <div class="col-md-4">
+                <input type="text" name="searchBienSo" value="@ViewData["searchBienSo"]" class="form-control" placeholder="Tìm kiếm nhanh Biển số xe..." />
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search me-1"></i> Tìm</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- DANH SÁCH XE CHỜ VÀO VÀ ĐANG GỬI TRONG BÃI -->
+<div class="table-responsive bg-white rounded shadow-sm p-3">
+    <table class="table table-hover align-middle">
+        <thead class="table-dark">
+            <tr>
+                <th>Biển số</th>
+                <th>Vị trí đỗ</th>
+                <th>Dự kiến vào</th>
+                <th>Vào thực tế</th>
+                <th>Trạng thái</th>
+                <th class="text-center">Xác nhận</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (!Model.Any())
+            {
+                <tr>
+                    <td colspan="6" class="text-center">Không có xe nào đang chờ vào hoặc đang gửi.</td>
+                </tr>
+            }
+            @foreach (var item in Model)
+            {
+                <!-- Dùng class table-warning (màu vàng) cho xe đang chờ và table-success (màu xanh) cho xe đang trong bãi -->
+                <tr class="@(item.TrangThai == "Chờ xác nhận" ? "table-warning" : "table-success")">
+                    <td class="fw-bold fs-5">@item.PhuongTien?.BienSoXe</td>
+                    <td class="fw-bold text-primary">@item.ViTriDoXe?.TenViTri</td>
+                    <td>@item.ThoiGianDuKienVao.ToString("dd/MM HH:mm")</td>
+                    <td>@(item.ThoiGianVaoThucTe?.ToString("dd/MM HH:mm") ?? "-")</td>
+                    <td>
+                        @if (item.TrangThai == "Chờ xác nhận")
+                        {
+                            <span class="badge bg-warning text-dark"><i class="bi bi-hourglass-split"></i> Chờ vào bãi</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-success"><i class="bi bi-p-circle"></i> Đang đỗ xe</span>
+                        }
+                    </td>
+                    <td class="text-center">
+                        @if (item.TrangThai == "Chờ xác nhận")
+                        {
+                            <!-- Nút bấm gọi hàm XacNhanVao trong Controller -->
+                            <form asp-action="XacNhanVao" method="post" class="d-inline">
+                                <input type="hidden" name="id" value="@item.MaPhieu" />
+                                <button type="submit" class="btn btn-success fw-bold" onclick="return confirm('Xác nhận xe @item.PhuongTien?.BienSoXe vào bãi?');">
+                                    <i class="bi bi-arrow-right-square me-1"></i> CHO XE VÀO
+                                </button>
+                            </form>
+                        }
+                        else if (item.TrangThai == "Đang gửi")
+                        {
+                            <!-- Nút bấm gọi hàm XacNhanRa trong Controller để tính tiền -->
+                            <form asp-action="XacNhanRa" method="post" class="d-inline">
+                                <input type="hidden" name="id" value="@item.MaPhieu" />
+                                <button type="submit" class="btn btn-danger fw-bold" onclick="return confirm('Xác nhận xe @item.PhuongTien?.BienSoXe ra bãi và tính tiền?');">
+                                    <i class="bi bi-box-arrow-right me-1"></i> CHO XE RA
+                                </button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
