@@ -1,0 +1,246 @@
+@* Họ và tên: Tăng Hoàng Giang *@
+@* Mã sinh viên: 23103100031 *@
+@* Nội dung thực hiện: Tạo View hiển thị Dashboard và Thống kê chi tiết (Module 4) *@
+
+@model QuanLyBaiDoXe_UNETI03_TI17A2HN.Models.ViewModels.ThongKeViewModel
+
+@{
+    ViewData["Title"] = "Dashboard & Thống kê";
+}
+
+<!-- PHẦN 1: TỔNG QUAN HỆ THỐNG (DASHBOARD) -->
+<h2 class="mb-4">Tổng quan hệ thống (Dashboard)</h2>
+
+<div class="row mb-5">
+    <div class="col-md-3 mb-3">
+        <div class="card bg-primary text-white h-100 shadow-sm border-0">
+            <div class="card-body">
+                <h5 class="card-title fw-normal">Tổng phiếu gửi xe</h5>
+                <h2 class="display-5 fw-bold">@Model.Dashboard.TongPhieuGuiXe</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card bg-warning text-dark h-100 shadow-sm border-0">
+            <div class="card-body">
+                <h5 class="card-title fw-normal">Chờ xác nhận</h5>
+                <h2 class="display-5 fw-bold">@Model.Dashboard.SoPhieuChoXacNhan</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card bg-success text-white h-100 shadow-sm border-0">
+            <div class="card-body">
+                <h5 class="card-title fw-normal">Xe đang gửi</h5>
+                <h2 class="display-5 fw-bold">@Model.Dashboard.SoXeDangGui</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card bg-info text-white h-100 shadow-sm border-0">
+            <div class="card-body">
+                <h5 class="card-title fw-normal">Vị trí còn trống</h5>
+                <h2 class="display-5 fw-bold">@Model.Dashboard.SoViTriConTrong</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- PHẦN 2: THỐNG KÊ CHI TIẾT (SỬ DỤNG TABS CỦA BOOTSTRAP) -->
+<h2 class="mb-4">Thống kê chi tiết</h2>
+
+<ul class="nav nav-tabs" id="thongKeTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active fw-bold" id="phuongtien-tab" data-bs-toggle="tab" data-bs-target="#phuongtien" type="button" role="tab" aria-controls="phuongtien" aria-selected="true">Phương tiện & Loại xe</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link fw-bold" id="vitri-tab" data-bs-toggle="tab" data-bs-target="#vitri" type="button" role="tab" aria-controls="vitri" aria-selected="false">Vị trí & Phiếu</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link fw-bold" id="luotgui-tab" data-bs-toggle="tab" data-bs-target="#luotgui" type="button" role="tab" aria-controls="luotgui" aria-selected="false">Lượt gửi & Doanh thu</button>
+    </li>
+</ul>
+
+<div class="tab-content border border-top-0 p-4 mb-5 bg-white shadow-sm" id="thongKeTabsContent">
+    
+    <!-- TAB 1: HIỂN THỊ DỮ LIỆU LIÊN QUAN ĐẾN PHƯƠNG TIỆN -->
+    <div class="tab-pane fade show active" id="phuongtien" role="tabpanel" aria-labelledby="phuongtien-tab">
+        <div class="row">
+            <div class="col-md-7">
+                <h5 class="mb-3">Số phương tiện theo loại xe</h5>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Loại xe</th>
+                                <th>Số lượng phương tiện</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.SoPhuongTienTheoLoai)
+                            {
+                                <tr>
+                                    <td>@item.TenLoai</td>
+                                    <td>@item.SoLuong</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col-md-5">
+                <h5 class="mb-3">Tổng quan khác</h5>
+                <ul class="list-group">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Tổng số loại phương tiện
+                        <span class="badge bg-primary rounded-pill fs-6">@Model.Dashboard.TongLoaiPhuongTien</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Tổng số chủ phương tiện
+                        <span class="badge bg-primary rounded-pill fs-6">@Model.Dashboard.TongChuPhuongTien</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Tổng số phương tiện đã đăng ký
+                        <span class="badge bg-primary rounded-pill fs-6">@Model.Dashboard.TongPhuongTien</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 2: HIỂN THỊ DỮ LIỆU LIÊN QUAN ĐẾN VỊ TRÍ ĐỖ VÀ PHIẾU GỬI XE -->
+    <div class="tab-pane fade" id="vitri" role="tabpanel" aria-labelledby="vitri-tab">
+        <div class="row">
+            <div class="col-md-6">
+                <h5 class="mb-3">Số vị trí theo trạng thái</h5>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Trạng thái</th>
+                                <th>Số lượng vị trí</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.SoViTriTheoTrangThai)
+                            {
+                                <tr>
+                                    <td>
+                                        @if (item.TrangThai == "Còn trống") { <span class="badge bg-info text-dark">@item.TrangThai</span> }
+                                        else if (item.TrangThai == "Đang sử dụng") { <span class="badge bg-success">@item.TrangThai</span> }
+                                        else { <span class="badge bg-secondary">@item.TrangThai</span> }
+                                    </td>
+                                    <td class="fw-bold">@item.SoLuong</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <h5 class="mb-3">Số phiếu theo trạng thái</h5>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Trạng thái phiếu</th>
+                                <th>Số lượng</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.SoPhieuTheoTrangThai)
+                            {
+                                <tr>
+                                    <td>
+                                        @if (item.TrangThai == "Chờ xác nhận") { <span class="badge bg-warning text-dark">@item.TrangThai</span> }
+                                        else if (item.TrangThai == "Đang gửi") { <span class="badge bg-success">@item.TrangThai</span> }
+                                        else if (item.TrangThai == "Đã lấy xe") { <span class="badge bg-primary">@item.TrangThai</span> }
+                                        else { <span class="badge bg-danger">@item.TrangThai</span> }
+                                    </td>
+                                    <td class="fw-bold">@item.SoLuong</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 3: HIỂN THỊ DỮ LIỆU DOANH THU -->
+    <div class="tab-pane fade" id="luotgui" role="tabpanel" aria-labelledby="luotgui-tab">
+        <div class="row">
+            <div class="col-md-7">
+                <h5 class="mb-3">Lượt gửi & Doanh thu theo tháng</h5>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Tháng / Năm</th>
+                                <th>Số lượt gửi (Đã lấy xe)</th>
+                                <th>Doanh thu (VNĐ)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.LuotGuiVaDoanhThuTheoThang.Any())
+                            {
+                                @foreach (var item in Model.LuotGuiVaDoanhThuTheoThang)
+                                {
+                                    <tr>
+                                        <td class="fw-bold">@item.Thang / @item.Nam</td>
+                                        <td>@item.SoLuot lượt</td>
+                                        <td class="text-danger fw-bold">@item.DoanhThu.ToString("N0") đ</td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="3" class="text-center">Chưa có dữ liệu doanh thu</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col-md-5">
+                <h5 class="mb-3">Vị trí đỗ "Hot" nhất</h5>
+                @if (Model.ViTriDungNhieuNhat != null)
+                {
+                    <div class="alert alert-success d-flex align-items-center">
+                        <i class="bi bi-trophy-fill fs-3 me-3 text-warning"></i>
+                        <div>
+                            <div class="fw-bold fs-5">Vị trí: @Model.ViTriDungNhieuNhat.TenViTri</div>
+                            <div>Đã có <strong>@Model.ViTriDungNhieuNhat.SoLuot</strong> lượt gửi xe</div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-secondary">Chưa có dữ liệu</div>
+                }
+                
+                <h5 class="mb-3 mt-4">Lượt gửi theo loại xe</h5>
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Loại phương tiện</th>
+                                <th>Số lượt gửi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.LuotGuiTheoLoaiXe)
+                            {
+                                <tr>
+                                    <td>@item.TenLoai</td>
+                                    <td>@item.SoLuong</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
