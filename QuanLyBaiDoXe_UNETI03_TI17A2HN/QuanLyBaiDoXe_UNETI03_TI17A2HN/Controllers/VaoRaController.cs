@@ -114,19 +114,25 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
 
             phieu.ThoiGianRaThucTe = DateTime.Now;
 
+            double totalHours = 0;
+
             // Kiểm tra thời gian ra phải lớn hơn thời gian vào
             if (phieu.ThoiGianVaoThucTe.HasValue && phieu.ThoiGianRaThucTe > phieu.ThoiGianVaoThucTe)
             {
                 // Tính khoảng thời gian đỗ xe
                 TimeSpan duration = phieu.ThoiGianRaThucTe.Value - phieu.ThoiGianVaoThucTe.Value;
                 
-                // TÍNH TIỀN LÀM TRÒN LÊN (Module 4) - vd 2h15p -> 3h bằng Math.Ceiling
-                double totalHours = Math.Ceiling(duration.TotalHours);
+                // TÍNH TIỀN THEO BLOCK 30 PHÚT (Module 4)
+                // Ví dụ: đỗ 40 phút -> làm tròn lên thành 2 block (60 phút = 1.0 giờ)
+                // đỗ 1h15p (75 phút) -> làm tròn lên thành 3 block (90 phút = 1.5 giờ)
+                double totalBlocks = Math.Ceiling(duration.TotalMinutes / 30.0);
                 
-                // Tránh trường hợp vào ra ngay lập tức bị tính 0 giờ, tối thiểu thu phí 1 giờ
-                if (totalHours < 1) totalHours = 1;
+                // Tối thiểu thu phí 1 block 30 phút (0.5 giờ)
+                if (totalBlocks < 1) totalBlocks = 1;
 
-                // Tính thành tiền = Số giờ làm tròn x Đơn giá
+                totalHours = totalBlocks * 0.5;
+
+                // Tính thành tiền = Số giờ quy đổi x Đơn giá theo giờ
                 phieu.ThanhTien = (decimal)totalHours * phieu.DonGiaTheoGio;
             }
             else
@@ -147,7 +153,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             _context.Update(phieu);
             await _context.SaveChangesAsync();
 
-            TempData["SuccessMessage"] = $"Xe {phieu.PhuongTien?.BienSoXe} ra khỏi bãi. Số tiền thu: {phieu.ThanhTien?.ToString("N0")} VNĐ.";
+            TempData["SuccessMessage"] = $"Xe {phieu.PhuongTien?.BienSoXe} ra khỏi bãi. Thời gian gửi: {totalHours} giờ (tính theo block 30 phút). Số tiền thu: {phieu.ThanhTien?.ToString("N0")} VNĐ.";
             return RedirectToAction(nameof(Index));
         }
     }
