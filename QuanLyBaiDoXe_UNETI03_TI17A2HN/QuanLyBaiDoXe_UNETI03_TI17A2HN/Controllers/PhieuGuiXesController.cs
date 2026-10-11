@@ -17,16 +17,32 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
         }
 
         // GET: PHIEUGUIXES
-        public async Task<IActionResult> Index(int? page, string? searchString, string? trangThaiFilter)
+        public async Task<IActionResult> Index(
+            string? searchBienSo, 
+            string? searchTenChuXe, 
+            string? filterTrangThai, 
+            string? filterLoaiXe, 
+            DateTime? filterNgayDangKy,
+            string? searchString,
+            string? trangThaiFilter)
         {
-            int pageSize = 10;
-            int pageNumber = page ?? 1;
+            // Hỗ trợ cả tên tham số mới và cũ
+            searchBienSo = searchBienSo ?? searchString;
+            filterTrangThai = filterTrangThai ?? trangThaiFilter;
 
-            ViewBag.CurrentFilter = searchString;
-            ViewBag.TrangThaiFilter = trangThaiFilter;
+            ViewData["searchBienSo"] = searchBienSo;
+            ViewData["searchTenChuXe"] = searchTenChuXe;
+            ViewData["filterTrangThai"] = filterTrangThai;
+            ViewData["filterLoaiXe"] = filterLoaiXe;
+            ViewData["filterNgayDangKy"] = filterNgayDangKy?.ToString("yyyy-MM-dd");
+
+            ViewBag.LoaiXeList = await _context.LoaiPhuongTien.ToListAsync();
 
             var query = _context.PhieuGuiXe
                 .Include(p => p.PhuongTien)
+                    .ThenInclude(pt => pt.ChuPhuongTien)
+                .Include(p => p.PhuongTien)
+                    .ThenInclude(pt => pt.LoaiPhuongTien)
                 .Include(p => p.ViTriDoXe)
                 .AsQueryable();
 
@@ -55,38 +71,40 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                 }
             }
 
-            if (!string.IsNullOrWhiteSpace(trangThaiFilter))
+            if (!string.IsNullOrWhiteSpace(filterTrangThai))
             {
-                query = query.Where(p => p.TrangThai == trangThaiFilter);
+                query = query.Where(p => p.TrangThai == filterTrangThai);
             }
 
-            if (!string.IsNullOrWhiteSpace(searchString))
+            if (!string.IsNullOrWhiteSpace(searchBienSo))
             {
                 query = query.Where(p => p.PhuongTien != null &&
                                          p.PhuongTien.BienSoXe != null &&
-                                         p.PhuongTien.BienSoXe.Contains(searchString));
+                                         p.PhuongTien.BienSoXe.Contains(searchBienSo));
             }
 
-            int totalItems = await query.CountAsync();
-            int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
-
-            if (totalPages > 0 && pageNumber > totalPages)
+            if (!string.IsNullOrWhiteSpace(searchTenChuXe))
             {
-                pageNumber = totalPages;
+                query = query.Where(p => p.PhuongTien != null &&
+                                         p.PhuongTien.ChuPhuongTien != null &&
+                                         p.PhuongTien.ChuPhuongTien.HoTen.Contains(searchTenChuXe));
             }
 
-            var danhSach = await query
-                .OrderByDescending(p => p.NgayDangKy)
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
+            if (!string.IsNullOrWhiteSpace(filterLoaiXe))
+            {
+                query = query.Where(p => p.PhuongTien != null &&
+                                         p.PhuongTien.LoaiPhuongTien != null &&
+                                         p.PhuongTien.LoaiPhuongTien.TenLoaiPhuongTien == filterLoaiXe);
+            }
 
-            ViewBag.UserRole = vaiTro;
-            ViewBag.Total = totalItems;
-            ViewBag.CurrentPage = pageNumber;
-            ViewBag.TotalPages = totalPages;
+            if (filterNgayDangKy.HasValue)
+            {
+                query = query.Where(p => p.NgayDangKy.Date == filterNgayDangKy.Value.Date);
+            }
 
-            return View(danhSach);
+            query = query.OrderByDescending(p => p.NgayDangKy);
+
+            return View(await query.ToListAsync());
         }
 
         // GET: PHIEUGUIXES/Details/5
@@ -404,6 +422,45 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
         private bool PhieuGuiXeExists(int id)
         {
             return _context.PhieuGuiXe.Any(e => e.MaPhieu == id);
+        }
+
+        // HỦY PHIẾU (Module 4)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> HuyPhieu(int id)
+        {
+            var phieu = await _context.PhieuGuiXe.FindAsync(id);
+            if (phieu == null) return NotFound();
+
+            // Phân quyền: Đảm bảo Khách hàng KHÔNG thể dùng Inspect HTML để sửa ID và hủy phiếu của người khác
+            var vaiTro = HttpContext.Session.GetString("VaiTro");
+            var maTaiKhoanStr = HttpContext.Session.GetString("MaTaiKhoan");
+            if (vaiTro == "Khách hàng" && int.TryParse(maTaiKhoanStr, out int maTaiKhoan))
+            {
+                var phuongTien = await _context.PhuongTien
+                    .Include(pt => pt.ChuPhuongTien)
+                    .FirstOrDefaultAsync(pt => pt.MaPhuongTien == phieu.MaPhuongTien);
+                    
+                if (phuongTien?.ChuPhuongTien?.MaTaiKhoan != maTaiKhoan)
+                {
+                    return Unauthorized(); 
+                }
+            }
+
+            // Chỉ phiếu chưa được xác nhận vào bãi mới được hủy
+            if (phieu.TrangThai != "Chờ xác nhận")
+            {
+                TempData["ErrorMessage"] = "Chỉ có thể hủy phiếu đang ở trạng thái 'Chờ xác nhận'.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            // Thực hiện đổi trạng thái thành Đã hủy (Soft delete)
+            phieu.TrangThai = "Đã hủy";
+            _context.Update(phieu);
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Đã hủy phiếu thành công!";
+            return RedirectToAction(nameof(Index));
         }
     }
 }
