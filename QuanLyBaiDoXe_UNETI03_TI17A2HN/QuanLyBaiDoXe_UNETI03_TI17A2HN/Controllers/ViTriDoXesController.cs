@@ -18,13 +18,16 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
 
         // GET: VITRIDOXES
         public async Task<IActionResult> Index(
-            string searchString,
+           string searchString,
             int? maLoaiPhuongTien,
             string khuVuc,
             int? tang,
             string trangThai,
-            string sortOrder)
+            string sortOrder,
+            int page = 1) 
         {
+            int pageSize = 10; 
+
             ViewData["CurrentSearch"] = searchString;
             ViewData["CurrentLoaiPhuongTien"] = maLoaiPhuongTien;
             ViewData["CurrentKhuVuc"] = khuVuc;
@@ -33,17 +36,45 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             ViewData["CurrentSort"] = sortOrder;
 
             await NapDuLieuDropdownLocAsync(maLoaiPhuongTien, khuVuc, tang);
+
             var query = _context.ViTriDoXe
                 .Include(v => v.LoaiPhuongTien)
                 .AsQueryable();
 
+            // Tìm kiếm
             query = TimKiem(query, searchString);
+
+            // Lọc đa điều kiện
             query = LocDaDieuKien(query, maLoaiPhuongTien, khuVuc, tang, trangThai);
+
+            // Sắp xếp
             query = SapXep(query, sortOrder);
 
-            return View(await query.ToListAsync());
-        }
+            // Phân trang
+            int totalItems = await query.CountAsync();
+            int totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+            page = Math.Max(1, Math.Min(page, totalPages > 0 ? totalPages : 1));
 
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
+            ViewBag.TotalItems = totalItems;
+
+            ViewBag.CurrentSearch = searchString;
+            ViewBag.CurrentLoaiPhuongTien = maLoaiPhuongTien;
+            ViewBag.CurrentKhuVuc = khuVuc;
+            ViewBag.CurrentTang = tang;
+            ViewBag.CurrentTrangThai = trangThai;
+            ViewBag.CurrentSort = sortOrder;
+
+            // 5. Phân trang bằng Skip và Take
+            var items = await PhanTrang(query, page, pageSize).ToListAsync();
+
+            return View(items);
+        }
+        private IQueryable<ViTriDoXe> PhanTrang(IQueryable<ViTriDoXe> query, int page, int pageSize)
+        {
+            return query.Skip((page - 1) * pageSize).Take(pageSize);
+        }
         ///Tìm kiếm
         private IQueryable<ViTriDoXe> TimKiem(IQueryable<ViTriDoXe> query, string searchString)
         {
