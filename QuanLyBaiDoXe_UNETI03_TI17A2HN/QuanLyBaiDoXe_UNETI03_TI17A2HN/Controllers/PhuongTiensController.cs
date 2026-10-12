@@ -90,48 +90,6 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
 
             return View(items);
         }
-
-      // GET: PHUONGTIENS/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-        
-            var phuongTien = await _context.PhuongTien.FirstOrDefaultAsync(p => p.MaPhuongTien == id);
-            if (phuongTien == null)
-            {
-                return NotFound();
-            }
-        
-            string? vaiTro = HttpContext.Session.GetString("VaiTro");
-            string? maTaiKhoanStr = HttpContext.Session.GetString("MaTaiKhoan");
-        
-            if (vaiTro == "Khách hàng")
-            {
-                if (!int.TryParse(maTaiKhoanStr, out int maTaiKhoan))
-                {
-                    return RedirectToAction(nameof(Index));
-                }
-        
-                var chuPhuongTien = await _context.ChuPhuongTien.FirstOrDefaultAsync(c => c.MaTaiKhoan == maTaiKhoan);
-                if (chuPhuongTien == null || phuongTien.MaChuPhuongTien != chuPhuongTien.MaChuPhuongTien)
-                {
-                    return RedirectToAction(nameof(Index));
-                }
-        
-                ViewBag.MaChuPhuongTien = new SelectList(new[] { chuPhuongTien }, "MaChuPhuongTien", "HoTen", phuongTien.MaChuPhuongTien);
-            }
-            else
-            {
-                ViewBag.MaChuPhuongTien = new SelectList(_context.ChuPhuongTien, "MaChuPhuongTien", "HoTen", phuongTien.MaChuPhuongTien);
-            }
-        
-            ViewBag.MaLoaiPhuongTien = new SelectList(_context.LoaiPhuongTien, "MaLoaiPhuongTien", "TenLoaiPhuongTien", phuongTien.MaLoaiPhuongTien);
-            return View(phuongTien);
-        }
-
         // GET: PHUONGTIENS/Create
         public async Task<IActionResult> Create()
         {
