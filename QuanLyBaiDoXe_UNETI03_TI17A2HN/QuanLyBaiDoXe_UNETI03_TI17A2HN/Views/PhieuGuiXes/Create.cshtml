@@ -1,96 +1,409 @@
 @model QuanLyBaiDoXe_UNETI03_TI17A2HN.Models.PhieuGuiXe
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Đăng ký gửi xe";
+
+    var danhSachXe =
+        ViewBag.DanhSachXe as List<QuanLyBaiDoXe_UNETI03_TI17A2HN.Models.PhuongTien>
+        ?? new List<QuanLyBaiDoXe_UNETI03_TI17A2HN.Models.PhuongTien>();
+
+    var danhSachViTri =
+        ViewBag.DanhSachViTri as List<QuanLyBaiDoXe_UNETI03_TI17A2HN.Models.ViTriDoXe>
+        ?? new List<QuanLyBaiDoXe_UNETI03_TI17A2HN.Models.ViTriDoXe>();
 }
 
-<h1>Create</h1>
+<div class="container py-4 py-lg-5">
 
-<h4>PhieuGuiXe</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <!-- TIÊU ĐỀ -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <h2 class="fw-bold mb-2">
+                <i class="bi bi-car-front-fill text-primary me-2"></i>
+                Đăng ký gửi xe
+            </h2>
+            <p class="text-secondary mb-0">
+                Điền thông tin phương tiện và thời gian gửi xe.
+            </p>
+        </div>
 
-            <div class="form-group">
-                <label asp-for="MaPhuongTien" class="control-label"></label>
-                <input asp-for="MaPhuongTien" class="form-control" />
-                <span asp-validation-for="MaPhuongTien" class="text-danger"></span>
-            </div>
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i>
+            Quay lại
+        </a>
+    </div>
 
-            <div class="form-group">
-                <label asp-for="MaViTri" class="control-label"></label>
-                <input asp-for="MaViTri" class="form-control" />
-                <span asp-validation-for="MaViTri" class="text-danger"></span>
-            </div>
+    <!-- THÔNG BÁO -->
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            @TempData["Error"]
+            <button type="button" class="btn-close"
+                    data-bs-dismiss="alert" aria-label="Đóng"></button>
+        </div>
+    }
 
-            <div class="form-group">
-                <label asp-for="NgayDangKy" class="control-label"></label>
-                <input asp-for="NgayDangKy" class="form-control" />
-                <span asp-validation-for="NgayDangKy" class="text-danger"></span>
-            </div>
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-circle-fill me-2"></i>
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close"
+                    data-bs-dismiss="alert" aria-label="Đóng"></button>
+        </div>
+    }
 
-            <div class="form-group">
-                <label asp-for="ThoiGianDuKienVao" class="control-label"></label>
-                <input asp-for="ThoiGianDuKienVao" class="form-control" />
-                <span asp-validation-for="ThoiGianDuKienVao" class="text-danger"></span>
-            </div>
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close"
+                    data-bs-dismiss="alert" aria-label="Đóng"></button>
+        </div>
+    }
 
-            <div class="form-group">
-                <label asp-for="ThoiGianDuKienRa" class="control-label"></label>
-                <input asp-for="ThoiGianDuKienRa" class="form-control" />
-                <span asp-validation-for="ThoiGianDuKienRa" class="text-danger"></span>
-            </div>
+    <!-- FORM ĐĂNG KÝ -->
+    <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
 
-            <div class="form-group">
-                <label asp-for="ThoiGianVaoThucTe" class="control-label"></label>
-                <input asp-for="ThoiGianVaoThucTe" class="form-control" />
-                <span asp-validation-for="ThoiGianVaoThucTe" class="text-danger"></span>
-            </div>
+        <div class="card-header bg-primary text-white px-4 py-3">
+            <h5 class="mb-1 fw-bold">
+                <i class="bi bi-clipboard-check me-2"></i>
+                Thông tin đăng ký
+            </h5>
+            <small class="text-white-50">
+                Các trường có dấu <span class="text-warning">*</span> là bắt buộc.
+            </small>
+        </div>
 
-            <div class="form-group">
-                <label asp-for="ThoiGianRaThucTe" class="control-label"></label>
-                <input asp-for="ThoiGianRaThucTe" class="form-control" />
-                <span asp-validation-for="ThoiGianRaThucTe" class="text-danger"></span>
-            </div>
+        <div class="card-body p-3 p-md-4 p-lg-5">
 
-            <div class="form-group">
-                <label asp-for="DonGiaTheoGio" class="control-label"></label>
-                <input asp-for="DonGiaTheoGio" class="form-control" />
-                <span asp-validation-for="DonGiaTheoGio" class="text-danger"></span>
-            </div>
+            <form asp-action="Create"
+                  method="post"
+                  id="formDangKy">
 
-            <div class="form-group">
-                <label asp-for="ThanhTien" class="control-label"></label>
-                <input asp-for="ThanhTien" class="form-control" />
-                <span asp-validation-for="ThanhTien" class="text-danger"></span>
-            </div>
+                @Html.AntiForgeryToken()
 
-            <div class="form-group">
-                <label asp-for="TrangThai" class="control-label"></label>
-                <input asp-for="TrangThai" class="form-control" />
-                <span asp-validation-for="TrangThai" class="text-danger"></span>
-            </div>
+                <div asp-validation-summary="ModelOnly"
+                     class="alert alert-danger"
+                     role="alert"></div>
 
-            <div class="form-group">
-                <label asp-for="PhuongTien" class="control-label"></label>
-                <input asp-for="PhuongTien" class="form-control" />
-                <span asp-validation-for="PhuongTien" class="text-danger"></span>
-            </div>
+                <!-- THÔNG TIN PHƯƠNG TIỆN -->
+                <div class="mb-4">
+                    <h6 class="fw-bold text-primary mb-3">
+                        <i class="bi bi-car-front me-2"></i>
+                        1. Thông tin phương tiện
+                    </h6>
 
-            <div class="form-group">
-                <label asp-for="ViTriDoXe" class="control-label"></label>
-                <input asp-for="ViTriDoXe" class="form-control" />
-                <span asp-validation-for="ViTriDoXe" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+                    <div class="row g-3">
+
+                        <div class="col-12">
+                            <label asp-for="MaPhuongTien"
+                                   class="form-label fw-semibold">
+                                Phương tiện
+                                <span class="text-danger">*</span>
+                            </label>
+
+                            @if (danhSachXe.Any())
+                            {
+                                <select asp-for="MaPhuongTien"
+                                        class="form-select"
+                                        id="MaPhuongTien"
+                                        required>
+                                    <option value="">-- Chọn phương tiện --</option>
+
+                                    @foreach (var xe in danhSachXe)
+                                    {
+                                        <option value="@xe.MaPhuongTien">
+                                            @xe.BienSoXe
+                                            @if (xe.LoaiPhuongTien != null)
+                                            {
+                                                <text> - @xe.LoaiPhuongTien.TenLoaiPhuongTien</text>
+                                            }
+                                        </option>
+                                    }
+                                </select>
+
+                                <span asp-validation-for="MaPhuongTien"
+                                      class="text-danger small"></span>
+                            }
+                            else
+                            {
+                                <div class="alert alert-warning mb-0">
+                                    <i class="bi bi-exclamation-circle me-2"></i>
+                                    Không có phương tiện để đăng ký.
+                                    Vui lòng kiểm tra danh sách phương tiện.
+                                </div>
+                            }
+                        </div>
+
+                    </div>
+                </div>
+
+                <hr class="my-4" />
+
+                <!-- THÔNG TIN VỊ TRÍ -->
+                <div class="mb-4">
+                    <h6 class="fw-bold text-primary mb-3">
+                        <i class="bi bi-geo-alt-fill me-2"></i>
+                        2. Vị trí đỗ xe
+                    </h6>
+
+                    <div class="row g-3">
+
+                        <div class="col-12">
+                            <label asp-for="MaViTri"
+                                   class="form-label fw-semibold">
+                                Vị trí đỗ
+                                <span class="text-danger">*</span>
+                            </label>
+
+                            @if (danhSachViTri.Any())
+                            {
+                                <select asp-for="MaViTri"
+                                        class="form-select"
+                                        id="MaViTri"
+                                        required>
+                                    <option value="">-- Chọn vị trí đỗ --</option>
+
+                                    @foreach (var viTri in danhSachViTri)
+                                    {
+                                        <option value="@viTri.MaViTri"
+                                                data-loai="@viTri.MaLoaiPhuongTien">
+                                            @viTri.TenViTri
+                                            @if (viTri.LoaiPhuongTien != null)
+                                            {
+                                                <text> - @viTri.LoaiPhuongTien.TenLoaiPhuongTien</text>
+                                            }
+                                            @if (!string.IsNullOrWhiteSpace(viTri.TrangThai))
+                                            {
+                                                <text> - @viTri.TrangThai</text>
+                                            }
+                                        </option>
+                                    }
+                                </select>
+
+                                <span asp-validation-for="MaViTri"
+                                      class="text-danger small"></span>
+
+                                <div class="form-text">
+                                    Chọn vị trí phù hợp với loại phương tiện.
+                                    Hệ thống cần kiểm tra trạng thái và lịch sử dụng
+                                    trước khi xác nhận đăng ký.
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="alert alert-warning mb-0">
+                                    <i class="bi bi-exclamation-circle me-2"></i>
+                                    Hiện không có vị trí đỗ xe trong danh sách.
+                                </div>
+                            }
+                        </div>
+
+                    </div>
+                </div>
+
+                <hr class="my-4" />
+
+                <!-- THỜI GIAN GỬI XE -->
+                <div class="mb-4">
+                    <h6 class="fw-bold text-primary mb-3">
+                        <i class="bi bi-clock-history me-2"></i>
+                        3. Thời gian gửi xe
+                    </h6>
+
+                    <div class="row g-3">
+
+                        <div class="col-12 col-md-6">
+                            <label asp-for="ThoiGianDuKienVao"
+                                   class="form-label fw-semibold">
+                                Thời gian dự kiến vào
+                                <span class="text-danger">*</span>
+                            </label>
+
+                            <input asp-for="ThoiGianDuKienVao"
+                                   type="datetime-local"
+                                   class="form-control"
+                                   id="ThoiGianDuKienVao"
+                                   required
+                                   step="60" />
+
+                            <span asp-validation-for="ThoiGianDuKienVao"
+                                  class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label asp-for="ThoiGianDuKienRa"
+                                   class="form-label fw-semibold">
+                                Thời gian dự kiến ra
+                                <span class="text-danger">*</span>
+                            </label>
+
+                            <input asp-for="ThoiGianDuKienRa"
+                                   type="datetime-local"
+                                   class="form-control"
+                                   id="ThoiGianDuKienRa"
+                                   required
+                                   step="60" />
+
+                            <span asp-validation-for="ThoiGianDuKienRa"
+                                  class="text-danger small"></span>
+                        </div>
+
+                    </div>
+
+                    <div id="thongBaoThoiGian"
+                         class="alert alert-danger mt-3 d-none"
+                         role="alert">
+                        Thời gian dự kiến ra phải sau thời gian dự kiến vào.
+                    </div>
+                </div>
+
+                <!-- LƯU Ý -->
+                <div class="alert alert-info border-0 rounded-3 mb-4">
+                    <div class="d-flex align-items-start">
+                        <i class="bi bi-info-circle-fill fs-5 me-3"></i>
+
+                        <div>
+                            <h6 class="fw-bold mb-2">Lưu ý khi đăng ký</h6>
+                            <ul class="mb-0 ps-3">
+                                <li>Phương tiện phải đang hoạt động.</li>
+                                <li>Phương tiện phải thuộc tài khoản của bạn.</li>
+                                <li>Một phương tiện không được có hai lượt gửi xe đang hoạt động.</li>
+                                <li>Vị trí đỗ phải phù hợp với loại phương tiện.</li>
+                                <li>Thời gian dự kiến ra phải sau thời gian dự kiến vào.</li>
+                                <li>Vị trí đỗ không được trùng lịch với lượt gửi xe khác.</li>
+                                <li>Đơn giá gửi xe cần được hệ thống xác định theo quy định hiện hành.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NÚT THAO TÁC -->
+                <div class="d-flex flex-column-reverse flex-sm-row justify-content-end gap-2">
+
+                    <a asp-action="Index"
+                           class="btn btn-outline-secondary px-4">
+                        <i class="bi bi-x-circle me-1"></i>
+                        Hủy
+                    </a>
+
+                    <button type="submit"
+                            class="btn btn-primary px-4"
+                            id="btnDangKy"
+                            disabled="@(!danhSachXe.Any() || !danhSachViTri.Any())">
+                        <i class="bi bi-check-circle me-1"></i>
+                        Đăng ký gửi xe
+                    </button>
+
+                </div>
+
+            </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.getElementById("formDangKy");
+            const thoiGianVao = document.getElementById("ThoiGianDuKienVao");
+            const thoiGianRa = document.getElementById("ThoiGianDuKienRa");
+            const thongBao = document.getElementById("thongBaoThoiGian");
+
+            if (!form || !thoiGianVao || !thoiGianRa) {
+                return;
+            }
+
+            // Định dạng ngày theo múi giờ địa phương.
+            function formatDateTimeLocal(date) {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, "0");
+                const day = String(date.getDate()).padStart(2, "0");
+                const hours = String(date.getHours()).padStart(2, "0");
+                const minutes = String(date.getMinutes()).padStart(2, "0");
+
+                return `${year}-${month}-${day}T${hours}:${minutes}`;
+            }
+
+            // Điền thời gian mặc định khi tạo đăng ký mới.
+            if (!thoiGianVao.value) {
+                const now = new Date();
+                now.setSeconds(0, 0);
+                thoiGianVao.value = formatDateTimeLocal(now);
+            }
+
+            if (!thoiGianRa.value && thoiGianVao.value) {
+                const vao = new Date(thoiGianVao.value);
+
+                if (!Number.isNaN(vao.getTime())) {
+                    vao.setHours(vao.getHours() + 2);
+                    thoiGianRa.value = formatDateTimeLocal(vao);
+                }
+            }
+
+            // Kiểm tra thời gian và hiển thị thông báo.
+            function kiemTraThoiGian(hienThongBao) {
+                if (!thoiGianVao.value || !thoiGianRa.value) {
+                    thongBao.classList.add("d-none");
+                    return false;
+                }
+
+                const vao = new Date(thoiGianVao.value);
+                const ra = new Date(thoiGianRa.value);
+
+                const hopLe =
+                    !Number.isNaN(vao.getTime()) &&
+                    !Number.isNaN(ra.getTime()) &&
+                    ra > vao;
+
+                thongBao.classList.toggle("d-none", hopLe || !hienThongBao);
+
+                thoiGianRa.setCustomValidity(
+                    hopLe ? "" : "Thời gian ra phải sau thời gian vào."
+                );
+
+                return hopLe;
+            }
+
+            // Cập nhật thời gian ra nếu không còn sau thời gian vào.
+            thoiGianVao.addEventListener("change", function () {
+                if (!thoiGianVao.value) {
+                    return;
+                }
+
+                const vao = new Date(thoiGianVao.value);
+                const ra = new Date(thoiGianRa.value);
+
+                if (Number.isNaN(vao.getTime())) {
+                    return;
+                }
+
+                if (!thoiGianRa.value ||
+                    Number.isNaN(ra.getTime()) ||
+                    ra <= vao) {
+                    const newRa = new Date(vao);
+                    newRa.setHours(newRa.getHours() + 2);
+                    thoiGianRa.value = formatDateTimeLocal(newRa);
+                }
+
+                kiemTraThoiGian(false);
+            });
+
+            thoiGianRa.addEventListener("change", function () {
+                kiemTraThoiGian(true);
+            });
+
+            form.addEventListener("submit", function (event) {
+                if (!kiemTraThoiGian(true)) {
+                    event.preventDefault();
+                    thoiGianRa.reportValidity();
+                    thoiGianRa.focus();
+                }
+            });
+        });
+    </script>
+}
