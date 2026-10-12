@@ -1,60 +1,76 @@
+@* Lương Thị Quỳnh Hương - 23103100064 *@
 @model QuanLyBaiDoXe_UNETI03_TI17A2HN.Models.LoaiPhuongTien
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Tạo mới Loại phương tiện";
 }
 
-<h1>Create</h1>
+<div class="container-fluid px-0 d-flex justify-content-center">
+    <div class="card shadow-sm border-0 rounded-3 overflow-hidden" style="width: 100%; max-width: 600px;">
+        <div class="card-header bg-primary text-white py-3 text-center">
+            <h4 class="m-0 fw-bold">Thêm mới Loại phương tiện</h4>
+        </div>
 
-<h4>LoaiPhuongTien</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="card-body p-4 bg-white">
+            <form asp-action="Create" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-            <div class="form-group">
-                <label asp-for="TenLoaiPhuongTien" class="control-label"></label>
-                <input asp-for="TenLoaiPhuongTien" class="form-control" />
-                <span asp-validation-for="TenLoaiPhuongTien" class="text-danger"></span>
-            </div>
+                <div class="mb-3">
+                    <label asp-for="TenLoaiPhuongTien" class="form-label fw-bold text-dark">
+                        Tên loại phương tiện (*)
+                    </label>
+                    <input asp-for="TenLoaiPhuongTien" class="form-control px-3 py-2" placeholder="Nhập tên loại phương tiện (ví dụ: Xe máy điện)" required />
+                    <span asp-validation-for="TenLoaiPhuongTien" class="text-danger small"></span>
+                </div>
 
-            <div class="form-group">
-                <label asp-for="DonGiaTheoGio" class="control-label"></label>
-                <input asp-for="DonGiaTheoGio" class="form-control" />
-                <span asp-validation-for="DonGiaTheoGio" class="text-danger"></span>
-            </div>
+                <div class="mb-3">
+                    <label asp-for="DonGiaTheoGio" class="form-label fw-bold text-dark">
+                        Đơn giá theo giờ (VNĐ) (*)
+                    </label>
+                    <input asp-for="DonGiaTheoGio"
+                           asp-format="{0:0}"
+                           type="number"
+                           class="form-control px-3 py-2"
+                           placeholder="Nhập đơn giá (ví dụ: 5000)"
+                           required />
+                    <span asp-validation-for="DonGiaTheoGio" class="text-danger small"></span>
+                </div>
 
-            <div class="form-group">
-                <label asp-for="MoTa" class="control-label"></label>
-                <input asp-for="MoTa" class="form-control" />
-                <span asp-validation-for="MoTa" class="text-danger"></span>
-            </div>
+                <div class="mb-3">
+                    <label asp-for="TrangThai" class="form-label fw-bold text-dark">
+                        Trạng thái (*)
+                    </label>
+                    <select asp-for="TrangThai" class="form-select px-3 py-2">
+                        <option value="true">Hoạt động</option>
+                        <option value="false">Ngừng áp dụng</option>
+                    </select>
+                    <span asp-validation-for="TrangThai" class="text-danger small"></span>
+                </div>
 
-            <div class="form-group">
-                <label asp-for="TrangThai" class="control-label"></label>
-                <input asp-for="TrangThai" class="form-check-input" />
-                <span asp-validation-for="TrangThai" class="text-danger"></span>
-            </div>
+                <div class="mb-3">
+                    <label asp-for="MoTa" class="form-label fw-bold text-dark">
+                        Mô tả
+                    </label>
+                    <textarea asp-for="MoTa" class="form-control px-3 py-2" rows="3" placeholder="Nhập mô tả chi tiết..."></textarea>
+                    <span asp-validation-for="MoTa" class="text-danger small"></span>
+                </div>
 
-            <div class="form-group">
-                <label asp-for="PhuongTiens" class="control-label"></label>
-                <input asp-for="PhuongTiens" class="form-control" />
-                <span asp-validation-for="PhuongTiens" class="text-danger"></span>
-            </div>
+                <div class="d-flex justify-content-between align-items-center mt-4 pt-2">
+                    <a asp-action="Index" class="btn btn-secondary px-4 py-2 text-white fw-medium shadow-sm" style="background-color: #6c757d; border-color: #6c757d;">
+                        <i class="bi bi-arrow-left me-1"></i> Trở về danh sách
+                    </a>
 
-            <div class="form-group">
-                <label asp-for="ViTriDoXes" class="control-label"></label>
-                <input asp-for="ViTriDoXes" class="form-control" />
-                <span asp-validation-for="ViTriDoXes" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+                    <button type="submit" class="btn btn-primary px-4 py-2 fw-medium shadow-sm d-inline-flex align-items-center gap-1">
+                        <i class="bi bi-plus-circle"></i> Tạo mới
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
