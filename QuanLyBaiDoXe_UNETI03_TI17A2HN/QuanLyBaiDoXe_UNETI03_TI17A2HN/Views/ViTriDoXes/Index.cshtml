@@ -10,6 +10,10 @@
 
     var currentSort = ViewData["CurrentSort"]?.ToString();
     var currentTrangThai = ViewData["CurrentTrangThai"]?.ToString();
+    
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int totalPages = ViewBag.TotalPages ?? 1;
+    int totalItems = ViewBag.TotalItems ?? 0;
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -151,3 +155,51 @@
         }
     </tbody>
 </table>
+@if (totalPages > 1)
+{
+    <nav aria-label="Page navigation" class="mt-4">
+        <ul class="pagination justify-content-center mb-0">
+            <!-- Nút Trước -->
+            <li class="page-item @(currentPage <= 1 ? "disabled" : "")">
+                <a class="page-link"
+                   asp-action="Index"
+                   asp-route-page="@(currentPage - 1)"
+                   asp-route-searchString="@ViewBag.CurrentSearch"
+                   asp-route-maLoaiPhuongTien="@ViewBag.CurrentLoaiPhuongTien"
+                   asp-route-khuVuc="@ViewBag.CurrentKhuVuc"
+                   asp-route-tang="@ViewBag.CurrentTang"
+                   asp-route-trangThai="@ViewBag.CurrentTrangThai"
+                   asp-route-sortOrder="@ViewBag.CurrentSort">Trước</a>
+            </li>
+
+            <!-- Danh sách Số Trang -->
+            @for (int i = 1; i <= totalPages; i++)
+            {
+                <li class="page-item @(currentPage == i ? "active" : "")">
+                    <a class="page-link"
+                       asp-action="Index"
+                       asp-route-page="@i"
+                       asp-route-searchString="@ViewBag.CurrentSearch"
+                       asp-route-maLoaiPhuongTien="@ViewBag.CurrentLoaiPhuongTien"
+                       asp-route-khuVuc="@ViewBag.CurrentKhuVuc"
+                       asp-route-tang="@ViewBag.CurrentTang"
+                       asp-route-trangThai="@ViewBag.CurrentTrangThai"
+                       asp-route-sortOrder="@ViewBag.CurrentSort">@i</a>
+                </li>
+            }
+
+            <!-- Nút Sau -->
+            <li class="page-item @(currentPage >= totalPages ? "disabled" : "")">
+                <a class="page-link"
+                   asp-action="Index"
+                   asp-route-page="@(currentPage + 1)"
+                   asp-route-searchString="@ViewBag.CurrentSearch"
+                   asp-route-maLoaiPhuongTien="@ViewBag.CurrentLoaiPhuongTien"
+                   asp-route-khuVuc="@ViewBag.CurrentKhuVuc"
+                   asp-route-tang="@ViewBag.CurrentTang"
+                   asp-route-trangThai="@ViewBag.CurrentTrangThai"
+                   asp-route-sortOrder="@ViewBag.CurrentSort">Sau</a>
+            </li>
+        </ul>
+    </nav>
+}
