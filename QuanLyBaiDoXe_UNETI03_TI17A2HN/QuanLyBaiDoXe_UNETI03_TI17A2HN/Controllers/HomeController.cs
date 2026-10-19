@@ -21,9 +21,13 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
 
         public async Task<IActionResult> Index()
         {
+            if (string.IsNullOrEmpty(HttpContext.Session.GetString("TenDangNhap")))
+            {
+                return RedirectToAction("DangNhap", "TaiKhoans");
+            }
+
             var viewModel = new HomeDashboardViewModel
             {
-                // 5 lượt gửi xe gần đây nhất
                 HoatDongGanDay = await _context.PhieuGuiXe
                     .Include(p => p.PhuongTien)
                         .ThenInclude(pt => pt.LoaiPhuongTien)
@@ -69,7 +73,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             TempData["QuickMaLoai"] = maLoaiPhuongTien;
             TempData["QuickThoiGianVao"] = thoiGianVao?.ToString("yyyy-MM-ddTHH:mm");
             TempData["SuccessMessage"] = "Đã tiếp nhận thông tin xe. Vui lòng chọn vị trí đỗ và thời gian ra để hoàn tất đăng ký.";
-            
+
             return RedirectToAction("Create", "PhieuGuiXes");
         }
 
