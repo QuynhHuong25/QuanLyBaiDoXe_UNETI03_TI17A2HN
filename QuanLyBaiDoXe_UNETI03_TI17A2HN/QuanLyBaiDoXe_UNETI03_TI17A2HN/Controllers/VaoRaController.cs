@@ -60,7 +60,28 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            // Kiểm tra phương tiện này có đang nằm trong bãi (phiếu khác đang gửi) không
+            // 1. Kiểm tra phương tiện có đang bị tạm ngừng hoạt động không
+            if (phieu.PhuongTien != null && !phieu.PhuongTien.TrangThai)
+            {
+                TempData["ErrorMessage"] = "Phương tiện này hiện đang ở trạng thái ngừng hoạt động!";
+                return RedirectToAction(nameof(Index));
+            }
+
+            // 2. Kiểm tra vị trí đỗ có đang bị Tạm ngừng không
+            if (phieu.ViTriDoXe != null && phieu.ViTriDoXe.TrangThai == "Tạm ngừng")
+            {
+                TempData["ErrorMessage"] = "Vị trí đỗ này hiện đang Tạm ngừng hoạt động!";
+                return RedirectToAction(nameof(Index));
+            }
+
+            // 3. Kiểm tra loại phương tiện có phù hợp với vị trí đỗ không
+            if (phieu.PhuongTien != null && phieu.ViTriDoXe != null && phieu.PhuongTien.MaLoaiPhuongTien != phieu.ViTriDoXe.MaLoaiPhuongTien)
+            {
+                TempData["ErrorMessage"] = "Loại phương tiện không phù hợp với vị trí đỗ này!";
+                return RedirectToAction(nameof(Index));
+            }
+
+            // 4. Kiểm tra phương tiện này có đang nằm trong bãi (phiếu khác đang gửi) không
             bool xeDangGui = await _context.PhieuGuiXe
                 .AnyAsync(p => p.MaPhuongTien == phieu.MaPhuongTien && p.TrangThai == "Đang gửi");
             
@@ -70,7 +91,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            // Kiểm tra vị trí đỗ đã được cấp có bị xe khác chiếm chỗ chưa
+            // 5. Kiểm tra vị trí đỗ đã được cấp có bị xe khác chiếm chỗ chưa
             bool viTriBan = await _context.ViTriDoXe
                 .AnyAsync(v => v.MaViTri == phieu.MaViTri && v.TrangThai == "Đang sử dụng");
 
@@ -141,8 +162,8 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            // Giải phóng vị trí đỗ (đổi trạng thái vị trí thành Còn trống)
-            if (phieu.ViTriDoXe != null)
+            // Giải phóng vị trí đỗ: Chỉ trả về "Còn trống" nếu vị trí không ở trạng thái "Tạm ngừng"
+            if (phieu.ViTriDoXe != null && phieu.ViTriDoXe.TrangThai != "Tạm ngừng")
             {
                 phieu.ViTriDoXe.TrangThai = "Còn trống";
             }

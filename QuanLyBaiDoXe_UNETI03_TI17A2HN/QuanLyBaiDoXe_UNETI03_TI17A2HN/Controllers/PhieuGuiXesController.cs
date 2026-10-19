@@ -360,7 +360,18 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             {
                 try
                 {
-                    _context.Update(phieuGuiXe);
+                    var existingPhieu = await _context.PhieuGuiXe.FindAsync(id);
+                    if (existingPhieu == null)
+                    {
+                        return NotFound();
+                    }
+
+                    // Cập nhật các thông tin được phép sửa; Đơn giá, thành tiền và trạng thái giữ nguyên từ hệ thống
+                    existingPhieu.MaPhuongTien = phieuGuiXe.MaPhuongTien;
+                    existingPhieu.MaViTri = phieuGuiXe.MaViTri;
+                    existingPhieu.ThoiGianDuKienVao = phieuGuiXe.ThoiGianDuKienVao;
+                    existingPhieu.ThoiGianDuKienRa = phieuGuiXe.ThoiGianDuKienRa;
+
                     await _context.SaveChangesAsync();
 
                     TempData["SuccessMessage"] = "Cập nhật phiếu gửi xe thành công!";
