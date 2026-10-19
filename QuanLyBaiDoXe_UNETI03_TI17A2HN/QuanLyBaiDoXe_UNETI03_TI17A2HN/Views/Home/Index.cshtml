@@ -6,6 +6,7 @@
 
 @{
     ViewData["Title"] = "Trang chủ - Quản lý bãi đỗ xe";
+    string? vaiTro = Context.Session?.GetString("VaiTro");
 }
 
 <style>
@@ -258,7 +259,7 @@
             </a>
         </div>
 
-        <!-- Khách hàng -->
+        <!-- Khách hàng / Thông tin cá nhân -->
         <div class="col-12 col-sm-6 col-xl-3">
             <a asp-controller="ChuPhuongTiens" asp-action="Index" class="feature-card h-100">
                 <div class="d-flex align-items-center justify-content-between mb-2">
@@ -266,8 +267,8 @@
                         <i class="bi bi-person"></i>
                     </div>
                 </div>
-                <h6 class="fw-bold text-dark mb-1">Khách hàng</h6>
-                <p class="text-muted small mb-3" style="min-height: 38px;">Quản lý thông tin khách hàng đăng ký gửi xe.</p>
+                <h6 class="fw-bold text-dark mb-1">@(vaiTro == "Khách hàng" ? "Thông tin cá nhân" : "Khách hàng")</h6>
+                <p class="text-muted small mb-3" style="min-height: 38px;">@(vaiTro == "Khách hàng" ? "Xem và cập nhật thông tin chủ xe của bạn." : "Quản lý thông tin khách hàng đăng ký gửi xe.")</p>
                 <div class="text-warning small fw-semibold d-flex align-items-center gap-1" style="color: #d97706 !important;">
                     <i class="bi bi-arrow-right"></i>
                 </div>
@@ -280,7 +281,7 @@
         <!-- CỘT TRÁI: HOẠT ĐỘNG GẦN ĐÂY -->
         <div class="col-lg-8">
             <div class="dashboard-card">
-                <h5 class="fw-bold text-dark mb-3">Hoạt động gần đây</h5>
+                <h5 class="fw-bold text-dark mb-3">@(vaiTro == "Khách hàng" ? "Lượt gửi gần đây của bạn" : "Hoạt động gần đây")</h5>
                 
                 <div class="table-responsive">
                     <table class="table align-middle table-borderless table-hover mb-0">
@@ -347,7 +348,7 @@
 
                 <div class="mt-3 pt-2">
                     <a asp-controller="PhieuGuiXes" asp-action="Index" class="text-primary text-decoration-none fw-semibold small d-inline-flex align-items-center gap-1">
-                        <span>Xem tất cả</span>
+                        <span>@(vaiTro == "Khách hàng" ? "Xem lịch sử gửi xe" : "Xem tất cả")</span>
                         <i class="bi bi-arrow-right"></i>
                     </a>
                 </div>

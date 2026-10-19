@@ -1,3 +1,6 @@
+// Họ và tên: Trịnh Thị Hay (MSV: 23103100112) - Module 3: Đăng ký gửi xe (Create, Details, Edit)
+// Họ và tên: Tăng Hoàng Giang (MSV: 23103100031) - Module 4: Quản lý danh sách phiếu (Index, Tìm kiếm, Lọc), Hủy phiếu an toàn
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;

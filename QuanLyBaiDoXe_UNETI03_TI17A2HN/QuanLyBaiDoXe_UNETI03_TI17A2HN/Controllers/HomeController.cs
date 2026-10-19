@@ -21,17 +21,39 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
 
         public async Task<IActionResult> Index()
         {
+            // Kiểm tra đăng nhập theo yêu cầu đề tài
             if (string.IsNullOrEmpty(HttpContext.Session.GetString("TenDangNhap")))
             {
                 return RedirectToAction("DangNhap", "TaiKhoans");
             }
 
+            string? vaiTro = HttpContext.Session.GetString("VaiTro");
+            string? maTaiKhoanStr = HttpContext.Session.GetString("MaTaiKhoan");
+
+            var queryPhieu = _context.PhieuGuiXe
+                .Include(p => p.PhuongTien)
+                    .ThenInclude(pt => pt.LoaiPhuongTien)
+                .Include(p => p.ViTriDoXe)
+                .AsQueryable();
+
+            // Phân quyền dữ liệu: Khách hàng chỉ xem được các hoạt động gửi xe của chính mình
+            if (vaiTro == "Khách hàng" && int.TryParse(maTaiKhoanStr, out int maTaiKhoan))
+            {
+                var chuPT = await _context.ChuPhuongTien.FirstOrDefaultAsync(c => c.MaTaiKhoan == maTaiKhoan);
+                if (chuPT != null)
+                {
+                    queryPhieu = queryPhieu.Where(p => p.PhuongTien != null && p.PhuongTien.MaChuPhuongTien == chuPT.MaChuPhuongTien);
+                }
+                else
+                {
+                    queryPhieu = queryPhieu.Where(p => false);
+                }
+            }
+
             var viewModel = new HomeDashboardViewModel
             {
-                HoatDongGanDay = await _context.PhieuGuiXe
-                    .Include(p => p.PhuongTien)
-                        .ThenInclude(pt => pt.LoaiPhuongTien)
-                    .Include(p => p.ViTriDoXe)
+                // 5 lượt gửi gần đây (Admin: toàn bãi xe, Khách hàng: chỉ của mình)
+                HoatDongGanDay = await queryPhieu
                     .OrderByDescending(p => p.NgayDangKy)
                     .Take(5)
                     .ToListAsync(),
