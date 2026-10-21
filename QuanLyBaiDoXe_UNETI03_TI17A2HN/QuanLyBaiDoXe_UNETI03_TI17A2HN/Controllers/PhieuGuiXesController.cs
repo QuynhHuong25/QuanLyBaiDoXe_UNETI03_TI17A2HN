@@ -27,7 +27,8 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             string? filterLoaiXe, 
             DateTime? filterNgayDangKy,
             string? searchString,
-            string? trangThaiFilter)
+            string? trangThaiFilter,
+            int page = 1)
         {
             // Hỗ trợ cả tên tham số mới và cũ
             searchBienSo = searchBienSo ?? searchString;
@@ -107,7 +108,22 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
 
             query = query.OrderByDescending(p => p.NgayDangKy);
 
-            return View(await query.ToListAsync());
+            // Phân trang danh sách phiếu gửi xe (10 bản ghi / trang)
+            int pageSize = 10;
+            int totalItems = await query.CountAsync();
+            int totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+            page = Math.Max(1, Math.Min(page, totalPages > 0 ? totalPages : 1));
+
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
+            ViewBag.TotalItems = totalItems;
+
+            var items = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return View(items);
         }
 
         // GET: PHIEUGUIXES/Details/5

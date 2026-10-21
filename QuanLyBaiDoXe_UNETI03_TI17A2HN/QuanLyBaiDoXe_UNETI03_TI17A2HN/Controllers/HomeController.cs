@@ -36,16 +36,25 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                 .Include(p => p.ViTriDoXe)
                 .AsQueryable();
 
-            // Phân quyền dữ liệu: Khách hàng chỉ xem được các hoạt động gửi xe của chính mình
-            if (vaiTro == "Khách hàng" && int.TryParse(maTaiKhoanStr, out int maTaiKhoan))
+            // Phân quyền dữ liệu: Chỉ Quản trị viên (Admin) mới xem được toàn bộ hoạt động của bãi xe.
+            // Khách hàng hoặc người dùng chưa đăng nhập chỉ xem được hoạt động của chính mình.
+            if (vaiTro != "Admin")
             {
-                var chuPT = await _context.ChuPhuongTien.FirstOrDefaultAsync(c => c.MaTaiKhoan == maTaiKhoan);
-                if (chuPT != null)
+                if (!string.IsNullOrEmpty(maTaiKhoanStr) && int.TryParse(maTaiKhoanStr, out int maTaiKhoan))
                 {
-                    queryPhieu = queryPhieu.Where(p => p.PhuongTien != null && p.PhuongTien.MaChuPhuongTien == chuPT.MaChuPhuongTien);
+                    var chuPT = await _context.ChuPhuongTien.FirstOrDefaultAsync(c => c.MaTaiKhoan == maTaiKhoan);
+                    if (chuPT != null)
+                    {
+                        queryPhieu = queryPhieu.Where(p => p.PhuongTien != null && p.PhuongTien.MaChuPhuongTien == chuPT.MaChuPhuongTien);
+                    }
+                    else
+                    {
+                        queryPhieu = queryPhieu.Where(p => false);
+                    }
                 }
                 else
                 {
+                    // Chưa đăng nhập hoặc không xác định được tài khoản -> không hiển thị dữ liệu gửi xe của người khác
                     queryPhieu = queryPhieu.Where(p => false);
                 }
             }

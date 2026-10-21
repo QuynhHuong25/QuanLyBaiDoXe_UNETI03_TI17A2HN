@@ -181,3 +181,53 @@
         </tbody>
     </table>
 </div>
+
+<!-- Phân trang danh sách phiếu gửi xe -->
+@if (ViewBag.TotalPages > 1)
+{
+    int currentPage = ViewBag.CurrentPage;
+    int totalPages = ViewBag.TotalPages;
+
+    <nav aria-label="Page navigation" class="mt-4">
+        <ul class="pagination justify-content-center">
+            <!-- Nút Trước -->
+            <li class="page-item @(currentPage <= 1 ? "disabled" : "")">
+                <a class="page-link"
+                   asp-action="Index"
+                   asp-route-page="@(currentPage - 1)"
+                   asp-route-searchBienSo="@ViewData["searchBienSo"]"
+                   asp-route-searchTenChuXe="@ViewData["searchTenChuXe"]"
+                   asp-route-filterTrangThai="@ViewData["filterTrangThai"]"
+                   asp-route-filterLoaiXe="@ViewData["filterLoaiXe"]"
+                   asp-route-filterNgayDangKy="@ViewData["filterNgayDangKy"]">Trước</a>
+            </li>
+
+            <!-- Danh sách Số Trang -->
+            @for (int i = 1; i <= totalPages; i++)
+            {
+                <li class="page-item @(currentPage == i ? "active" : "")">
+                    <a class="page-link"
+                       asp-action="Index"
+                       asp-route-page="@i"
+                       asp-route-searchBienSo="@ViewData["searchBienSo"]"
+                       asp-route-searchTenChuXe="@ViewData["searchTenChuXe"]"
+                       asp-route-filterTrangThai="@ViewData["filterTrangThai"]"
+                       asp-route-filterLoaiXe="@ViewData["filterLoaiXe"]"
+                       asp-route-filterNgayDangKy="@ViewData["filterNgayDangKy"]">@i</a>
+                </li>
+            }
+
+            <!-- Nút Sau -->
+            <li class="page-item @(currentPage >= totalPages ? "disabled" : "")">
+                <a class="page-link"
+                   asp-action="Index"
+                   asp-route-page="@(currentPage + 1)"
+                   asp-route-searchBienSo="@ViewData["searchBienSo"]"
+                   asp-route-searchTenChuXe="@ViewData["searchTenChuXe"]"
+                   asp-route-filterTrangThai="@ViewData["filterTrangThai"]"
+                   asp-route-filterLoaiXe="@ViewData["filterLoaiXe"]"
+                   asp-route-filterNgayDangKy="@ViewData["filterNgayDangKy"]">Sau</a>
+            </li>
+        </ul>
+    </nav>
+}
