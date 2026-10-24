@@ -18,10 +18,38 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
 
         // GET: TAIKHOANS
         [PhanQuyen("Admin")]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string? searchString, int page = 1)
         {
-            var quanLyBaiDoXe_UNETI03_TI17A2HNContext = _context.TaiKhoan.Include(t => t.ChuPhuongTien);
-            return View(await quanLyBaiDoXe_UNETI03_TI17A2HNContext.ToListAsync());
+            int pageSize = 10; // Số lượng tài khoản hiển thị trên mỗi trang
+
+            var query = _context.TaiKhoan.Include(t => t.ChuPhuongTien).AsQueryable();
+
+            // Tìm kiếm theo tên đăng nhập, họ tên hoặc email nếu có nhập
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                query = query.Where(t => t.TenDangNhap.Contains(searchString)
+                                      || (t.HoTen != null && t.HoTen.Contains(searchString))
+                                      || (t.Email != null && t.Email.Contains(searchString)));
+            }
+
+            int totalItems = await query.CountAsync();
+            int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+            // Đảm bảo trang hiện tại nằm trong giới hạn hợp lệ
+            if (page < 1) page = 1;
+            if (totalPages > 0 && page > totalPages) page = totalPages;
+
+            var taiKhoans = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            // Lưu trữ thông tin phục vụ hiển thị ở View
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages > 0 ? totalPages : 1;
+            ViewBag.CurrentSearch = searchString;
+
+            return View(taiKhoans);
         }
 
         // GET: TAIKHOANS/Details
@@ -105,8 +133,8 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
 
             // Kiểm tra quyền: Chỉ chính tài khoản đó hoặc Admin mới được phép chỉnh sửa
             bool isChinhToi = (maTaiKhoanSession != null && taiKhoan.MaTaiKhoan == maTaiKhoanSession)
-                           || (!string.IsNullOrEmpty(tenDangNhapSession) && taiKhoan.TenDangNhap == tenDangNhapSession)
-                           || (vaiTro == "Admin");
+                        || (!string.IsNullOrEmpty(tenDangNhapSession) && taiKhoan.TenDangNhap == tenDangNhapSession)
+                        || (vaiTro == "Admin");
 
             if (!isChinhToi)
             {
