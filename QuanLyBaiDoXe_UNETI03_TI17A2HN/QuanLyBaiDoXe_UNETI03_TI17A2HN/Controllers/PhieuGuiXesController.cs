@@ -21,10 +21,10 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
 
         // GET: PHIEUGUIXES
         public async Task<IActionResult> Index(
-            string? searchBienSo, 
-            string? searchTenChuXe, 
-            string? filterTrangThai, 
-            string? filterLoaiXe, 
+            string? searchBienSo,
+            string? searchTenChuXe,
+            string? filterTrangThai,
+            string? filterLoaiXe,
             DateTime? filterNgayDangKy,
             string? searchString,
             string? trangThaiFilter,
@@ -470,10 +470,10 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                 var phuongTien = await _context.PhuongTien
                     .Include(pt => pt.ChuPhuongTien)
                     .FirstOrDefaultAsync(pt => pt.MaPhuongTien == phieu.MaPhuongTien);
-                    
+
                 if (phuongTien?.ChuPhuongTien?.MaTaiKhoan != maTaiKhoan)
                 {
-                    return Unauthorized(); 
+                    return Unauthorized();
                 }
             }
 
