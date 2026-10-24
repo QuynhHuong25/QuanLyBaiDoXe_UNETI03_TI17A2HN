@@ -1,0 +1,858 @@
+﻿/* =====================================================================
+   parksmart.css  -  Giao diện ParkSmart (chuyển từ demo-giao-dien-bai-do-xe.html)
+   Đặt tại: wwwroot/css/parksmart.css
+   Phải được nạp SAU bootstrap.min.css, site.css và <Dự án>.styles.css
+   ===================================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
+
+/* ---------- 1. Biến màu (lấy nguyên từ demo) ---------- */
+:root {
+    --bg: #f4f6fb;
+    --sf: #ffffff;
+    --tx: #0f172a;
+    --mu: #64748b;
+    --bd: #e5e9f2;
+    --pr: #2563eb;
+    --pr2: #1e40af;
+    --nv: #0b1f4d;
+    --ac: #f5b400;
+    --ok: #16a34a;
+    --wa: #d97706;
+    --er: #dc2626;
+    --sh: 0 6px 24px rgba(15, 23, 42, .07);
+    /* ép Bootstrap dùng cùng bảng màu */
+    --bs-body-font-family: 'Be Vietnam Pro', system-ui, sans-serif;
+    --bs-body-color: var(--tx);
+    --bs-body-bg: var(--bg);
+    --bs-primary: #2563eb;
+    --bs-primary-rgb: 37, 99, 235;
+    --bs-border-color: var(--bd);
+}
+
+/* ---------- 2. Nền tảng ---------- */
+html {
+    font-size: 15px;
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0 !important; /* site.css đang đặt margin-bottom:60px */
+    background: var(--bg);
+    color: var(--tx);
+    font-family: 'Be Vietnam Pro', system-ui, sans-serif;
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+a {
+    text-decoration: none;
+}
+
+    a:not([class]) {
+        color: var(--pr);
+    }
+
+h1, h2, h3, h4, h5 {
+    line-height: 1.2;
+    font-weight: 700;
+}
+
+/* ---------- 3. Khung ứng dụng: sidebar + topbar ---------- */
+.ps-app {
+    display: grid;
+    grid-template-columns: 262px 1fr;
+    min-height: 100vh;
+}
+
+.ps-content {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.ps-side {
+    background: var(--sf);
+    border-right: 1px solid var(--bd);
+    padding: 20px 14px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow: auto;
+}
+
+.ps-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 800;
+    font-size: 19px;
+    color: var(--tx);
+}
+
+    .ps-logo i {
+        font-style: normal;
+        width: 38px;
+        height: 38px;
+        border-radius: 11px;
+        background: var(--ac);
+        color: var(--nv);
+        display: grid;
+        place-items: center;
+        font-weight: 800;
+    }
+
+.ps-side .ps-logo {
+    padding: 0 8px 20px;
+}
+
+.ps-side h6 {
+    margin: 18px 10px 6px;
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: var(--mu);
+    font-weight: 700;
+}
+
+.ps-side a.ps-link {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    padding: 10px 12px;
+    margin: 2px 0;
+    border-radius: 12px;
+    font-weight: 500;
+    color: var(--mu);
+}
+
+    .ps-side a.ps-link:hover {
+        background: var(--bg);
+        color: var(--tx);
+    }
+
+    .ps-side a.ps-link.on {
+        background: linear-gradient(135deg, var(--pr), var(--pr2));
+        color: #fff;
+        box-shadow: 0 6px 16px rgba(37, 99, 235, .35);
+    }
+
+.ps-top {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 28px;
+    background: var(--sf);
+    border-bottom: 1px solid var(--bd);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+    .ps-top .u {
+        margin-left: auto;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+
+.ps-av {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--ac);
+    color: #1a1300;
+    font-weight: 800;
+    display: grid;
+    place-items: center;
+}
+
+.ps-pill {
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 99px;
+    background: rgba(37, 99, 235, .14);
+    color: var(--pr);
+    font-weight: 700;
+}
+
+    .ps-pill.green {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+.ps-main {
+    padding: 28px;
+    flex-grow: 1;
+}
+
+    .ps-main h2 {
+        font-size: 24px;
+        font-weight: 800;
+        letter-spacing: -.3px;
+    }
+
+.ps-menu-btn {
+    display: none;
+}
+
+@media (max-width: 900px) {
+    .ps-app {
+        grid-template-columns: 1fr;
+    }
+
+    .ps-side {
+        position: fixed;
+        left: -280px;
+        width: 262px;
+        z-index: 40;
+        transition: .25s;
+    }
+
+        .ps-side.on {
+            left: 0;
+            box-shadow: 0 0 0 100vmax rgba(2, 6, 23, .5);
+        }
+
+    .ps-menu-btn {
+        display: inline-flex;
+    }
+
+    .ps-main {
+        padding: 18px;
+    }
+
+    .ps-top {
+        padding: 12px 16px;
+    }
+}
+
+/* ---------- 4. Nút ---------- */
+.btn {
+    border-radius: 12px;
+    font-weight: 600;
+    transition: .2s;
+}
+
+.btn-primary {
+    --bs-btn-bg: var(--pr);
+    --bs-btn-border-color: var(--pr);
+    --bs-btn-hover-bg: var(--pr2);
+    --bs-btn-hover-border-color: var(--pr2);
+    --bs-btn-active-bg: var(--pr2);
+    --bs-btn-active-border-color: var(--pr2);
+}
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(37, 99, 235, .3);
+    }
+
+.btn-ac {
+    --bs-btn-bg: var(--ac);
+    --bs-btn-border-color: var(--ac);
+    --bs-btn-color: #1a1300;
+    --bs-btn-hover-bg: #ffc61a;
+    --bs-btn-hover-border-color: #ffc61a;
+    --bs-btn-hover-color: #1a1300;
+    --bs-btn-active-bg: #ffc61a;
+    --bs-btn-active-color: #1a1300;
+}
+
+    .btn-ac:hover {
+        transform: translateY(-2px);
+    }
+
+.btn-gh {
+    --bs-btn-bg: transparent;
+    --bs-btn-border-color: var(--bd);
+    --bs-btn-color: var(--tx);
+    --bs-btn-hover-bg: var(--bg);
+    --bs-btn-hover-border-color: var(--bd);
+    --bs-btn-hover-color: var(--tx);
+    --bs-btn-active-bg: var(--bg);
+    --bs-btn-active-color: var(--tx);
+    border-width: 1.5px;
+}
+
+.btn-sm {
+    border-radius: 9px;
+    font-size: 12.5px;
+    padding: 6px 12px;
+}
+
+    /* Nút thao tác trong bảng: Chi tiết/Sửa = viền xám, Xóa = đỏ nhạt (như demo) */
+    .btn-sm.btn-info, .btn-sm.btn-warning, .btn-sm.btn-secondary,
+    .btn-action-detail, .btn-action-edit {
+        background: transparent;
+        color: var(--tx);
+        border: 1.5px solid var(--bd);
+        border-radius: 9px;
+    }
+
+        .btn-sm.btn-info:hover, .btn-sm.btn-warning:hover, .btn-sm.btn-secondary:hover,
+        .btn-action-detail:hover, .btn-action-edit:hover {
+            background: var(--bg);
+            color: var(--tx);
+            border-color: var(--bd);
+        }
+
+    .btn-sm.btn-danger, .btn-action-delete {
+        background: #fee2e2;
+        color: var(--er);
+        border: 1.5px solid #fee2e2;
+        border-radius: 9px;
+    }
+
+        .btn-sm.btn-danger:hover, .btn-action-delete:hover {
+            background: #fecaca;
+            color: #b91c1c;
+            border-color: #fecaca;
+        }
+
+/* ---------- 5. Thẻ, bảng, badge, form ---------- */
+.card {
+    background: var(--sf);
+    border: 1px solid var(--bd);
+    border-radius: 18px;
+    box-shadow: var(--sh);
+}
+
+.table {
+    --bs-table-bg: transparent;
+    --bs-table-striped-bg: rgba(37, 99, 235, .03);
+    --bs-table-hover-bg: rgba(37, 99, 235, .04);
+    --bs-table-border-color: var(--bd);
+    font-size: 14px;
+    margin-bottom: 0;
+}
+
+    .table > thead th {
+        color: var(--mu);
+        font-weight: 600;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+        white-space: nowrap;
+    }
+
+    .table > :not(caption) > * > * {
+        padding: .8rem .75rem;
+    }
+
+.table-dark { /* thead.table-dark cũ -> tiêu đề sáng như demo */
+    --bs-table-bg: transparent;
+    --bs-table-color: var(--mu);
+    --bs-table-border-color: var(--bd);
+    background: transparent;
+    color: var(--mu);
+}
+
+.table-bordered > :not(caption) > * {
+    border-width: 0;
+}
+
+    .table-bordered > :not(caption) > * > * {
+        border-width: 0 0 1px;
+    }
+
+/* Bảng đứng trực tiếp trong trang -> tự bọc thành "thẻ" */
+.ps-main .container-fluid > .table,
+.ps-main .container-fluid > .table-responsive,
+.ps-main .container-fluid > .table-responsive-custom {
+    background: var(--sf);
+    border: 1px solid var(--bd);
+    border-radius: 18px;
+    box-shadow: var(--sh);
+}
+
+.ps-main .container-fluid > .table {
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.badge {
+    border-radius: 99px;
+    font-weight: 600;
+    font-size: 12px;
+    padding: .4em .85em;
+}
+
+    .badge.bg-success, .badge-status-active {
+        background: #dcfce7 !important;
+        color: #166534 !important;
+    }
+
+    .badge.bg-danger, .badge-status-inactive {
+        background: #fee2e2 !important;
+        color: #991b1b !important;
+    }
+
+    .badge.bg-warning {
+        background: #fef3c7 !important;
+        color: #92400e !important;
+    }
+
+    .badge.bg-info, .badge.bg-primary {
+        background: #dbeafe !important;
+        color: #1d4ed8 !important;
+    }
+
+    .badge.bg-secondary {
+        background: #e2e8f0 !important;
+        color: #475569 !important;
+    }
+
+.form-label, label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--mu);
+}
+
+.form-check-label {
+    font-weight: 500;
+}
+
+.form-control, .form-select {
+    border: 1.5px solid var(--bd);
+    border-radius: 11px;
+    background-color: var(--bg);
+    color: var(--tx);
+    padding-top: .65rem;
+    padding-bottom: .65rem;
+}
+
+    .form-control:focus, .form-select:focus {
+        background-color: var(--bg);
+        border-color: var(--pr);
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, .15);
+    }
+
+.alert {
+    border: 0;
+    border-radius: 14px;
+}
+
+.page-link {
+    border-radius: 9px;
+    margin: 0 2px;
+    border: 1px solid var(--bd);
+    color: var(--tx);
+}
+
+.page-item.active .page-link {
+    background: var(--pr);
+    border-color: var(--pr);
+    color: #fff;
+}
+
+/* ---------- 6. Thành phần riêng của demo ---------- */
+/* Banner chào mừng */
+.ps-welcome {
+    background: linear-gradient(120deg, #0b1f4d, #2563eb);
+    color: #fff;
+    border-radius: 22px;
+    padding: 30px;
+    margin-bottom: 22px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+    .ps-welcome h2 {
+        color: #fff;
+    }
+
+    .ps-welcome p {
+        margin: 6px 0 0;
+        opacity: .85;
+    }
+
+/* 4 ô số liệu */
+.ps-kp {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 22px;
+}
+
+    .ps-kp .card {
+        flex-direction: row;
+        display: flex;
+        gap: 14px;
+        align-items: center;
+        padding: 20px;
+    }
+
+.ps-ico {
+    width: 50px;
+    height: 50px;
+    border-radius: 14px;
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    font-size: 24px;
+    background: rgba(37, 99, 235, .12);
+}
+
+.ps-kp b {
+    font-size: 26px;
+    display: block;
+    line-height: 1.1;
+}
+
+.ps-kp span {
+    color: var(--mu);
+    font-size: 13px;
+}
+
+.ps-two {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+}
+
+@media (max-width: 900px) {
+    .ps-two {
+        grid-template-columns: 1fr;
+    }
+
+    .ps-kp {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 560px) {
+    .ps-kp {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Sơ đồ chỗ đỗ */
+.ps-lot {
+    display: grid;
+    gap: 6px;
+}
+
+.ps-s {
+    aspect-ratio: 1;
+    border-radius: 7px;
+    background: #dcfce7;
+    color: #166534;
+    display: grid;
+    place-items: center;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 0 2px;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+    .ps-s.u {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .ps-s.x {
+        background: #e2e8f0;
+        color: #64748b;
+    }
+
+.ps-lg {
+    display: flex;
+    gap: 14px;
+    font-size: 12px;
+    color: var(--mu);
+    margin-top: 12px;
+    flex-wrap: wrap;
+}
+
+    .ps-lg b {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-radius: 3px;
+        margin-right: 5px;
+    }
+
+/* Thanh tiến trình + biểu đồ cột */
+.ps-bar {
+    height: 9px;
+    background: var(--bd);
+    border-radius: 9px;
+    overflow: hidden;
+    margin: 6px 0 14px;
+}
+
+    .ps-bar i {
+        display: block;
+        height: 100%;
+        background: var(--pr);
+        border-radius: 9px;
+    }
+
+.ps-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 14px;
+    height: 200px;
+    padding-top: 10px;
+}
+
+    .ps-bars > div {
+        flex: 1;
+        text-align: center;
+        font-size: 12px;
+        color: var(--mu);
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        height: 100%;
+    }
+
+    .ps-bars i {
+        display: block;
+        border-radius: 9px 9px 3px 3px;
+        margin-bottom: 6px;
+        background: linear-gradient(180deg, var(--pr), #93b4ff);
+    }
+
+/* Màn Điều phối vào / ra */
+.ps-eb {
+    color: var(--pr);
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    font-size: 12px;
+    margin-bottom: 6px;
+}
+
+.ps-big {
+    font-size: 36px;
+    font-weight: 800;
+    letter-spacing: -.5px;
+    margin: 0;
+}
+
+.ps-vg {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+
+.ps-vc {
+    padding: 30px;
+    border-radius: 24px;
+}
+
+.ps-vt {
+    font-size: 12px;
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: 8px;
+    letter-spacing: .3px;
+}
+
+    .ps-vt.w {
+        background: #fef3c7;
+        color: #b45309;
+    }
+
+    .ps-vt.p {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+.ps-pl {
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    margin: 26px 0;
+}
+
+.ps-vi {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 22px;
+}
+
+    .ps-vi div {
+        background: var(--bg);
+        border-radius: 14px;
+        padding: 14px 16px;
+    }
+
+    .ps-vi small {
+        display: block;
+        color: var(--mu);
+        font-size: 12px;
+    }
+
+    .ps-vi b {
+        font-size: 17px;
+    }
+
+.ps-vb {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 16px;
+    border-radius: 14px;
+    box-shadow: 0 8px 18px rgba(37, 99, 235, .3);
+}
+
+@media (max-width: 1100px) {
+    .ps-vg {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 700px) {
+    .ps-vg {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Các class cũ của Home/Index (đã chuyển từ <style> trong view sang đây) */
+.dashboard-card {
+    background: var(--sf);
+    border: 1px solid var(--bd);
+    border-radius: 18px;
+    padding: 24px;
+    box-shadow: var(--sh);
+    height: 100%;
+}
+
+.badge-status {
+    padding: 4px 12px;
+    border-radius: 99px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.status-dang-gui {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.status-da-gui {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.status-cho-xac-nhan {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.status-khac {
+    background: #e2e8f0;
+    color: #475569;
+}
+
+.form-control-dash, .form-select-dash {
+    border-radius: 11px;
+    border: 1.5px solid var(--bd);
+    background-color: var(--bg);
+    padding: 10px 14px;
+    font-size: 14px;
+}
+
+/* ---------- 7. Trang Đăng nhập / Đăng ký / Quên mật khẩu ---------- */
+/* Dùng bằng cách thêm class "ps-auth" vào <body> của 3 view này */
+body.ps-auth {
+    display: block;
+    padding: 0;
+    background: var(--sf);
+    min-height: 100vh;
+    font-family: 'Be Vietnam Pro', system-ui, sans-serif;
+}
+
+.ps-auth .login-card {
+    max-width: none;
+    border-radius: 0;
+    box-shadow: none;
+    border: 0;
+    min-height: 100vh;
+}
+
+    .ps-auth .login-card > .row {
+        min-height: 100vh;
+    }
+
+.ps-auth .login-left {
+    background: linear-gradient(135deg, #0b1f4d, #1e40af);
+    color: #fff;
+    padding: 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+    .ps-auth .login-left .ps-logo {
+        color: #fff;
+    }
+
+    .ps-auth .login-left h1 {
+        font-size: 36px;
+        font-weight: 800;
+        line-height: 1.2;
+    }
+
+    .ps-auth .login-left p {
+        opacity: .8;
+        margin-top: 14px;
+        max-width: 420px;
+    }
+
+.ps-auth .login-right {
+    border: 0;
+    padding: 30px;
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center !important;
+}
+
+    .ps-auth .login-right > div:first-child {
+        width: 100%;
+        max-width: 400px;
+    }
+
+    .ps-auth .login-right > div:last-child:not(:first-child) {
+        display: none;
+    }
+/* dòng © ở cột phải */
+.ps-auth .btn-primary-custom {
+    background-color: var(--pr);
+    border-radius: 12px;
+}
+
+    .ps-auth .btn-primary-custom:hover {
+        background-color: var(--pr2);
+    }
+
+.ps-auth .form-control-custom {
+    background-color: var(--bg);
+    border: 1.5px solid var(--bd);
+    border-radius: 11px;
+}
+
+    .ps-auth .form-control-custom:focus {
+        border-color: var(--pr);
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, .15);
+    }
+
+.ps-back {
+    display: inline-block;
+    color: var(--mu);
+    font-size: 13px;
+    margin-bottom: 14px;
+}
+
+    .ps-back:hover {
+        color: var(--pr);
+    }
