@@ -1,3 +1,4 @@
+@* Lương Thị Quỳnh Hương - 23103100064 *@
 @model IEnumerable<QuanLyBaiDoXe_UNETI03_TI17A2HN.Models.PhuongTien>
 
 @{
@@ -12,28 +13,147 @@
     string currentFilter = ViewBag.CurrentFilter as string ?? "";
 }
 
-<div class="container-fluid py-4">
+<style>
+    .table-container {
+        background-color: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(11,31,77,0.05);
+        overflow: hidden;
+        border: 1px solid #e2e8f0;
+    }
 
+    .custom-table {
+        margin-bottom: 0;
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    .custom-table thead th {
+        background-color: #f8fafc !important;
+        color: #475569 !important;
+        border-bottom: 2px solid #e2e8f0;
+        border-top: none;
+        padding: 14px 16px;
+        font-weight: 700;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        vertical-align: middle;
+    }
+
+    .custom-table tbody td {
+        padding: 16px;
+        vertical-align: middle;
+        border-bottom: 1px solid #f1f5f9;
+        color: #1e293b;
+        font-size: 14px;
+    }
+
+    .custom-table tbody tr:nth-child(even) td {
+        background-color: #fafbfc !important;
+    }
+
+    .custom-table tbody tr:hover td {
+        background-color: #f1f5f9 !important;
+    }
+
+    /* Cụm nút thao tác nhóm ô vuông chuẩn mẫu ParkSmart */
+    .action-group {
+        display: inline-flex;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        overflow: hidden;
+        background: #ffffff;
+    }
+
+    .action-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 34px;
+        text-decoration: none;
+        border: none;
+        border-right: 1px solid #cbd5e1;
+        background: transparent;
+        transition: all 0.2s;
+        font-size: 15px;
+        cursor: pointer;
+    }
+
+    .action-btn:last-child {
+        border-right: none;
+    }
+
+    .action-btn.view { color: #0ea5e9; }
+    .action-btn.view:hover { background-color: #e0f2fe; }
+
+    .action-btn.edit { color: #d97706; }
+    .action-btn.edit:hover { background-color: #fef3c7; }
+
+    .action-btn.delete { color: #ef4444; }
+    .action-btn.delete:hover { background-color: #fee2e2; }
+
+    .action-btn.disabled-btn { color: #94a3b8; background-color: #f8fafc; cursor: not-allowed; }
+
+    /* CSS tùy chỉnh phân trang bo tròn */
+    .custom-pagination .pagination {
+        gap: 6px;
+    }
+
+    .custom-pagination .page-item .page-link {
+        border: 1px solid #e2e8f0;
+        border-radius: 8px !important;
+        color: #475569;
+        padding: 8px 14px;
+        font-weight: 600;
+        font-size: 14px;
+        background-color: #ffffff;
+        transition: all 0.2s;
+    }
+
+    .custom-pagination .page-item .page-link:hover {
+        background-color: #f1f5f9;
+        color: #1e293b;
+        border-color: #cbd5e1;
+    }
+
+    .custom-pagination .page-item.active .page-link {
+        background-color: #2563eb !important;
+        border-color: #2563eb !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+    }
+
+    .custom-pagination .page-item.disabled .page-link {
+        background-color: #f8fafc;
+        color: #94a3b8;
+        border-color: #e2e8f0;
+    }
+</style>
+
+<div class="container-fluid px-0 py-2">
+
+    <!-- Header Page -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h2 class="fw-bold mb-1">
-                <i class="bi bi-car-front-fill me-2"></i>
+            <h2 class="fw-bold mb-1 text-dark fs-3">
+                <i class="bi bi-car-front-fill me-2 text-primary"></i>
                 Quản lý phương tiện
             </h2>
-            <p class="text-muted mb-0">
-                Quản lý thông tin phương tiện trong hệ thống
+            <p class="text-secondary small mb-0 mt-1">
+                Quản lý thông tin và trạng thái phương tiện trong hệ thống
             </p>
         </div>
-        <a asp-action="Create" class="btn btn-primary">
-            <i class="bi bi-plus-circle me-1"></i>
-            Thêm phương tiện
+        <a asp-action="Create" class="btn btn-primary px-3 py-2 fw-semibold shadow-sm d-inline-flex align-items-center gap-2 rounded-3">
+            <i class="bi bi-plus-circle"></i> Thêm phương tiện
         </a>
     </div>
 
     @if (TempData["SuccessMessage"] != null)
     {
-        <div class="alert alert-success alert-dismissible fade show">
-            <i class="bi bi-check-circle me-2"></i>
+        <div class="alert alert-success alert-dismissible fade show shadow-sm mb-4 rounded-3" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
             @TempData["SuccessMessage"]
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
@@ -41,174 +161,165 @@
 
     @if (TempData["ErrorMessage"] != null)
     {
-        <div class="alert alert-danger alert-dismissible fade show">
-            <i class="bi bi-exclamation-triangle me-2"></i>
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm mb-4 rounded-3" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
             @TempData["ErrorMessage"]
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     }
 
-    <div class="card shadow-sm border-0 mb-4">
-        <div class="card-body">
-            <form asp-action="Index" method="get" class="row g-2">
+    <!-- Khung tìm kiếm -->
+    <div class="card shadow-sm border-0 mb-4 rounded-4">
+        <div class="card-body bg-light p-3 rounded-4">
+            <form asp-action="Index" method="get" class="row g-2 align-items-center">
                 <div class="col-md-8">
                     <div class="input-group">
-                        <span class="input-group-text">
+                        <span class="input-group-text bg-white border-end-0 text-muted rounded-start-3">
                             <i class="bi bi-search"></i>
                         </span>
                         <input type="text"
                                name="searchString"
                                value="@currentFilter"
-                               class="form-control"
+                               class="form-control border-start-0 ps-0 rounded-end-3"
                                placeholder="Tìm theo biển số hoặc nhãn hiệu..." />
                     </div>
                 </div>
                 <div class="col-md-2">
-                    <button type="submit" class="btn btn-primary w-100">
-                        <i class="bi bi-search me-1"></i>
-                        Tìm kiếm
+                    <button type="submit" class="btn btn-primary w-100 rounded-3 fw-semibold">
+                        <i class="bi bi-search me-1"></i> Tìm kiếm
                     </button>
                 </div>
                 <div class="col-md-2">
-                    <a asp-action="Index" class="btn btn-outline-secondary w-100">
-                        <i class="bi bi-arrow-clockwise me-1"></i>
-                        Làm mới
+                    <a asp-action="Index" class="btn btn-outline-secondary w-100 rounded-3 fw-semibold">
+                        <i class="bi bi-arrow-clockwise me-1"></i> Làm mới
                     </a>
                 </div>
             </form>
         </div>
     </div>
 
-    <div class="mb-3">
-        <span class="badge bg-secondary">
-            Tổng số: @total phương tiện
-        </span>
+    <div class="mb-3 text-secondary small">
+        Tổng số: <strong class="text-dark">@total</strong> phương tiện
     </div>
 
-    <div class="card shadow-sm border-0">
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="table-dark">
-                        <tr>
-                            <th class="text-center">STT</th>
-                            <th>Biển số xe</th>
-                            <th>Chủ phương tiện</th>
-                            <th>Loại phương tiện</th>
-                            <th>Nhãn hiệu</th>
-                            <th>Màu sắc</th>
-                            <th class="text-center">Trạng thái</th>
-                            <th class="text-center" style="width:180px">Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (Model != null && Model.Any())
+    <!-- Bảng dữ liệu -->
+    <div class="table-container">
+        <div class="table-responsive">
+            <table class="table custom-table">
+                <thead>
+                    <tr>
+                        <th class="text-center" style="width: 70px;">STT</th>
+                        <th>Biển số xe</th>
+                        <th>Chủ phương tiện</th>
+                        <th>Loại phương tiện</th>
+                        <th>Nhãn hiệu</th>
+                        <th>Màu sắc</th>
+                        <th class="text-center">Trạng thái</th>
+                        <th class="text-center" style="width: 140px;">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        int stt = (currentPage - 1) * 10 + 1;
+
+                        foreach (var item in Model)
                         {
-                            int stt = (currentPage - 1) * 10 + 1;
+                            bool dangGui = listDangGui.Contains(item.MaPhuongTien);
 
-                            foreach (var item in Model)
-                            {
-                                bool dangGui = listDangGui.Contains(item.MaPhuongTien);
-
-                                <tr>
-                                    <td class="text-center">@stt</td>
-                                    <td>
-                                        <strong>@item.BienSoXe</strong>
-                                    </td>
-                                    <td>@item.ChuPhuongTien?.HoTen</td>
-                                    <td>@item.LoaiPhuongTien?.TenLoaiPhuongTien</td>
-                                    <td>
-                                        @(string.IsNullOrWhiteSpace(item.NhanHieu) ? "—" : item.NhanHieu)
-                                    </td>
-                                    <td>
-                                        @(string.IsNullOrWhiteSpace(item.MauSac) ? "—" : item.MauSac)
-                                    </td>
-                                    <td class="text-center">
-                                        @if (dangGui)
+                            <tr>
+                                <td class="text-center text-secondary">@stt</td>
+                                <td>
+                                    <span class="fw-bold text-dark">@item.BienSoXe</span>
+                                </td>
+                                <td><span class="text-secondary">@(item.ChuPhuongTien?.HoTen ?? "---")</span></td>
+                                <td><span class="text-secondary">@(item.LoaiPhuongTien?.TenLoaiPhuongTien ?? "---")</span></td>
+                                <td>
+                                    <span class="text-secondary">@(string.IsNullOrWhiteSpace(item.NhanHieu) ? "---" : item.NhanHieu)</span>
+                                </td>
+                                <td>
+                                    <span class="text-secondary">@(string.IsNullOrWhiteSpace(item.MauSac) ? "---" : item.MauSac)</span>
+                                </td>
+                                <td class="text-center">
+                                    @if (dangGui)
+                                    {
+                                        <span class="badge bg-warning bg-opacity-10 text-warning px-3 py-2 rounded-pill fw-semibold">
+                                            <i class="bi bi-car-front-fill me-1"></i> Đang gửi
+                                        </span>
+                                    }
+                                    else if (item.TrangThai)
+                                    {
+                                        <span class="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill fw-semibold">
+                                            <i class="bi bi-check-circle me-1"></i> Hoạt động
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary bg-opacity-10 text-secondary px-3 py-2 rounded-pill fw-semibold">
+                                            <i class="bi bi-x-circle me-1"></i> Ngừng HĐ
+                                        </span>
+                                    }
+                                </td>
+                                <td class="text-center">
+                                    <div class="action-group">
+                                        <a asp-action="Details"
+                                           asp-route-id="@item.MaPhuongTien"
+                                           class="action-btn view"
+                                           title="Chi tiết">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a asp-action="Edit"
+                                           asp-route-id="@item.MaPhuongTien"
+                                           class="action-btn edit"
+                                           title="Sửa">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        @if (!dangGui)
                                         {
-                                            <span class="badge bg-warning text-dark">
-                                                <i class="bi bi-car-front-fill me-1"></i>
-                                                Đang gửi
-                                            </span>
-                                        }
-                                        else if (item.TrangThai)
-                                        {
-                                            <span class="badge bg-success">
-                                                <i class="bi bi-check-circle me-1"></i>
-                                                Hoạt động
-                                            </span>
+                                            <a asp-action="Delete"
+                                               asp-route-id="@item.MaPhuongTien"
+                                               class="action-btn delete"
+                                               title="Xóa">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
                                         }
                                         else
                                         {
-                                            <span class="badge bg-secondary">
-                                                <i class="bi bi-x-circle me-1"></i>
-                                                Ngừng hoạt động
+                                            <span class="action-btn disabled-btn" title="Xe đang gửi, không thể xóa">
+                                                <i class="bi bi-lock"></i>
                                             </span>
                                         }
-                                    </td>
-                                    <td class="text-center">
-                                        <div class="btn-group" role="group">
-                                            <a asp-action="Details"
-                                                   asp-route-id="@item.MaPhuongTien"
-                                                   class="btn btn-sm btn-outline-info"
-                                                   title="Chi tiết">
-                                                <i class="bi bi-eye"></i>
-                                            </a>
-                                            <a asp-action="Edit"
-                                                   asp-route-id="@item.MaPhuongTien"
-                                                   class="btn btn-sm btn-outline-warning"
-                                                   title="Sửa">
-                                                <i class="bi bi-pencil"></i>
-                                            </a>
-                                            @if (!dangGui)
-                                            {
-                                                <a asp-action="Delete"
-                                                       asp-route-id="@item.MaPhuongTien"
-                                                       class="btn btn-sm btn-outline-danger"
-                                                       title="Xóa">
-                                                    <i class="bi bi-trash"></i>
-                                                </a>
-                                            }
-                                            else
-                                            {
-                                                <button type="button"
-                                                        class="btn btn-sm btn-outline-secondary"
-                                                        disabled
-                                                        title="Xe đang gửi">
-                                                    <i class="bi bi-lock"></i>
-                                                </button>
-                                            }
-                                        </div>
-                                    </td>
-                                </tr>
-                                stt++;
-                            }
-                        }
-                        else
-                        {
-                            <tr>
-                                <td colspan="8" class="text-center py-5 text-muted">
-                                    <i class="bi bi-inbox fs-1 d-block mb-2"></i>
-                                    Không tìm thấy phương tiện nào.
+                                    </div>
                                 </td>
                             </tr>
+                            stt++;
                         }
-                    </tbody>
-                </table>
-            </div>
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="8" class="text-center py-5 text-muted">
+                                <i class="bi bi-inbox fs-2 d-block mb-2 text-secondary"></i>
+                                Không tìm thấy phương tiện nào.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
         </div>
     </div>
 
+    <!-- Phân trang chuẩn mẫu bo tròn -->
     @if (totalPages > 1)
     {
-        <nav class="mt-4">
-            <ul class="pagination justify-content-center">
+        <nav class="mt-4 custom-pagination">
+            <ul class="pagination justify-content-center mb-0">
                 <li class="page-item @(currentPage == 1 ? "disabled" : "")">
                     <a class="page-link"
-                           asp-action="Index"
-                           asp-route-page="@(currentPage - 1)"
-                           asp-route-searchString="@currentFilter">
-                        <i class="bi bi-chevron-left"></i>
+                       asp-action="Index"
+                       asp-route-page="@(currentPage - 1)"
+                       asp-route-searchString="@currentFilter">
+                        <i class="bi bi-chevron-left"></i> Trước
                     </a>
                 </li>
 
@@ -216,9 +327,9 @@
                 {
                     <li class="page-item @(i == currentPage ? "active" : "")">
                         <a class="page-link"
-                               asp-action="Index"
-                               asp-route-page="@i"
-                               asp-route-searchString="@currentFilter">
+                           asp-action="Index"
+                           asp-route-page="@i"
+                           asp-route-searchString="@currentFilter">
                             @i
                         </a>
                     </li>
@@ -226,10 +337,10 @@
 
                 <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
                     <a class="page-link"
-                           asp-action="Index"
-                           asp-route-page="@(currentPage + 1)"
-                           asp-route-searchString="@currentFilter">
-                        <i class="bi bi-chevron-right"></i>
+                       asp-action="Index"
+                       asp-route-page="@(currentPage + 1)"
+                       asp-route-searchString="@currentFilter">
+                        Sau <i class="bi bi-chevron-right"></i>
                     </a>
                 </li>
             </ul>
