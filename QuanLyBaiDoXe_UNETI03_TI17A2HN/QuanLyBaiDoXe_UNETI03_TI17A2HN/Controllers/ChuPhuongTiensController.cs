@@ -26,7 +26,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                 .Include(c => c.TaiKhoan)
                 .AsQueryable();
 
-           
+
             var vaiTro = HttpContext.Session.GetString("VaiTro");
             var maTaiKhoanStr = HttpContext.Session.GetString("MaTaiKhoan");
 
@@ -36,7 +36,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                 query = query.Where(c => c.MaTaiKhoan == maTaiKhoan);
             }
 
-          
+
             if (!string.IsNullOrEmpty(searchString))
             {
                 query = query.Where(c =>
@@ -221,56 +221,56 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
 
 
         [HttpPost]
-         [ValidateAntiForgeryToken]
-         [PhanQuyen("Admin")]
-         public async Task<IActionResult> CapNhatTrangThai(
+        [ValidateAntiForgeryToken]
+        [PhanQuyen("Admin")]
+        public async Task<IActionResult> CapNhatTrangThai(
              int id,
              bool trangThai,
              string? searchString,
              int page = 1)
-         {
-             var chuPhuongTien = await _context.ChuPhuongTien
-                 .Include(c => c.TaiKhoan)
-                 .FirstOrDefaultAsync(c => c.MaChuPhuongTien == id);
-        
-             if (chuPhuongTien == null)
-             {
-                 return NotFound();
-             }
-        
-             // Cập nhật trạng thái chủ phương tiện
-             chuPhuongTien.TrangThai = trangThai;
-        
-             // Cập nhật trạng thái tài khoản đăng nhập
-             if (chuPhuongTien.TaiKhoan != null)
-             {
-                 chuPhuongTien.TaiKhoan.TrangThai = trangThai;
-             }
-        
-             await _context.SaveChangesAsync();
-        
-             // Kiểm tra lại dữ liệu sau khi lưu
-             var taiKhoanKiemTra = await _context.TaiKhoan
-                 .FirstOrDefaultAsync(t => t.MaTaiKhoan == chuPhuongTien.MaTaiKhoan);
-        
-             if (taiKhoanKiemTra == null)
-             {
-                 TempData["SuccessMessage"] =
-                     "Đã cập nhật chủ phương tiện nhưng không tìm thấy tài khoản liên kết!";
-             }
-             else
-             {
-                 TempData["SuccessMessage"] =
-                     $"Đã {(trangThai ? "kích hoạt" : "khóa")} tài khoản thành công! " +
-                     $"Trạng thái tài khoản: {taiKhoanKiemTra.TrangThai}";
-             }
-        
-             return RedirectToAction(nameof(Index), new
-             {
-                 page,
-                 searchString
-             });
-         }
+        {
+            var chuPhuongTien = await _context.ChuPhuongTien
+                .Include(c => c.TaiKhoan)
+                .FirstOrDefaultAsync(c => c.MaChuPhuongTien == id);
+
+            if (chuPhuongTien == null)
+            {
+                return NotFound();
+            }
+
+            // Cập nhật trạng thái chủ phương tiện
+            chuPhuongTien.TrangThai = trangThai;
+
+            // Cập nhật trạng thái tài khoản đăng nhập
+            if (chuPhuongTien.TaiKhoan != null)
+            {
+                chuPhuongTien.TaiKhoan.TrangThai = trangThai;
+            }
+
+            await _context.SaveChangesAsync();
+
+            // Kiểm tra lại dữ liệu sau khi lưu
+            var taiKhoanKiemTra = await _context.TaiKhoan
+                .FirstOrDefaultAsync(t => t.MaTaiKhoan == chuPhuongTien.MaTaiKhoan);
+
+            if (taiKhoanKiemTra == null)
+            {
+                TempData["SuccessMessage"] =
+                    "Đã cập nhật chủ phương tiện nhưng không tìm thấy tài khoản liên kết!";
+            }
+            else
+            {
+                TempData["SuccessMessage"] =
+                    $"Đã {(trangThai ? "kích hoạt" : "khóa")} tài khoản thành công! " +
+                    $"Trạng thái tài khoản: {taiKhoanKiemTra.TrangThai}";
+            }
+
+            return RedirectToAction(nameof(Index), new
+            {
+                page,
+                searchString
+            });
+        }
         // GET: CHUPHUONGTIENS/Delete/5
         [PhanQuyen("Admin")]
         public async Task<IActionResult> Delete(int? machuphuongtien)
