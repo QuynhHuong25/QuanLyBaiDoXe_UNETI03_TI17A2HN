@@ -59,6 +59,18 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                 }
             }
 
+            int soXeCuaToi = 0;
+            if (vaiTro == "Admin")
+            {
+                soXeCuaToi = await _context.PhuongTien.CountAsync();
+            }
+            else if (int.TryParse(maTaiKhoanStr, out int mtk))
+            {
+                var chu = await _context.ChuPhuongTien.FirstOrDefaultAsync(c => c.MaTaiKhoan == mtk);
+                if (chu != null)
+                    soXeCuaToi = await _context.PhuongTien.CountAsync(x => x.MaChuPhuongTien == chu.MaChuPhuongTien);
+            }
+
             var viewModel = new HomeDashboardViewModel
             {
                 // 5 lượt gửi gần đây (Admin: toàn bãi xe, Khách hàng: chỉ của mình)
@@ -66,6 +78,9 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                     .OrderByDescending(p => p.NgayDangKy)
                     .Take(5)
                     .ToListAsync(),
+                SoXeCuaToi = soXeCuaToi,
+                SoLuotGui = await queryPhieu.CountAsync(),
+                SoDangGui = await queryPhieu.CountAsync(p => p.TrangThai == "Đang gửi"),
 
                 // Danh sách loại xe phục vụ form đăng ký gửi xe nhanh
                 DanhSachLoaiXe = await _context.LoaiPhuongTien
@@ -111,6 +126,16 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
         public IActionResult Privacy()
         {
             return View();
+        }
+        public async Task<IActionResult> GioiThieu()
+        {
+            ViewBag.SoDo = await _context.ViTriDoXe.OrderBy(v => v.TenViTri).Take(32).ToListAsync();
+            ViewBag.TongViTri = await _context.ViTriDoXe.CountAsync();
+            ViewBag.ViTriTrong = await _context.ViTriDoXe.CountAsync(v => v.TrangThai == "Còn trống");
+
+            var bangGia = await _context.LoaiPhuongTien
+                .Where(l => l.TrangThai).OrderBy(l => l.DonGiaTheoGio).ToListAsync();
+            return View(bangGia);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
