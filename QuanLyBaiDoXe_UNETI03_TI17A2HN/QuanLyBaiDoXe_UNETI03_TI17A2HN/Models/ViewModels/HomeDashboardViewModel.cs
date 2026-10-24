@@ -14,5 +14,8 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Models.ViewModels
         public int TongViTriTrong { get; set; }
         public int TongKhachHang { get; set; }
         public int TongPhuongTien { get; set; }
+        public int SoXeCuaToi { get; set; }
+        public int SoLuotGui { get; set; }
+        public int SoDangGui { get; set; }
     }
 }
