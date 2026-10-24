@@ -24,9 +24,9 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             int? tang,
             string trangThai,
             string sortOrder,
-            int page = 1) 
+            int page = 1)
         {
-            int pageSize = 10; 
+            int pageSize = 10;
 
             ViewData["CurrentSearch"] = searchString;
             ViewData["CurrentLoaiPhuongTien"] = maLoaiPhuongTien;
@@ -68,7 +68,10 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
 
             // 5. Phân trang bằng Skip và Take
             var items = await PhanTrang(query, page, pageSize).ToListAsync();
-
+            ViewBag.SoDo = await _context.ViTriDoXe
+    .Include(v => v.LoaiPhuongTien)
+    .OrderBy(v => v.TenViTri)
+    .ToListAsync();
             return View(items);
         }
         private IQueryable<ViTriDoXe> PhanTrang(IQueryable<ViTriDoXe> query, int page, int pageSize)
