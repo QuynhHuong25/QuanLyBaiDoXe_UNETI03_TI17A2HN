@@ -1,4 +1,5 @@
-﻿@* Trang giới thiệu công khai (landing) - theo demo ParkSmart *@
+@* Lương Thị Quỳnh Hương - 23103100064 *@
+@* Trang giới thiệu công khai (landing) - theo demo ParkSmart *@
 @model List<QuanLyBaiDoXe_UNETI03_TI17A2HN.Models.LoaiPhuongTien>
 @using System.Globalization
 
@@ -28,6 +29,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"]</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" />
     <link rel="stylesheet" href="~/css/parksmart.css" asp-append-version="true" />
     <style>
         .lp-wrap { max-width: 1180px; margin: auto; padding: 0 20px; }
@@ -36,9 +38,9 @@
         .lp-nav { position: sticky; top: 0; z-index: 20; background: rgba(11,31,77,.92); backdrop-filter: blur(10px); color: #fff; }
         .lp-nav .lp-wrap { display: flex; align-items: center; gap: 24px; height: 68px; }
         .lp-nav nav { display: flex; gap: 22px; margin-left: auto; font-weight: 500; font-size: 14px; }
-        .lp-nav nav a { color: #fff; opacity: .8; }
+        .lp-nav nav a { color: #fff; opacity: .8; text-decoration: none; }
         .lp-nav nav a:hover { opacity: 1; color: var(--ac); }
-        .lp-nav .ps-logo { color: #fff; }
+        .lp-nav .ps-logo { color: #fff; text-decoration: none; }
 
         /* HERO */
         .lp-hero {
@@ -86,10 +88,12 @@
         .lp-cta p { opacity: .85; margin: 10px 0 24px; }
 
         /* FOOTER */
-        .lp-foot { background: var(--nv); color: #b6c3e3; padding: 50px 0 24px; margin-top: 80px; font-size: 14px; }
-        .lp-foot .g { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 30px; }
-        .lp-foot h5 { color: #fff; margin: 0 0 10px; font-size: 15px; }
-        .lp-foot p { margin: 4px 0; }
+        .lp-foot { background: #0b1f4d; color: #b6c3e3; padding: 50px 0 24px; margin-top: 80px; font-size: 14px; }
+        .lp-foot .g { display: grid; grid-template-columns: 1.3fr 1.2fr 0.8fr 0.8fr 1fr; gap: 24px; }
+        .lp-foot h5 { color: #fff; margin: 0 0 14px; font-size: 15px; font-weight: 700; }
+        .lp-foot p { margin: 6px 0; font-size: 13.5px; }
+        .lp-foot a { color: #b6c3e3; text-decoration: none; display: block; margin-bottom: 6px; font-size: 13.5px; transition: color 0.2s; }
+        .lp-foot a:hover { color: #f5b400; }
 
         @@media (max-width: 900px) {
             .lp-hero .lp-wrap, .lp-foot .g { grid-template-columns: 1fr; }
@@ -249,28 +253,56 @@
         </div>
     </section>
 
-    <!-- FOOTER -->
+    <!-- FOOTER CHUẨN MẪU TẠI HÌNH ẢNH -->
     <footer class="lp-foot" id="lh">
         <div class="lp-wrap">
             <div class="g">
                 <div>
-                    <div class="ps-logo" style="color:#fff;margin-bottom:10px"><i>P</i>ParkSmart</div>
-                    <p>An toàn – Nhanh chóng – Tiện lợi</p>
+                    <div class="d-flex align-items-center gap-2 mb-2 text-white fw-bold fs-5">
+                        <div style="width:32px; height:32px; background:#0d6efd; color:#ffffff; border-radius:8px; display:grid; place-items:center; font-weight:800;">P</div>
+                        <span>Quản lý bãi đỗ xe</span>
+                    </div>
+                    <p class="text-light opacity-75">An toàn - Nhanh chóng - Tiện lợi</p>
                 </div>
+
                 <div>
-                    <h5>Liên hệ</h5>
-                    <p>📞 Hotline: 1900 1900</p>
-                    <p>✉️ UNETI03@gmail.com.vn</p>
-                    <p>📍 218 Lĩnh Nam, Hà Nội</p>
+                    <h5>Thông tin liên hệ</h5>
+                    <p><i class="bi bi-telephone-fill me-2 text-warning"></i>Hotline: 1900 1900</p>
+                    <p><i class="bi bi-envelope-fill me-2 text-warning"></i>Email: UNETI03@baidoxe.vn</p>
+                    <p><i class="bi bi-geo-alt-fill me-2 text-warning"></i>Địa chỉ: 218 Lĩnh Nam, Hà Nội</p>
                 </div>
+
+                <div>
+                    <h5>Liên kết nhanh</h5>
+                    <a href="#gt">Trang chủ</a>
+                    <a href="#qt">Đăng ký gửi xe</a>
+                    <a href="#tn">Quản lý xe</a>
+                    <a href="#bg">Bãi đỗ xe</a>
+                </div>
+
                 <div>
                     <h5>Hỗ trợ</h5>
-                    <p>Hướng dẫn sử dụng</p>
-                    <p>Câu hỏi thường gặp</p>
-                    <p>Chính sách bảo mật</p>
+                    <a href="#">Hướng dẫn sử dụng</a>
+                    <a href="#">Câu hỏi thường gặp</a>
+                    <a href="#">Chính sách bảo mật</a>
+                    <a href="#">Điều khoản sử dụng</a>
+                </div>
+
+                <div>
+                    <h5>Kết nối với chúng tôi</h5>
+                    <div class="d-flex gap-3 mb-3 fs-5">
+                        <a href="#" class="text-light opacity-75" title="Facebook"><i class="bi bi-facebook"></i></a>
+                        <a href="#" class="text-light opacity-75" title="LinkedIn"><i class="bi bi-linkedin"></i></a>
+                        <a href="#" class="text-light opacity-75" title="YouTube"><i class="bi bi-youtube"></i></a>
+                        <a href="#" class="text-light opacity-75" title="Twitter"><i class="bi bi-twitter"></i></a>
+                    </div>
                 </div>
             </div>
-            <p style="margin-top:30px;text-align:center;opacity:.6">&copy; 2026 Quản lý bãi đỗ xe. Tất cả quyền được bảo lưu.</p>
+
+            <hr style="border-color: rgba(255,255,255,0.15); margin: 30px 0 20px;" />
+            <p style="text-align:center; opacity:.6; font-size: 13px; margin:0;">
+                &copy; 2025 Quản lý bãi đỗ xe. Tất cả quyền được bảo lưu.
+            </p>
         </div>
     </footer>
 
