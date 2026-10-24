@@ -9,111 +9,6 @@
     string? vaiTro = Context.Session?.GetString("VaiTro");
 }
 
-<style>
-    .dashboard-banner {
-        background: linear-gradient(135deg, #f0f7ff 0%, #ffffff 60%, #eef6ff 100%);
-        border: 1px solid #e2e8f0;
-        border-radius: 20px;
-        position: relative;
-        overflow: hidden;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
-    }
-
-    /* CSS giúp ảnh lấp đầy chiều cao banner và giữ cố định lề trái của ảnh */
-    .banner-img-cover {
-        position: absolute;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        height: 100%;
-        width: 100%;
-        object-fit: cover;
-        object-position: left center; /* Neo ảnh ở lề trái, chỉ cắt bớt phần thừa bên phải */
-    }
-
-    .feature-card {
-        background: #ffffff;
-        border: 1px solid #edf2f7;
-        border-radius: 16px;
-        padding: 20px;
-        transition: all 0.25s ease-in-out;
-        text-decoration: none;
-        display: block;
-        color: inherit;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
-    }
-
-        .feature-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 10px 25px rgba(13, 110, 253, 0.08);
-            border-color: #c7d9f7;
-            color: inherit;
-        }
-
-    .icon-box {
-        width: 44px;
-        height: 44px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 20px;
-        margin-bottom: 14px;
-    }
-
-    .dashboard-card {
-        background: #ffffff;
-        border: 1px solid #edf2f7;
-        border-radius: 18px;
-        padding: 24px;
-        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.02);
-        height: 100%;
-    }
-
-    .badge-status {
-        padding: 4px 12px;
-        border-radius: 50px;
-        font-size: 12px;
-        font-weight: 600;
-        display: inline-block;
-    }
-
-    .status-dang-gui {
-        background-color: #e0f2fe;
-        color: #0284c7;
-    }
-
-    .status-da-gui {
-        background-color: #dcfce7;
-        color: #16a34a;
-    }
-
-    .status-cho-xac-nhan {
-        background-color: #fef3c7;
-        color: #d97706;
-    }
-
-    .status-khac {
-        background-color: #f1f5f9;
-        color: #64748b;
-    }
-
-    .form-control-dash, .form-select-dash {
-        border-radius: 10px;
-        border: 1px solid #e2e8f0;
-        background-color: #f8fafc;
-        padding: 10px 14px;
-        font-size: 14px;
-        transition: all 0.2s;
-    }
-
-        .form-control-dash:focus, .form-select-dash:focus {
-            background-color: #ffffff;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
-        }
-</style>
-
 <div class="container-fluid p-0">
     <!-- THÔNG BÁO FLASH MESSAGE -->
     @if (TempData["SuccessMessage"] != null)
@@ -131,95 +26,29 @@
         </div>
     }
 
-    <!-- 1. BANNER CHÀO MỪNG (Chuẩn chiều cao & neo vị trí ảnh) -->
-    <div class="dashboard-banner mb-4">
-        <div class="row align-items-center g-0 position-relative">
-            <div class="col-lg-7 p-4 p-lg-5" style="z-index: 2;">
-                <p class="text-secondary mb-1 fw-medium" style="font-size: 15px;">Chào mừng bạn đến với</p>
-                <h1 class="fw-bold text-primary mb-3" style="font-size: calc(1.5rem + 1.2vw); letter-spacing: -0.5px;">
-                    Hệ thống quản lý bãi đỗ xe
-                </h1>
-                <p class="text-muted mb-4 fs-6" style="max-width: 520px; line-height: 1.6;">
-                    Giải pháp đơn giản, hiệu quả giúp quản lý bãi đỗ xe và đăng ký gửi xe nhanh chóng, thuận tiện.
-                </p>
-                <a asp-controller="PhieuGuiXes" asp-action="Create" class="btn btn-primary px-4 py-2 rounded-3 fw-semibold shadow-sm d-inline-flex align-items-center gap-2">
-                    <span>Đăng ký gửi xe</span>
-                    <i class="bi bi-arrow-right"></i>
-                </a>
-            </div>
+    @{
+        string tenChao = Context.Session?.GetString("HoTen") ?? "bạn";
+    }
 
-            <!-- Khung ảnh phủ full chiều cao banner, cố định bên trái của ảnh, xén bớt góc phải -->
-            <div class="col-lg-5 position-absolute end-0 top-0 bottom-0 h-100 d-none d-lg-block overflow-hidden" style="z-index: 1;">
-                <img src="~/css/Image/BaiDoXe.png" alt="Bãi đỗ xe" class="banner-img-cover" />
-            </div>
+    <!-- 1. BANNER CHÀO MỪNG (giống demo) -->
+    <div class="ps-welcome">
+        <div>
+            <h2>Xin chào, @tenChao 👋</h2>
+            <p>
+                @(vaiTro == "Admin"
+                    ? $"Hiện có {Model.SoDangGui} xe đang gửi trong bãi."
+                    : $"Bạn đang có {Model.SoDangGui} xe gửi trong bãi. Chúc bạn một ngày thuận lợi!")
+            </p>
         </div>
+        <a asp-controller="PhieuGuiXes" asp-action="Create" class="btn btn-ac">Đăng ký gửi xe →</a>
     </div>
 
-    <!-- 2. BỐN THẺ ĐIỀU HƯỚNG NHANH -->
-    <div class="row g-3 mb-4">
-        <!-- Đăng ký gửi xe -->
-        <div class="col-12 col-sm-6 col-xl-3">
-            <a asp-controller="PhieuGuiXes" asp-action="Create" class="feature-card h-100">
-                <div class="d-flex align-items-center justify-content-between mb-2">
-                    <div class="icon-box" style="background-color: #eff6ff; color: #2563eb;">
-                        <i class="bi bi-car-front"></i>
-                    </div>
-                </div>
-                <h6 class="fw-bold text-dark mb-1">Đăng ký gửi xe</h6>
-                <p class="text-muted small mb-3" style="min-height: 38px;">Đăng ký nhanh chóng, nhận mã và vị trí đỗ xe.</p>
-                <div class="text-primary small fw-semibold d-flex align-items-center gap-1">
-                    <i class="bi bi-arrow-right"></i>
-                </div>
-            </a>
-        </div>
-
-        <!-- Quản lý xe -->
-        <div class="col-12 col-sm-6 col-xl-3">
-            <a asp-controller="PhuongTiens" asp-action="Index" class="feature-card h-100">
-                <div class="d-flex align-items-center justify-content-between mb-2">
-                    <div class="icon-box" style="background-color: #ecfdf5; color: #059669;">
-                        <i class="bi bi-card-checklist"></i>
-                    </div>
-                </div>
-                <h6 class="fw-bold text-dark mb-1">Quản lý xe</h6>
-                <p class="text-muted small mb-3" style="min-height: 38px;">Theo dõi thông tin xe, thời gian gửi, trạng thái.</p>
-                <div class="text-success small fw-semibold d-flex align-items-center gap-1">
-                    <i class="bi bi-arrow-right"></i>
-                </div>
-            </a>
-        </div>
-
-        <!-- Bãi đỗ xe -->
-        <div class="col-12 col-sm-6 col-xl-3">
-            <a asp-controller="ViTriDoXes" asp-action="Index" class="feature-card h-100">
-                <div class="d-flex align-items-center justify-content-between mb-2">
-                    <div class="icon-box" style="background-color: #f5f3ff; color: #7c3aed;">
-                        <i class="bi bi-p-square"></i>
-                    </div>
-                </div>
-                <h6 class="fw-bold text-dark mb-1">Bãi đỗ xe</h6>
-                <p class="text-muted small mb-3" style="min-height: 38px;">Xem sơ đồ bãi đỗ, tình trạng chỗ trống.</p>
-                <div class="text-primary small fw-semibold d-flex align-items-center gap-1" style="color: #7c3aed !important;">
-                    <i class="bi bi-arrow-right"></i>
-                </div>
-            </a>
-        </div>
-
-        <!-- Khách hàng / Thông tin cá nhân -->
-        <div class="col-12 col-sm-6 col-xl-3">
-            <a asp-controller="ChuPhuongTiens" asp-action="Index" class="feature-card h-100">
-                <div class="d-flex align-items-center justify-content-between mb-2">
-                    <div class="icon-box" style="background-color: #fffbeb; color: #d97706;">
-                        <i class="bi bi-person"></i>
-                    </div>
-                </div>
-                <h6 class="fw-bold text-dark mb-1">@(vaiTro == "Khách hàng" ? "Thông tin cá nhân" : "Khách hàng")</h6>
-                <p class="text-muted small mb-3" style="min-height: 38px;">@(vaiTro == "Khách hàng" ? "Xem và cập nhật thông tin chủ xe của bạn." : "Quản lý thông tin khách hàng đăng ký gửi xe.")</p>
-                <div class="text-warning small fw-semibold d-flex align-items-center gap-1" style="color: #d97706 !important;">
-                    <i class="bi bi-arrow-right"></i>
-                </div>
-            </a>
-        </div>
+    <!-- 2. BỐN Ô SỐ LIỆU -->
+    <div class="ps-kp">
+        <div class="card"><div class="ps-ico">🚗</div><div><b>@Model.SoXeCuaToi</b><span>@(vaiTro == "Admin" ? "Phương tiện" : "Xe của tôi")</span></div></div>
+        <div class="card"><div class="ps-ico">🕘</div><div><b>@Model.SoLuotGui</b><span>Lượt gửi</span></div></div>
+        <div class="card"><div class="ps-ico">⏳</div><div><b>@Model.SoDangGui</b><span>Đang gửi</span></div></div>
+        <div class="card"><div class="ps-ico">🅿️</div><div><b>@Model.TongViTriTrong</b><span>Chỗ trống</span></div></div>
     </div>
 
     <!-- 3. PHẦN DƯỚI: HOẠT ĐỘNG GẦN ĐÂY & FORM ĐĂNG KÝ NHANH -->
