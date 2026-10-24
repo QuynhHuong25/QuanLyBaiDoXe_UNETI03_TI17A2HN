@@ -84,7 +84,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             // 4. Kiểm tra phương tiện này có đang nằm trong bãi (phiếu khác đang gửi) không
             bool xeDangGui = await _context.PhieuGuiXe
                 .AnyAsync(p => p.MaPhuongTien == phieu.MaPhuongTien && p.TrangThai == "Đang gửi");
-            
+
             if (xeDangGui)
             {
                 TempData["ErrorMessage"] = "Phương tiện này hiện đang có lượt gửi hoạt động trong bãi!";
@@ -142,12 +142,12 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             {
                 // Tính khoảng thời gian đỗ xe
                 TimeSpan duration = phieu.ThoiGianRaThucTe.Value - phieu.ThoiGianVaoThucTe.Value;
-                
+
                 // TÍNH TIỀN THEO BLOCK 30 PHÚT (Module 4)
                 // Ví dụ: đỗ 40 phút -> làm tròn lên thành 2 block (60 phút = 1.0 giờ)
                 // đỗ 1h15p (75 phút) -> làm tròn lên thành 3 block (90 phút = 1.5 giờ)
                 double totalBlocks = Math.Ceiling(duration.TotalMinutes / 30.0);
-                
+
                 // Tối thiểu thu phí 1 block 30 phút (0.5 giờ)
                 if (totalBlocks < 1) totalBlocks = 1;
 
@@ -167,7 +167,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             {
                 phieu.ViTriDoXe.TrangThai = "Còn trống";
             }
-            
+
             // Đánh dấu phiếu là Đã lấy xe
             phieu.TrangThai = "Đã lấy xe";
 
