@@ -1,118 +1,200 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using QuanLyBaiDoXe_UNETI03_TI17A2HN.Models;
 using QuanLyBaiDoXe_UNETI03_TI17A2HN.Lọc;
 
-//Lương Thị Quỳnh Hương - 23103100064
-
 namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
 {
-    public class TaiKhoansController : Controller
+    [PhanQuyen("Admin", "Khách hàng")]
+    public class PhuongTiensController : Controller
     {
         private readonly QuanLyBaiDoXe_UNETI03_TI17A2HNContext _context;
 
-        public TaiKhoansController(QuanLyBaiDoXe_UNETI03_TI17A2HNContext context)
+        public PhuongTiensController(QuanLyBaiDoXe_UNETI03_TI17A2HNContext context)
         {
             _context = context;
         }
 
-        // GET: TAIKHOANS
-        [PhanQuyen("Admin")]
-        public async Task<IActionResult> Index(string? searchString, int page = 1)
+        // GET: PHUONGTIENS
+        public async Task<IActionResult> Index(int? page, string? searchString)
         {
-            int pageSize = 10; // Số lượng tài khoản hiển thị trên mỗi trang
-
-            var query = _context.TaiKhoan.Include(t => t.ChuPhuongTien).AsQueryable();
-
-            // Tìm kiếm theo tên đăng nhập, họ tên hoặc email nếu có nhập
-            if (!string.IsNullOrEmpty(searchString))
+            int pageSize = 10;
+            int pageNumber = page ?? 1;
+            if (pageNumber < 1)
             {
-                query = query.Where(t => t.TenDangNhap.Contains(searchString)
-                                      || (t.HoTen != null && t.HoTen.Contains(searchString))
-                                      || (t.Email != null && t.Email.Contains(searchString)));
+                pageNumber = 1;
+            }
+
+            ViewBag.CurrentFilter = searchString;
+            var query = _context.PhuongTien
+                .Include(p => p.ChuPhuongTien)
+                .Include(p => p.LoaiPhuongTien)
+                .AsQueryable();
+
+            string? vaiTro = HttpContext.Session.GetString("VaiTro");
+            string? maTaiKhoanStr = HttpContext.Session.GetString("MaTaiKhoan");
+
+            if (vaiTro == "Khách hàng")
+            {
+                if (!int.TryParse(maTaiKhoanStr, out int maTaiKhoan))
+                {
+                    TempData["ErrorMessage"] = "Không xác định được tài khoản đăng nhập.";
+                    return RedirectToAction("Index", "Home");
+                }
+
+                var chuPhuongTien = await _context.ChuPhuongTien
+                    .FirstOrDefaultAsync(c => c.MaTaiKhoan == maTaiKhoan);
+
+                if (chuPhuongTien == null)
+                {
+                    query = query.Where(p => false);
+                }
+                else
+                {
+                    query = query.Where(p => p.MaChuPhuongTien == chuPhuongTien.MaChuPhuongTien);
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(searchString))
+            {
+                searchString = searchString.Trim();
+                query = query.Where(p => (p.BienSoXe != null && p.BienSoXe.Contains(searchString)) ||
+                                         (p.NhanHieu != null && p.NhanHieu.Contains(searchString)));
             }
 
             int totalItems = await query.CountAsync();
             int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
 
-            // Đảm bảo trang hiện tại nằm trong giới hạn hợp lệ
-            if (page < 1) page = 1;
-            if (totalPages > 0 && page > totalPages) page = totalPages;
+            if (totalPages > 0 && pageNumber > totalPages)
+            {
+                pageNumber = totalPages;
+            }
 
-            var taiKhoans = await query
-                .Skip((page - 1) * pageSize)
+            var items = await query.OrderByDescending(p => p.MaPhuongTien)
+                .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
 
-            // Lưu trữ thông tin phục vụ hiển thị ở View
-            ViewBag.CurrentPage = page;
-            ViewBag.TotalPages = totalPages > 0 ? totalPages : 1;
-            ViewBag.CurrentSearch = searchString;
+            var listDangGui = await _context.PhieuGuiXe
+                .Where(pg => pg.TrangThai == "Chờ xác nhận" || pg.TrangThai == "Đang gửi")
+                .Select(pg => pg.MaPhuongTien)
+                .Distinct()
+                .ToListAsync();
 
-            return View(taiKhoans);
+            ViewBag.ListDangGui = listDangGui;
+            ViewBag.UserRole = vaiTro;
+            ViewBag.Total = totalItems;
+            ViewBag.CurrentPage = pageNumber;
+            ViewBag.TotalPages = totalPages;
+
+            return View(items);
         }
-
-        // GET: TAIKHOANS/Details
-        public async Task<IActionResult> Details(int? mataikhoan)
+        // GET: PHUONGTIENS/Create
+        public async Task<IActionResult> Create()
         {
-            if (mataikhoan == null)
+            string? vaiTro = HttpContext.Session.GetString("VaiTro");
+            string? maTaiKhoanStr = HttpContext.Session.GetString("MaTaiKhoan");
+
+            if (vaiTro == "Khách hàng")
             {
-                var maTaiKhoanStr = HttpContext.Session.GetString("MaTaiKhoan");
-                if (int.TryParse(maTaiKhoanStr, out int currentId))
+                if (!int.TryParse(maTaiKhoanStr, out int maTaiKhoan))
                 {
-                    mataikhoan = currentId;
+                    TempData["ErrorMessage"] = "Không xác định được tài khoản đăng nhập.";
+                    return RedirectToAction(nameof(Index));
                 }
-                else
+
+                var chuPhuongTien = await _context.ChuPhuongTien.FirstOrDefaultAsync(c => c.MaTaiKhoan == maTaiKhoan);
+                if (chuPhuongTien == null)
                 {
-                    return RedirectToAction("DangNhap", "TaiKhoan");
+                    TempData["ErrorMessage"] = "Tài khoản chưa được liên kết thông tin Chủ phương tiện.";
+                    return RedirectToAction(nameof(Index));
                 }
+
+                ViewBag.MaChuPhuongTien = new SelectList(new[] { chuPhuongTien }, "MaChuPhuongTien", "HoTen", chuPhuongTien.MaChuPhuongTien);
+            }
+            else
+            {
+                ViewBag.MaChuPhuongTien = new SelectList(_context.ChuPhuongTien, "MaChuPhuongTien", "HoTen");
             }
 
-            var taikhoan = await _context.TaiKhoan
-                .Include(t => t.ChuPhuongTien)
-                .FirstOrDefaultAsync(m => m.MaTaiKhoan == mataikhoan);
-
-            if (taikhoan == null)
-            {
-                return NotFound();
-            }
-
-            var vaiTro = HttpContext.Session.GetString("VaiTro");
-            var currentMaTaiKhoanStr = HttpContext.Session.GetString("MaTaiKhoan");
-            if (vaiTro == "Khách hàng" && int.TryParse(currentMaTaiKhoanStr, out int myId))
-            {
-                if (taikhoan.MaTaiKhoan != myId)
-                {
-                    return RedirectToAction("Index", "Home");
-                }
-            }
-
-            return View(taikhoan);
-        }
-
-        // GET: TAIKHOANS/Create
-        [PhanQuyen("Admin")]
-        public IActionResult Create()
-        {
+            ViewBag.MaLoaiPhuongTien = new SelectList(_context.LoaiPhuongTien, "MaLoaiPhuongTien", "TenLoaiPhuongTien");
             return View();
         }
 
-        // POST: TAIKHOANS/Create
+        // POST: PHUONGTIENS/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [PhanQuyen("Admin")]
-        public async Task<IActionResult> Create([Bind("MaTaiKhoan,TenDangNhap,MatKhau,HoTen,Email,VaiTro,TrangThai,ChuPhuongTien")] TaiKhoan taikhoan)
+        public async Task<IActionResult> Create([Bind("MaPhuongTien,MaChuPhuongTien,MaLoaiPhuongTien,BienSoXe,NhanHieu,MauSac,MoTa,TrangThai")] PhuongTien phuongTien)
         {
+            string? vaiTro = HttpContext.Session.GetString("VaiTro");
+            string? maTaiKhoanStr = HttpContext.Session.GetString("MaTaiKhoan");
+
+            if (string.IsNullOrWhiteSpace(phuongTien.BienSoXe))
+            {
+                ModelState.AddModelError("BienSoXe", "Vui lòng nhập biển số xe.");
+            }
+            else
+            {
+                phuongTien.BienSoXe = phuongTien.BienSoXe.Trim().ToUpper();
+            }
+
+            if (!string.IsNullOrWhiteSpace(phuongTien.BienSoXe))
+            {
+                bool trungBienSo = await _context.PhuongTien.AnyAsync(p => p.BienSoXe == phuongTien.BienSoXe);
+                if (trungBienSo)
+                {
+                    ModelState.AddModelError("BienSoXe", "Biển số xe này đã tồn tại trong hệ thống.");
+                }
+            }
+
+            if (vaiTro == "Khách hàng")
+            {
+                if (!int.TryParse(maTaiKhoanStr, out int maTaiKhoan))
+                {
+                    ModelState.AddModelError("", "Không xác định được tài khoản đăng nhập.");
+                }
+                else
+                {
+                    var chuPhuongTien = await _context.ChuPhuongTien.FirstOrDefaultAsync(c => c.MaTaiKhoan == maTaiKhoan);
+                    if (chuPhuongTien == null)
+                    {
+                        ModelState.AddModelError("", "Tài khoản chưa được liên kết thông tin Chủ phương tiện.");
+                    }
+                    else
+                    {
+                        phuongTien.MaChuPhuongTien = chuPhuongTien.MaChuPhuongTien;
+                    }
+                }
+            }
+
+            bool chuPhuongTienTonTai = await _context.ChuPhuongTien.AnyAsync(c => c.MaChuPhuongTien == phuongTien.MaChuPhuongTien);
+            if (!chuPhuongTienTonTai)
+            {
+                ModelState.AddModelError("MaChuPhuongTien", "Chủ phương tiện không tồn tại.");
+            }
+
+            bool loaiPhuongTienTonTai = await _context.LoaiPhuongTien.AnyAsync(l => l.MaLoaiPhuongTien == phuongTien.MaLoaiPhuongTien);
+            if (!loaiPhuongTienTonTai)
+            {
+                ModelState.AddModelError("MaLoaiPhuongTien", "Loại phương tiện không tồn tại.");
+            }
+
+            phuongTien.TrangThai = true;
+
             if (ModelState.IsValid)
             {
-                _context.Add(taikhoan);
+                _context.PhuongTien.Add(phuongTien);
                 await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Thêm mới phương tiện thành công!";
                 return RedirectToAction(nameof(Index));
             }
-            return View(taikhoan);
+
+            await LoadCreateData(phuongTien, vaiTro, maTaiKhoanStr);
+            return View(phuongTien);
         }
 
-        // GET: TaiKhoans/Edit/5
+        // GET: PHUONGTIENS/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -120,302 +202,286 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                 return NotFound();
             }
 
-            var taiKhoan = await _context.TaiKhoan.FindAsync(id);
-            if (taiKhoan == null)
+            var phuongTien = await _context.PhuongTien.FirstOrDefaultAsync(p => p.MaPhuongTien == id);
+            if (phuongTien == null)
             {
                 return NotFound();
             }
 
-            // Lấy thông tin đăng nhập từ Session
-            string vaiTro = HttpContext.Session.GetString("VaiTro") ?? "";
-            string tenDangNhapSession = HttpContext.Session.GetString("TenDangNhap") ?? "";
-            int? maTaiKhoanSession = HttpContext.Session.GetInt32("MaTaiKhoan");
+            string? vaiTro = HttpContext.Session.GetString("VaiTro");
+            string? maTaiKhoanStr = HttpContext.Session.GetString("MaTaiKhoan");
 
-            // Kiểm tra quyền: Chỉ chính tài khoản đó hoặc Admin mới được phép chỉnh sửa
-            bool isChinhToi = (maTaiKhoanSession != null && taiKhoan.MaTaiKhoan == maTaiKhoanSession)
-                        || (!string.IsNullOrEmpty(tenDangNhapSession) && taiKhoan.TenDangNhap == tenDangNhapSession)
-                        || (vaiTro == "Admin");
-
-            if (!isChinhToi)
+            if (vaiTro == "Khách hàng")
             {
-                TempData["ErrorMessage"] = "Bạn không có quyền chỉnh sửa tài khoản này!";
-                return RedirectToAction(nameof(Details), new { id = id });
-            }
-
-            return View(taiKhoan);
-        }
-
-        // POST: TaiKhoans/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("MaTaiKhoan,TenDangNhap,MatKhau,HoTen,Email,VaiTro,TrangThai")] TaiKhoan taiKhoan, string? MatKhauMoi)
-        {
-            if (id != taiKhoan.MaTaiKhoan)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
+                if (!int.TryParse(maTaiKhoanStr, out int maTaiKhoan))
                 {
-                    var userInDb = await _context.TaiKhoan.FindAsync(id);
-                    if (userInDb == null) return NotFound();
-
-                    // Cập nhật các thông tin cơ bản
-                    userInDb.HoTen = taiKhoan.HoTen;
-                    userInDb.Email = taiKhoan.Email;
-
-                    // Đổi mật khẩu nếu người dùng nhập mật khẩu mới
-                    if (!string.IsNullOrEmpty(MatKhauMoi))
-                    {
-                        userInDb.MatKhau = MatKhauMoi;
-                    }
-
-                    _context.Update(userInDb);
-                    await _context.SaveChangesAsync();
-
-                    // Cập nhật lại Session Họ Tên nếu có thay đổi
-                    HttpContext.Session.SetString("HoTen", userInDb.HoTen ?? userInDb.TenDangNhap);
-
-                    TempData["SuccessMessage"] = "Cập nhật thông tin thành công!";
-                    return RedirectToAction(nameof(Details), new { id = userInDb.MaTaiKhoan });
+                    return RedirectToAction(nameof(Index));
                 }
-                catch (DbUpdateConcurrencyException)
+
+                var chuPhuongTien = await _context.ChuPhuongTien.FirstOrDefaultAsync(c => c.MaTaiKhoan == maTaiKhoan);
+                if (chuPhuongTien == null || phuongTien.MaChuPhuongTien != chuPhuongTien.MaChuPhuongTien)
                 {
-                    if (!TaiKhoanExists(taiKhoan.MaTaiKhoan))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    return RedirectToAction(nameof(Index));
                 }
-            }
-            return View(taiKhoan);
-        }
 
-        private bool TaiKhoanExists(int id)
-        {
-            return _context.TaiKhoan.Any(e => e.MaTaiKhoan == id);
-        }
-
-        // GET: TAIKHOANS/Delete/5
-        [PhanQuyen("Admin")]
-        public async Task<IActionResult> Delete(int? mataikhoan)
-        {
-            if (mataikhoan == null)
-            {
-                return NotFound();
-            }
-
-            var taikhoan = await _context.TaiKhoan
-                .Include(t => t.ChuPhuongTien)
-                .FirstOrDefaultAsync(m => m.MaTaiKhoan == mataikhoan);
-            if (taikhoan == null)
-            {
-                return NotFound();
-            }
-
-            return View(taikhoan);
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> DangNhap()
-        {
-            if (Request.Cookies.TryGetValue("SavedUsername", out string savedUsername))
-            {
-                ViewBag.SavedUsername = savedUsername;
-            }
-
-            await Task.CompletedTask;
-            return View();
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DangNhap(string tenDangNhap, string matKhau, bool ghiNho)
-        {
-            if (string.IsNullOrEmpty(tenDangNhap) || string.IsNullOrEmpty(matKhau))
-            {
-                ViewBag.Error = "Vui lòng nhập đầy đủ Tên đăng nhập và Mật khẩu!";
-                return View();
-            }
-
-            var taiKhoan = await _context.TaiKhoan
-                .FirstOrDefaultAsync(t => t.TenDangNhap == tenDangNhap && t.MatKhau == matKhau);
-
-            if (taiKhoan == null)
-            {
-                ViewBag.Error = "Tên đăng nhập hoặc mật khẩu không chính xác!";
-                return View();
-            }
-
-            if (taiKhoan.TrangThai == false)
-            {
-                ViewBag.Error = "Tài khoản của bạn đã bị khóa!";
-                return View();
-            }
-
-            CookieOptions cookieOptions = new CookieOptions
-            {
-                HttpOnly = true,
-                IsEssential = true
-            };
-
-            if (ghiNho)
-            {
-                cookieOptions.Expires = DateTime.Now.AddDays(30);
-                Response.Cookies.Append("SavedUsername", tenDangNhap, cookieOptions);
+                ViewBag.MaChuPhuongTien = new SelectList(new[] { chuPhuongTien }, "MaChuPhuongTien", "HoTen", phuongTien.MaChuPhuongTien);
             }
             else
             {
-                Response.Cookies.Delete("SavedUsername");
+                ViewBag.MaChuPhuongTien = new SelectList(_context.ChuPhuongTien, "MaChuPhuongTien", "HoTen", phuongTien.MaChuPhuongTien);
             }
 
-            HttpContext.Session.SetString("MaTaiKhoan", taiKhoan.MaTaiKhoan.ToString());
-            HttpContext.Session.SetString("TenDangNhap", taiKhoan.TenDangNhap);
-            HttpContext.Session.SetString("HoTen", taiKhoan.HoTen ?? taiKhoan.TenDangNhap);
-            HttpContext.Session.SetString("VaiTro", string.IsNullOrEmpty(taiKhoan.VaiTro) ? "Khách hàng" : taiKhoan.VaiTro);
-
-            return RedirectToAction("Index", "Home");
+            ViewBag.MaLoaiPhuongTien = new SelectList(_context.LoaiPhuongTien, "MaLoaiPhuongTien", "TenLoaiPhuongTien", phuongTien.MaLoaiPhuongTien);
+            return View(phuongTien);
         }
 
-        [HttpGet]
-        public async Task<IActionResult> DangXuat()
-        {
-            HttpContext.Session.Clear();
-            await Task.CompletedTask;
-            return RedirectToAction("DangNhap", "TaiKhoans");
-        }
-
-        [HttpGet]
-        public IActionResult DangKy()
-        {
-            return View();
-        }
-
+        // POST: PHUONGTIENS/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DangKy(string tenDangNhap, string matKhau, string xacNhanMatKhau)
+        public async Task<IActionResult> Edit(int id, [Bind("MaPhuongTien,MaChuPhuongTien,MaLoaiPhuongTien,BienSoXe,NhanHieu,MauSac,MoTa,TrangThai")] PhuongTien phuongTien)
         {
-            if (string.IsNullOrEmpty(tenDangNhap) || string.IsNullOrEmpty(matKhau))
+            if (id != phuongTien.MaPhuongTien)
             {
-                ViewBag.Error = "Vui lòng nhập đầy đủ Tên đăng nhập và Mật khẩu!";
-                return View();
+                return NotFound();
             }
 
-            if (matKhau != xacNhanMatKhau)
+            var xeCu = await _context.PhuongTien.FirstOrDefaultAsync(p => p.MaPhuongTien == id);
+            if (xeCu == null)
             {
-                ViewBag.Error = "Mật khẩu xác nhận không khớp!";
-                return View();
+                return NotFound();
             }
 
-            var taiKhoanDaTonTai = await _context.TaiKhoan
-                .AnyAsync(t => t.TenDangNhap == tenDangNhap);
+            string? vaiTro = HttpContext.Session.GetString("VaiTro");
+            string? maTaiKhoanStr = HttpContext.Session.GetString("MaTaiKhoan");
 
-            if (taiKhoanDaTonTai)
+            if (string.IsNullOrWhiteSpace(phuongTien.BienSoXe))
             {
-                ViewBag.Error = "Tên đăng nhập này đã tồn tại!";
-                return View();
+                ModelState.AddModelError("BienSoXe", "Vui lòng nhập biển số xe.");
+            }
+            else
+            {
+                phuongTien.BienSoXe = phuongTien.BienSoXe.Trim().ToUpper();
+                bool trungBienSo = await _context.PhuongTien.AnyAsync(p => p.MaPhuongTien != id && p.BienSoXe == phuongTien.BienSoXe);
+                if (trungBienSo)
+                {
+                    ModelState.AddModelError("BienSoXe", "Biển số xe này đã thuộc về phương tiện khác.");
+                }
             }
 
-            var taiKhoanMoi = new TaiKhoan();
-            taiKhoanMoi.TenDangNhap = tenDangNhap;
-            taiKhoanMoi.MatKhau = matKhau;
-            taiKhoanMoi.HoTen = tenDangNhap;
-            taiKhoanMoi.Email = $"{tenDangNhap.ToLower().Trim()}@gmail.com";
-            taiKhoanMoi.VaiTro = "Khách hàng";
-            taiKhoanMoi.TrangThai = true;
+            if (vaiTro == "Khách hàng")
+            {
+                if (!int.TryParse(maTaiKhoanStr, out int maTaiKhoan))
+                {
+                    ModelState.AddModelError("", "Không xác định được tài khoản đăng nhập.");
+                }
+                else
+                {
+                    var chuPhuongTien = await _context.ChuPhuongTien.FirstOrDefaultAsync(c => c.MaTaiKhoan == maTaiKhoan);
+                    if (chuPhuongTien == null)
+                    {
+                        ModelState.AddModelError("", "Không tìm thấy thông tin chủ phương tiện.");
+                    }
+                    else if (xeCu.MaChuPhuongTien != chuPhuongTien.MaChuPhuongTien)
+                    {
+                        return Forbid();
+                    }
+                    else
+                    {
+                        phuongTien.MaChuPhuongTien = xeCu.MaChuPhuongTien;
+                    }
+                }
+            }
+
+            bool chuPhuongTienTonTai = await _context.ChuPhuongTien.AnyAsync(c => c.MaChuPhuongTien == phuongTien.MaChuPhuongTien);
+            if (!chuPhuongTienTonTai)
+            {
+                ModelState.AddModelError("MaChuPhuongTien", "Chủ phương tiện không tồn tại.");
+            }
+
+            bool loaiPhuongTienTonTai = await _context.LoaiPhuongTien.AnyAsync(l => l.MaLoaiPhuongTien == phuongTien.MaLoaiPhuongTien);
+            if (!loaiPhuongTienTonTai)
+            {
+                ModelState.AddModelError("MaLoaiPhuongTien", "Loại phương tiện không tồn tại.");
+            }
+
+            bool dangGui = await _context.PhieuGuiXe.AnyAsync(p => p.MaPhuongTien == id && (p.TrangThai == "Chờ xác nhận" || p.TrangThai == "Đang gửi"));
+            if (dangGui && !phuongTien.TrangThai)
+            {
+                ModelState.AddModelError("TrangThai", "Không thể chuyển sang Ngừng hoạt động vì phương tiện đang gửi trong bãi.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                await LoadEditData(phuongTien, vaiTro, maTaiKhoanStr);
+                return View(phuongTien);
+            }
+
+            xeCu.MaChuPhuongTien = phuongTien.MaChuPhuongTien;
+            xeCu.MaLoaiPhuongTien = phuongTien.MaLoaiPhuongTien;
+            xeCu.BienSoXe = phuongTien.BienSoXe;
+            xeCu.NhanHieu = phuongTien.NhanHieu;
+            xeCu.MauSac = phuongTien.MauSac;
+            xeCu.MoTa = phuongTien.MoTa;
+            xeCu.TrangThai = phuongTien.TrangThai;
 
             try
             {
-                _context.TaiKhoan.Add(taiKhoanMoi);
                 await _context.SaveChangesAsync();
-
-                TempData["Success"] = "Đăng ký tài khoản thành công! Vui lòng đăng nhập.";
-                return RedirectToAction("DangNhap");
+                TempData["SuccessMessage"] = "Cập nhật phương tiện thành công!";
+                return RedirectToAction(nameof(Index));
             }
-            catch (Exception ex)
+            catch (DbUpdateConcurrencyException)
             {
-                ViewBag.Error = "Lỗi lưu dữ liệu: " + (ex.InnerException != null ? ex.InnerException.Message : ex.Message);
-                return View();
+                if (!PhuongTienExists(phuongTien.MaPhuongTien))
+                {
+                    return NotFound();
+                }
+                throw;
             }
         }
 
-        [HttpGet]
-        public IActionResult QuenMatKhau()
+        // GET: PHUONGTIENS/Delete/5
+        public async Task<IActionResult> Delete(int? id)
         {
-            return View();
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var phuongTien = await _context.PhuongTien
+                .Include(p => p.ChuPhuongTien)
+                .Include(p => p.LoaiPhuongTien)
+                .FirstOrDefaultAsync(p => p.MaPhuongTien == id);
+
+            if (phuongTien == null)
+            {
+                return NotFound();
+            }
+
+            string? vaiTro = HttpContext.Session.GetString("VaiTro");
+            string? maTaiKhoanStr = HttpContext.Session.GetString("MaTaiKhoan");
+
+            if (vaiTro == "Khách hàng")
+            {
+                if (!int.TryParse(maTaiKhoanStr, out int maTaiKhoan))
+                {
+                    return RedirectToAction(nameof(Index));
+                }
+
+                var chuPhuongTien = await _context.ChuPhuongTien.FirstOrDefaultAsync(c => c.MaTaiKhoan == maTaiKhoan);
+                if (chuPhuongTien == null || phuongTien.MaChuPhuongTien != chuPhuongTien.MaChuPhuongTien)
+                {
+                    return RedirectToAction(nameof(Index));
+                }
+            }
+
+            return View(phuongTien);
         }
 
+        // POST: PHUONGTIENS/Delete/5
         [HttpPost]
+        [ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> QuenMatKhau(string tenDangNhap, string matKhauMoi, string xacNhanMatKhauMoi)
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (string.IsNullOrEmpty(tenDangNhap) || string.IsNullOrEmpty(matKhauMoi))
+            var phuongTien = await _context.PhuongTien.FirstOrDefaultAsync(p => p.MaPhuongTien == id);
+            if (phuongTien == null)
             {
-                ViewBag.Error = "Vui lòng nhập đầy đủ thông tin!";
-                return View();
+                return RedirectToAction(nameof(Index));
             }
 
-            if (matKhauMoi != xacNhanMatKhauMoi)
+            string? vaiTro = HttpContext.Session.GetString("VaiTro");
+            string? maTaiKhoanStr = HttpContext.Session.GetString("MaTaiKhoan");
+
+            if (vaiTro == "Khách hàng")
             {
-                ViewBag.Error = "Mật khẩu xác nhận không khớp!";
-                return View();
+                if (!int.TryParse(maTaiKhoanStr, out int maTaiKhoan))
+                {
+                    return Forbid();
+                }
+
+                var chuPhuongTien = await _context.ChuPhuongTien.FirstOrDefaultAsync(c => c.MaTaiKhoan == maTaiKhoan);
+                if (chuPhuongTien == null || phuongTien.MaChuPhuongTien != chuPhuongTien.MaChuPhuongTien)
+                {
+                    return Forbid();
+                }
             }
 
-            var taiKhoan = await _context.TaiKhoan
-                .FirstOrDefaultAsync(t => t.TenDangNhap == tenDangNhap);
-
-            if (taiKhoan == null)
+            bool dangGui = await _context.PhieuGuiXe.AnyAsync(p => p.MaPhuongTien == id && (p.TrangThai == "Chờ xác nhận" || p.TrangThai == "Đang gửi"));
+            if (dangGui)
             {
-                ViewBag.Error = "Tên đăng nhập không tồn tại trên hệ thống!";
-                return View();
+                TempData["ErrorMessage"] = "Không thể xóa phương tiện vì xe đang có lượt gửi xe hoạt động.";
+                return RedirectToAction(nameof(Index));
             }
 
-            if (taiKhoan.MatKhau == matKhauMoi)
-            {
-                ViewBag.Error = "Mật khẩu mới không được trùng với mật khẩu cũ!";
-                return View();
-            }
-            taiKhoan.MatKhau = matKhauMoi;
-
-            try
-            {
-                _context.Update(taiKhoan);
-                await _context.SaveChangesAsync();
-
-                TempData["Success"] = "Đổi mật khẩu thành công! Vui lòng đăng nhập bằng mật khẩu mới.";
-                return RedirectToAction("DangNhap");
-            }
-            catch (Exception ex)
-            {
-                ViewBag.Error = "Lỗi cập nhật dữ liệu: " + (ex.InnerException != null ? ex.InnerException.Message : ex.Message);
-                return View();
-            }
-        }
-
-        // POST: TAIKHOANS/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        [PhanQuyen("Admin")]
-        public async Task<IActionResult> DeleteConfirmed(int? mataikhoan)
-        {
-            var taikhoan = await _context.TaiKhoan.FindAsync(mataikhoan);
-            if (taikhoan != null)
-            {
-                _context.TaiKhoan.Remove(taikhoan);
-            }
-
+            _context.PhuongTien.Remove(phuongTien);
             await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Xóa phương tiện thành công!";
             return RedirectToAction(nameof(Index));
         }
 
-        private bool TaiKhoanExists(int? mataikhoan)
+        private async Task LoadCreateData(PhuongTien phuongTien, string? vaiTro, string? maTaiKhoanStr)
         {
-            return _context.TaiKhoan.Any(e => e.MaTaiKhoan == mataikhoan);
+            if (vaiTro == "Khách hàng")
+            {
+                if (int.TryParse(maTaiKhoanStr, out int maTaiKhoan))
+                {
+                    var chuPhuongTien = await _context.ChuPhuongTien.FirstOrDefaultAsync(c => c.MaTaiKhoan == maTaiKhoan);
+                    if (chuPhuongTien != null)
+                    {
+                        ViewBag.MaChuPhuongTien = new SelectList(new[] { chuPhuongTien }, "MaChuPhuongTien", "HoTen", chuPhuongTien.MaChuPhuongTien);
+                    }
+                    else
+                    {
+                        ViewBag.MaChuPhuongTien = new SelectList(Enumerable.Empty<ChuPhuongTien>(), "MaChuPhuongTien", "HoTen");
+                    }
+                }
+                else
+                {
+                    ViewBag.MaChuPhuongTien = new SelectList(Enumerable.Empty<ChuPhuongTien>(), "MaChuPhuongTien", "HoTen");
+                }
+            }
+            else
+            {
+                ViewBag.MaChuPhuongTien = new SelectList(_context.ChuPhuongTien, "MaChuPhuongTien", "HoTen", phuongTien.MaChuPhuongTien);
+            }
+
+            ViewBag.MaLoaiPhuongTien = new SelectList(_context.LoaiPhuongTien, "MaLoaiPhuongTien", "TenLoaiPhuongTien", phuongTien.MaLoaiPhuongTien);
+        }
+
+        private async Task LoadEditData(PhuongTien phuongTien, string? vaiTro, string? maTaiKhoanStr)
+        {
+            if (vaiTro == "Khách hàng")
+            {
+                if (int.TryParse(maTaiKhoanStr, out int maTaiKhoan))
+                {
+                    var chuPhuongTien = await _context.ChuPhuongTien.FirstOrDefaultAsync(c => c.MaTaiKhoan == maTaiKhoan);
+                    if (chuPhuongTien != null)
+                    {
+                        ViewBag.MaChuPhuongTien = new SelectList(new[] { chuPhuongTien }, "MaChuPhuongTien", "HoTen", phuongTien.MaChuPhuongTien);
+                    }
+                    else
+                    {
+                        ViewBag.MaChuPhuongTien = new SelectList(Enumerable.Empty<ChuPhuongTien>(), "MaChuPhuongTien", "HoTen");
+                    }
+                }
+                else
+                {
+                    ViewBag.MaChuPhuongTien = new SelectList(Enumerable.Empty<ChuPhuongTien>(), "MaChuPhuongTien", "HoTen");
+                }
+            }
+            else
+            {
+                ViewBag.MaChuPhuongTien = new SelectList(_context.ChuPhuongTien, "MaChuPhuongTien", "HoTen", phuongTien.MaChuPhuongTien);
+            }
+
+            ViewBag.MaLoaiPhuongTien = new SelectList(_context.LoaiPhuongTien, "MaLoaiPhuongTien", "TenLoaiPhuongTien", phuongTien.MaLoaiPhuongTien);
+        }
+
+        private bool PhuongTienExists(int id)
+        {
+            return _context.PhuongTien.Any(p => p.MaPhuongTien == id);
         }
     }
 }
