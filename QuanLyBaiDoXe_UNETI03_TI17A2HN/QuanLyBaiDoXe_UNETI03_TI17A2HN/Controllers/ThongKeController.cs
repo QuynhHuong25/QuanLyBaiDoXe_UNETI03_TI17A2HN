@@ -30,10 +30,10 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             viewModel.Dashboard.TongChuPhuongTien = await _context.ChuPhuongTien.CountAsync();
             viewModel.Dashboard.TongPhuongTien = await _context.PhuongTien.CountAsync();
             viewModel.Dashboard.TongPhieuGuiXe = await _context.PhieuGuiXe.CountAsync();
-            
+
             viewModel.Dashboard.SoPhieuChoXacNhan = await _context.PhieuGuiXe.CountAsync(p => p.TrangThai == "Chờ xác nhận");
             viewModel.Dashboard.SoXeDangGui = await _context.PhieuGuiXe.CountAsync(p => p.TrangThai == "Đang gửi");
-            
+
             viewModel.Dashboard.SoViTriConTrong = await _context.ViTriDoXe.CountAsync(v => v.TrangThai == "Còn trống");
             viewModel.Dashboard.SoViTriDangSuDung = await _context.ViTriDoXe.CountAsync(v => v.TrangThai == "Đang sử dụng");
 
