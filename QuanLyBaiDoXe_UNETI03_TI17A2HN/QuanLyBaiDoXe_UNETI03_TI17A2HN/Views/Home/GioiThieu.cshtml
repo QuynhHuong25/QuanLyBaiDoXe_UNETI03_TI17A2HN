@@ -1,0 +1,279 @@
+﻿@* Trang giới thiệu công khai (landing) - theo demo ParkSmart *@
+@model List<QuanLyBaiDoXe_UNETI03_TI17A2HN.Models.LoaiPhuongTien>
+@using System.Globalization
+
+@{
+    Layout = null;
+    ViewData["Title"] = "ParkSmart – Quản lý bãi đỗ xe";
+
+    var vi = new CultureInfo("vi-VN");
+    var soDo = ViewBag.SoDo as List<QuanLyBaiDoXe_UNETI03_TI17A2HN.Models.ViTriDoXe>
+               ?? new List<QuanLyBaiDoXe_UNETI03_TI17A2HN.Models.ViTriDoXe>();
+    int tongViTri = (int)(ViewBag.TongViTri ?? 0);
+    int viTriTrong = (int)(ViewBag.ViTriTrong ?? 0);
+
+    string BieuTuong(string ten)
+    {
+        var t = (ten ?? "").ToLower();
+        if (t.Contains("đạp") || t.Contains("điện")) return "🛵";
+        if (t.Contains("máy")) return "🏍️";
+        if (t.Contains("7")) return "🚙";
+        return "🚗";
+    }
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/parksmart.css" asp-append-version="true" />
+    <style>
+        .lp-wrap { max-width: 1180px; margin: auto; padding: 0 20px; }
+
+        /* NAV */
+        .lp-nav { position: sticky; top: 0; z-index: 20; background: rgba(11,31,77,.92); backdrop-filter: blur(10px); color: #fff; }
+        .lp-nav .lp-wrap { display: flex; align-items: center; gap: 24px; height: 68px; }
+        .lp-nav nav { display: flex; gap: 22px; margin-left: auto; font-weight: 500; font-size: 14px; }
+        .lp-nav nav a { color: #fff; opacity: .8; }
+        .lp-nav nav a:hover { opacity: 1; color: var(--ac); }
+        .lp-nav .ps-logo { color: #fff; }
+
+        /* HERO */
+        .lp-hero {
+            background: radial-gradient(900px 400px at 85% 10%, rgba(37,99,235,.55), transparent), linear-gradient(135deg, #0b1f4d, #10307a);
+            color: #fff; padding: 80px 0 120px; position: relative; overflow: hidden;
+        }
+        .lp-hero .lp-wrap { display: grid; grid-template-columns: 1.1fr .9fr; gap: 40px; align-items: center; }
+        .lp-hero h1 { font-size: clamp(32px, 5vw, 54px); font-weight: 800; letter-spacing: -1px; }
+        .lp-hero h1 em { font-style: normal; color: var(--ac); }
+        .lp-hero p { color: #c7d4f2; font-size: 17px; max-width: 520px; margin: 18px 0 28px; }
+        .lp-tag {
+            display: inline-block; background: rgba(245,180,0,.15); color: var(--ac);
+            border: 1px solid rgba(245,180,0,.4); padding: 5px 14px; border-radius: 99px;
+            font-size: 13px; font-weight: 600; margin-bottom: 18px;
+        }
+        .lp-sign { background: #fff; color: var(--tx); border-radius: 22px; padding: 22px; box-shadow: 0 30px 60px rgba(0,0,0,.35); transform: rotate(2deg); }
+        .lp-sign h4 { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; font-size: 16px; }
+        .lp-sign .p { background: var(--pr); color: #fff; width: 34px; height: 34px; border-radius: 9px; display: grid; place-items: center; }
+
+        /* STATS */
+        .lp-stats { margin-top: -60px; position: relative; z-index: 2; }
+        .lp-stats .box { background: var(--sf); border-radius: 20px; box-shadow: var(--sh); display: grid; grid-template-columns: repeat(4, 1fr); padding: 26px; }
+        .lp-stat { text-align: center; border-right: 1px solid var(--bd); }
+        .lp-stat:last-child { border: 0; }
+        .lp-stat b { display: block; font-size: 30px; color: var(--pr); font-weight: 800; }
+        .lp-stat span { color: var(--mu); font-size: 13px; }
+
+        /* SECTIONS */
+        .lp-sec { padding: 80px 0; }
+        .lp-sec h2 { font-size: clamp(26px, 3.4vw, 38px); font-weight: 800; text-align: center; }
+        .lp-sec .sub { text-align: center; color: var(--mu); max-width: 560px; margin: 10px auto 44px; }
+        .lp-grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .lp-ft { transition: .25s; padding: 24px; }
+        .lp-ft:hover { transform: translateY(-6px); border-color: var(--pr); }
+        .lp-ft p { color: var(--mu); margin: 8px 0 0; font-size: 14px; }
+        .lp-step { padding: 24px; }
+        .lp-step .n { width: 44px; height: 44px; border-radius: 50%; background: var(--ac); color: #1a1300; font-weight: 800; display: grid; place-items: center; margin-bottom: 12px; }
+        .lp-step p { color: var(--mu); margin: 8px 0 0; }
+        .lp-price { text-align: center; padding: 24px; }
+        .lp-price b { font-size: 32px; color: var(--pr); display: block; margin: 8px 0; }
+        .lp-price.hot { background: linear-gradient(160deg, #0b1f4d, #1e40af); color: #fff; transform: scale(1.04); }
+        .lp-price.hot b { color: var(--ac); }
+        .lp-cta { background: linear-gradient(135deg, #1e40af, #2563eb); color: #fff; border-radius: 26px; padding: 50px; text-align: center; }
+        .lp-cta h2 { color: #fff; }
+        .lp-cta p { opacity: .85; margin: 10px 0 24px; }
+
+        /* FOOTER */
+        .lp-foot { background: var(--nv); color: #b6c3e3; padding: 50px 0 24px; margin-top: 80px; font-size: 14px; }
+        .lp-foot .g { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 30px; }
+        .lp-foot h5 { color: #fff; margin: 0 0 10px; font-size: 15px; }
+        .lp-foot p { margin: 4px 0; }
+
+        @@media (max-width: 900px) {
+            .lp-hero .lp-wrap, .lp-foot .g { grid-template-columns: 1fr; }
+            .lp-grid3 { grid-template-columns: 1fr 1fr; }
+            .lp-stats .box { grid-template-columns: 1fr 1fr; gap: 16px; }
+            .lp-nav nav { display: none; }
+            .lp-sign { transform: none; }
+        }
+        @@media (max-width: 560px) { .lp-grid3 { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+    <!-- NAV -->
+    <div class="lp-nav">
+        <div class="lp-wrap">
+            <a class="ps-logo" asp-controller="Home" asp-action="GioiThieu"><i>P</i>ParkSmart</a>
+            <nav>
+                <a href="#gt">Giới thiệu</a>
+                <a href="#tn">Tiện ích</a>
+                <a href="#qt">Quy trình</a>
+                <a href="#bg">Bảng giá</a>
+                <a href="#lh">Liên hệ</a>
+            </nav>
+            <a class="btn btn-gh" style="color:#fff;border-color:rgba(255,255,255,.3)" asp-controller="TaiKhoans" asp-action="DangNhap">Đăng nhập</a>
+            <a class="btn btn-ac" asp-controller="TaiKhoans" asp-action="DangKy">Đăng ký</a>
+        </div>
+    </div>
+
+    <!-- HERO -->
+    <div class="lp-hero" id="gt">
+        <div class="lp-wrap">
+            <div>
+                <span class="lp-tag">🅿 Bãi đỗ xe thông minh · Hà Nội</span>
+                <h1>Gửi xe <em>an toàn</em>,<br />nhanh chóng, tiện lợi</h1>
+                <p>Đăng ký chỗ đỗ trực tuyến, theo dõi vị trí xe theo thời gian thực và thanh toán minh bạch. Không còn cảnh vòng vòng tìm chỗ.</p>
+                <div style="display:flex;gap:12px;flex-wrap:wrap">
+                    <a class="btn btn-ac" asp-controller="TaiKhoans" asp-action="DangKy">Đăng ký gửi xe ngay →</a>
+                    <a class="btn btn-gh" style="color:#fff;border-color:rgba(255,255,255,.35)" href="#bg">Xem bảng giá</a>
+                </div>
+            </div>
+
+            <!-- Sơ đồ bãi: lấy dữ liệu thật từ bảng ViTriDoXe -->
+            <div class="lp-sign">
+                <h4><span>Tình trạng bãi xe</span><span class="p">P</span></h4>
+                @if (soDo.Any())
+                {
+                    <div class="ps-lot" style="grid-template-columns:repeat(8,1fr)">
+                        @foreach (var v in soDo)
+                        {
+                            string lop = v.TrangThai == "Đang sử dụng" ? "u" : (v.TrangThai == "Tạm ngừng" ? "x" : "");
+                            <div class="ps-s @lop" title="@v.TenViTri – @v.TrangThai">@v.TenViTri</div>
+                        }
+                    </div>
+                    <div class="ps-lg">
+                        <span><b style="background:#86efac"></b>Còn trống</span>
+                        <span><b style="background:#fca5a5"></b>Đang sử dụng</span>
+                        <span><b style="background:#cbd5e1"></b>Tạm ngừng</span>
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted mb-0">Chưa có dữ liệu vị trí đỗ xe.</p>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- STATS (số liệu thật) -->
+    <div class="lp-stats">
+        <div class="lp-wrap">
+            <div class="box">
+                <div class="lp-stat"><b>@tongViTri</b><span>Chỗ đỗ xe</span></div>
+                <div class="lp-stat"><b>24/7</b><span>Bảo vệ &amp; giám sát</span></div>
+                <div class="lp-stat"><b>@viTriTrong</b><span>Chỗ đang trống</span></div>
+                <div class="lp-stat"><b>@Model.Count</b><span>Loại phương tiện</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TIỆN ÍCH -->
+    <section class="lp-sec" id="tn">
+        <div class="lp-wrap">
+            <h2>Vì sao chọn ParkSmart?</h2>
+            <p class="sub">Giải pháp quản lý bãi đỗ xe hiện đại cho cả chủ xe và đơn vị vận hành.</p>
+            <div class="lp-grid3">
+                @foreach (var x in new[] {
+                    ("📍", "Xem chỗ trống trực tuyến", "Sơ đồ bãi đỗ cập nhật liên tục theo khu vực và tầng."),
+                    ("⚡", "Đăng ký trong 30 giây", "Nhập biển số, chọn loại xe và giờ gửi – nhận ngay vị trí đỗ."),
+                    ("🛡️", "An ninh 24/7", "Camera giám sát, bảo vệ trực liên tục, kiểm soát xe vào/ra."),
+                    ("💳", "Giá minh bạch", "Tính tiền theo giờ, hiển thị rõ thành tiền trước khi xác nhận."),
+                    ("📋", "Lịch sử đầy đủ", "Tra cứu mọi lượt gửi xe và hóa đơn bất cứ lúc nào."),
+                    ("👥", "Phân quyền rõ ràng", "Khách hàng và quản trị viên có giao diện riêng, an toàn.") })
+                {
+                    <div class="card lp-ft">
+                        <div class="ps-ico mb-3">@x.Item1</div>
+                        <h4 class="fs-6 fw-bold">@x.Item2</h4>
+                        <p>@x.Item3</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+
+    <!-- QUY TRÌNH -->
+    <section class="lp-sec" id="qt" style="background:var(--sf)">
+        <div class="lp-wrap">
+            <h2>Gửi xe chỉ với 3 bước</h2>
+            <p class="sub">Đơn giản, không cần chờ đợi.</p>
+            <div class="lp-grid3">
+                @{
+                    var cacBuoc = new[] {
+                        ("Đăng ký tài khoản", "Tạo tài khoản miễn phí và thêm thông tin phương tiện."),
+                        ("Đặt chỗ đỗ", "Chọn loại xe, thời gian dự kiến và nhận vị trí đỗ."),
+                        ("Vào bãi & thanh toán", "Đưa xe vào bãi, nhân viên xác nhận. Thanh toán khi lấy xe.") };
+                }
+                @for (int i = 0; i < cacBuoc.Length; i++)
+                {
+                    <div class="card lp-step">
+                        <div class="n">@(i + 1)</div>
+                        <h4 class="fs-6 fw-bold">@cacBuoc[i].Item1</h4>
+                        <p>@cacBuoc[i].Item2</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+
+    <!-- BẢNG GIÁ (lấy từ bảng LoaiPhuongTien) -->
+    <section class="lp-sec" id="bg">
+        <div class="lp-wrap">
+            <h2>Bảng giá gửi xe</h2>
+            <p class="sub">Tính theo giờ, áp dụng cho mọi loại phương tiện.</p>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px">
+                @for (int i = 0; i < Model.Count; i++)
+                {
+                    var l = Model[i];
+                    <div class="card lp-price @(Model.Count > 2 && i == 2 ? "hot" : "")">
+                        <div style="font-size:34px">@BieuTuong(l.TenLoaiPhuongTien)</div>
+                        <h4 class="fs-6 fw-bold">@l.TenLoaiPhuongTien</h4>
+                        <b>@l.DonGiaTheoGio.ToString("N0", vi)đ</b>
+                        <span style="opacity:.7">/ giờ</span>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="lp-sec" style="padding-top:0">
+        <div class="lp-wrap">
+            <div class="lp-cta">
+                <h2>Sẵn sàng gửi xe thông minh?</h2>
+                <p>Tạo tài khoản miễn phí và đặt chỗ đỗ đầu tiên ngay hôm nay.</p>
+                <a class="btn btn-ac" asp-controller="TaiKhoans" asp-action="DangKy">Đăng ký miễn phí</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="lp-foot" id="lh">
+        <div class="lp-wrap">
+            <div class="g">
+                <div>
+                    <div class="ps-logo" style="color:#fff;margin-bottom:10px"><i>P</i>ParkSmart</div>
+                    <p>An toàn – Nhanh chóng – Tiện lợi</p>
+                </div>
+                <div>
+                    <h5>Liên hệ</h5>
+                    <p>📞 Hotline: 1900 1900</p>
+                    <p>✉️ UNETI03@gmail.com.vn</p>
+                    <p>📍 218 Lĩnh Nam, Hà Nội</p>
+                </div>
+                <div>
+                    <h5>Hỗ trợ</h5>
+                    <p>Hướng dẫn sử dụng</p>
+                    <p>Câu hỏi thường gặp</p>
+                    <p>Chính sách bảo mật</p>
+                </div>
+            </div>
+            <p style="margin-top:30px;text-align:center;opacity:.6">&copy; 2026 Quản lý bãi đỗ xe. Tất cả quyền được bảo lưu.</p>
+        </div>
+    </footer>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
