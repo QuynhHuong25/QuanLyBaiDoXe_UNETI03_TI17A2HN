@@ -356,6 +356,31 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                 .ToListAsync();
         }
 
+        // GET: PHIEUGUIXES/Edit/5
+        [PhanQuyen("Admin")]
+        public async Task<IActionResult> Edit(int? id, int? maphieu)
+        {
+            var targetId = id ?? maphieu;
+            if (targetId == null)
+            {
+                return NotFound();
+            }
+
+            var phieuGuiXe = await _context.PhieuGuiXe
+                .Include(p => p.PhuongTien)
+                .Include(p => p.ViTriDoXe)
+                .FirstOrDefaultAsync(m => m.MaPhieu == targetId);
+
+            if (phieuGuiXe == null)
+            {
+                return NotFound();
+            }
+
+            ViewData["MaPhuongTien"] = new SelectList(_context.PhuongTien, "MaPhuongTien", "BienSoXe", phieuGuiXe.MaPhuongTien);
+            ViewData["MaViTri"] = new SelectList(_context.ViTriDoXe, "MaViTri", "TenViTri", phieuGuiXe.MaViTri);
+            return View(phieuGuiXe);
+        }
+
         // POST: PHIEUGUIXES/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]

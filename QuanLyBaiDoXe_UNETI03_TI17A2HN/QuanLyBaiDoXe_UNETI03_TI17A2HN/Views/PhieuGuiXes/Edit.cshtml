@@ -1,90 +1,114 @@
+@* Họ và tên: Tăng Hoàng Giang *@
+@* Mã sinh viên: 23103100031 *@
+@* Chức năng: Chỉnh sửa phiếu gửi xe (Module 4) *@
+
 @model QuanLyBaiDoXe_UNETI03_TI17A2HN.Models.PhieuGuiXe
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Chỉnh sửa phiếu gửi xe";
 }
 
-<h1>Edit</h1>
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0 rounded-3">
+                <div class="card-header bg-primary text-white py-3">
+                    <h5 class="mb-0 fw-bold">
+                        <i class="bi bi-pencil-square me-2"></i>Chỉnh sửa phiếu gửi xe: PG-@Model.MaPhieu.ToString("D4")
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Edit" method="post">
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                        <input type="hidden" asp-for="MaPhieu" />
 
-<h4>PhieuGuiXe</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="MaPhieu" />
-            <div class="form-group">
-                <label asp-for="MaPhuongTien" class="control-label"></label>
-                <input asp-for="MaPhuongTien" class="form-control" />
-                <span asp-validation-for="MaPhuongTien" class="text-danger"></span>
+                        <div class="row g-3">
+                            <!-- Phương tiện -->
+                            <div class="col-md-6">
+                                <label asp-for="MaPhuongTien" class="form-label fw-semibold">Phương tiện (Biển số xe)</label>
+                                <select asp-for="MaPhuongTien" class="form-select" asp-items="ViewBag.MaPhuongTien"></select>
+                                <span asp-validation-for="MaPhuongTien" class="text-danger small"></span>
+                            </div>
+
+                            <!-- Vị trí đỗ xe -->
+                            <div class="col-md-6">
+                                <label asp-for="MaViTri" class="form-label fw-semibold">Vị trí đỗ xe</label>
+                                <select asp-for="MaViTri" class="form-select" asp-items="ViewBag.MaViTri"></select>
+                                <span asp-validation-for="MaViTri" class="text-danger small"></span>
+                            </div>
+
+                            <!-- Ngày đăng ký -->
+                            <div class="col-md-6">
+                                <label asp-for="NgayDangKy" class="form-label fw-semibold">Ngày tạo phiếu</label>
+                                <input asp-for="NgayDangKy" class="form-control bg-light" readonly />
+                                <span asp-validation-for="NgayDangKy" class="text-danger small"></span>
+                            </div>
+
+                            <!-- Trạng thái -->
+                            <div class="col-md-6">
+                                <label asp-for="TrangThai" class="form-label fw-semibold">Trạng thái phiếu</label>
+                                <input asp-for="TrangThai" class="form-control bg-light" readonly />
+                                <small class="text-muted d-block mt-1">Trạng thái do hệ thống quản lý theo quy trình vào/ra.</small>
+                                <span asp-validation-for="TrangThai" class="text-danger small"></span>
+                            </div>
+
+                            <!-- Thời gian dự kiến vào -->
+                            <div class="col-md-6">
+                                <label asp-for="ThoiGianDuKienVao" class="form-label fw-semibold">Thời gian dự kiến vào</label>
+                                <input asp-for="ThoiGianDuKienVao" class="form-control" type="datetime-local" />
+                                <span asp-validation-for="ThoiGianDuKienVao" class="text-danger small"></span>
+                            </div>
+
+                            <!-- Thời gian dự kiến ra -->
+                            <div class="col-md-6">
+                                <label asp-for="ThoiGianDuKienRa" class="form-label fw-semibold">Thời gian dự kiến ra</label>
+                                <input asp-for="ThoiGianDuKienRa" class="form-control" type="datetime-local" />
+                                <span asp-validation-for="ThoiGianDuKienRa" class="text-danger small"></span>
+                            </div>
+
+                            <!-- Đơn giá theo giờ -->
+                            <div class="col-md-6">
+                                <label asp-for="DonGiaTheoGio" class="form-label fw-semibold">Đơn giá theo giờ (VNĐ)</label>
+                                <input asp-for="DonGiaTheoGio" class="form-control bg-light" readonly />
+                                <small class="text-muted d-block mt-1">Đơn giá tự động lấy từ loại phương tiện.</small>
+                                <span asp-validation-for="DonGiaTheoGio" class="text-danger small"></span>
+                            </div>
+
+                            <!-- Thành tiền -->
+                            <div class="col-md-6">
+                                <label asp-for="ThanhTien" class="form-label fw-semibold">Thành tiền (VNĐ)</label>
+                                <input asp-for="ThanhTien" class="form-control bg-light" readonly />
+                                <small class="text-muted d-block mt-1">Tính tự động theo block 30 phút khi xe ra.</small>
+                                <span asp-validation-for="ThanhTien" class="text-danger small"></span>
+                            </div>
+
+                            <!-- Thời gian vào thực tế -->
+                            <div class="col-md-6">
+                                <label asp-for="ThoiGianVaoThucTe" class="form-label fw-semibold">Thời gian vào thực tế</label>
+                                <input asp-for="ThoiGianVaoThucTe" class="form-control bg-light" readonly />
+                            </div>
+
+                            <!-- Thời gian ra thực tế -->
+                            <div class="col-md-6">
+                                <label asp-for="ThoiGianRaThucTe" class="form-label fw-semibold">Thời gian ra thực tế</label>
+                                <input asp-for="ThoiGianRaThucTe" class="form-control bg-light" readonly />
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="bi bi-x-circle me-1"></i>Hủy bỏ
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle me-1"></i>Lưu thay đổi
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="MaViTri" class="control-label"></label>
-                <input asp-for="MaViTri" class="form-control" />
-                <span asp-validation-for="MaViTri" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="NgayDangKy" class="control-label"></label>
-                <input asp-for="NgayDangKy" class="form-control" />
-                <span asp-validation-for="NgayDangKy" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ThoiGianDuKienVao" class="control-label"></label>
-                <input asp-for="ThoiGianDuKienVao" class="form-control" />
-                <span asp-validation-for="ThoiGianDuKienVao" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ThoiGianDuKienRa" class="control-label"></label>
-                <input asp-for="ThoiGianDuKienRa" class="form-control" />
-                <span asp-validation-for="ThoiGianDuKienRa" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ThoiGianVaoThucTe" class="control-label"></label>
-                <input asp-for="ThoiGianVaoThucTe" class="form-control" />
-                <span asp-validation-for="ThoiGianVaoThucTe" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ThoiGianRaThucTe" class="control-label"></label>
-                <input asp-for="ThoiGianRaThucTe" class="form-control" />
-                <span asp-validation-for="ThoiGianRaThucTe" class="text-danger"></span>
-            </div>
-            <div class="form-group mb-3">
-                <label asp-for="DonGiaTheoGio" class="control-label fw-semibold"></label>
-                <input asp-for="DonGiaTheoGio" class="form-control bg-light" readonly />
-                <small class="text-muted">Đơn giá tự động lấy từ loại phương tiện, không được sửa tay.</small>
-                <span asp-validation-for="DonGiaTheoGio" class="text-danger"></span>
-            </div>
-            <div class="form-group mb-3">
-                <label asp-for="ThanhTien" class="control-label fw-semibold"></label>
-                <input asp-for="ThanhTien" class="form-control bg-light" readonly />
-                <small class="text-muted">Thành tiền do hệ thống tự động tính khi xe ra.</small>
-                <span asp-validation-for="ThanhTien" class="text-danger"></span>
-            </div>
-            <div class="form-group mb-3">
-                <label asp-for="TrangThai" class="control-label fw-semibold"></label>
-                <input asp-for="TrangThai" class="form-control bg-light" readonly />
-                <small class="text-muted">Trạng thái phiếu chỉ được chuyển đổi qua quy trình Vào/Ra hoặc Hủy.</small>
-                <span asp-validation-for="TrangThai" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="PhuongTien" class="control-label"></label>
-                <input asp-for="PhuongTien" class="form-control" />
-                <span asp-validation-for="PhuongTien" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ViTriDoXe" class="control-label"></label>
-                <input asp-for="ViTriDoXe" class="form-control" />
-                <span asp-validation-for="ViTriDoXe" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
 </div>
 
 @section Scripts {
