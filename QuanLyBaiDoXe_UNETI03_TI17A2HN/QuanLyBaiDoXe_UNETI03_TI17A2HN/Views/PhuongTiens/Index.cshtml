@@ -10,7 +10,13 @@
     int currentPage = ViewBag.CurrentPage ?? 1;
     int totalPages = ViewBag.TotalPages ?? 1;
     int total = ViewBag.Total ?? 0;
-    string currentFilter = ViewBag.CurrentFilter as string ?? "";
+
+    bool isAdmin = vaiTro == "Admin";
+    string currentBienSo = ViewBag.CurrentBienSo as string ?? "";
+    string currentChuXe = ViewBag.CurrentChuXe as string ?? "";
+    string currentNhanHieu = ViewBag.CurrentNhanHieu as string ?? "";
+    string currentTrangThai = ViewBag.CurrentTrangThai as string ?? "";
+    var dsNhanHieu = ViewBag.NhanHieuList as List<string> ?? new List<string>();
 }
 
 <style>
@@ -28,34 +34,34 @@
         width: 100%;
     }
 
-    .custom-table thead th {
-        background-color: #f8fafc !important;
-        color: #475569 !important;
-        border-bottom: 2px solid #e2e8f0;
-        border-top: none;
-        padding: 14px 16px;
-        font-weight: 700;
-        font-size: 13px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        vertical-align: middle;
-    }
+        .custom-table thead th {
+            background-color: #f8fafc !important;
+            color: #475569 !important;
+            border-bottom: 2px solid #e2e8f0;
+            border-top: none;
+            padding: 14px 16px;
+            font-weight: 700;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            vertical-align: middle;
+        }
 
-    .custom-table tbody td {
-        padding: 16px;
-        vertical-align: middle;
-        border-bottom: 1px solid #f1f5f9;
-        color: #1e293b;
-        font-size: 14px;
-    }
+        .custom-table tbody td {
+            padding: 16px;
+            vertical-align: middle;
+            border-bottom: 1px solid #f1f5f9;
+            color: #1e293b;
+            font-size: 14px;
+        }
 
-    .custom-table tbody tr:nth-child(even) td {
-        background-color: #fafbfc !important;
-    }
+        .custom-table tbody tr:nth-child(even) td {
+            background-color: #fafbfc !important;
+        }
 
-    .custom-table tbody tr:hover td {
-        background-color: #f1f5f9 !important;
-    }
+        .custom-table tbody tr:hover td {
+            background-color: #f1f5f9 !important;
+        }
 
     /* Cụm nút thao tác nhóm ô vuông chuẩn mẫu ParkSmart */
     .action-group {
@@ -81,20 +87,39 @@
         cursor: pointer;
     }
 
-    .action-btn:last-child {
-        border-right: none;
-    }
+        .action-btn:last-child {
+            border-right: none;
+        }
 
-    .action-btn.view { color: #0ea5e9; }
-    .action-btn.view:hover { background-color: #e0f2fe; }
+        .action-btn.view {
+            color: #0ea5e9;
+        }
 
-    .action-btn.edit { color: #d97706; }
-    .action-btn.edit:hover { background-color: #fef3c7; }
+            .action-btn.view:hover {
+                background-color: #e0f2fe;
+            }
 
-    .action-btn.delete { color: #ef4444; }
-    .action-btn.delete:hover { background-color: #fee2e2; }
+        .action-btn.edit {
+            color: #d97706;
+        }
 
-    .action-btn.disabled-btn { color: #94a3b8; background-color: #f8fafc; cursor: not-allowed; }
+            .action-btn.edit:hover {
+                background-color: #fef3c7;
+            }
+
+        .action-btn.delete {
+            color: #ef4444;
+        }
+
+            .action-btn.delete:hover {
+                background-color: #fee2e2;
+            }
+
+        .action-btn.disabled-btn {
+            color: #94a3b8;
+            background-color: #f8fafc;
+            cursor: not-allowed;
+        }
 
     /* CSS tùy chỉnh phân trang bo tròn */
     .custom-pagination .pagination {
@@ -112,11 +137,11 @@
         transition: all 0.2s;
     }
 
-    .custom-pagination .page-item .page-link:hover {
-        background-color: #f1f5f9;
-        color: #1e293b;
-        border-color: #cbd5e1;
-    }
+        .custom-pagination .page-item .page-link:hover {
+            background-color: #f1f5f9;
+            color: #1e293b;
+            border-color: #cbd5e1;
+        }
 
     .custom-pagination .page-item.active .page-link {
         background-color: #2563eb !important;
@@ -132,22 +157,14 @@
     }
 </style>
 
-<div class="container-fluid px-0 py-2">
+<div class="container-fluid p-0">
 
-    <!-- Header Page -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <!-- Tiêu đề (giống trang Vị trí đỗ xe) -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="mb-0">Danh sách Phương tiện</h2>
         <div>
-            <h2 class="fw-bold mb-1 text-dark fs-3">
-                <i class="bi bi-car-front-fill me-2 text-primary"></i>
-                Quản lý phương tiện
-            </h2>
-            <p class="text-secondary small mb-0 mt-1">
-                Quản lý thông tin và trạng thái phương tiện trong hệ thống
-            </p>
+            <a asp-action="Create" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Tạo mới</a>
         </div>
-        <a asp-action="Create" class="btn btn-primary px-3 py-2 fw-semibold shadow-sm d-inline-flex align-items-center gap-2 rounded-3">
-            <i class="bi bi-plus-circle"></i> Thêm phương tiện
-        </a>
     </div>
 
     @if (TempData["SuccessMessage"] != null)
@@ -168,31 +185,61 @@
         </div>
     }
 
-    <!-- Khung tìm kiếm -->
-    <div class="card shadow-sm border-0 mb-4 rounded-4">
-        <div class="card-body bg-light p-3 rounded-4">
-            <form asp-action="Index" method="get" class="row g-2 align-items-center">
-                <div class="col-md-8">
-                    <div class="input-group">
-                        <span class="input-group-text bg-white border-end-0 text-muted rounded-start-3">
-                            <i class="bi bi-search"></i>
-                        </span>
+    <!-- Khung tìm kiếm & lọc (giống trang Vị trí đỗ xe) -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body bg-light">
+            <form asp-action="Index" method="get">
+                <div class="row g-2">
+                    <!-- Biển số xe -->
+                    <div class="@(isAdmin ? "col-md-3" : "col-md-4")">
+                        <label class="form-label font-weight-bold">Biển số xe:</label>
                         <input type="text"
-                               name="searchString"
-                               value="@currentFilter"
-                               class="form-control border-start-0 ps-0 rounded-end-3"
-                               placeholder="Tìm theo biển số hoặc nhãn hiệu..." />
+                               name="searchBienSo"
+                               value="@currentBienSo"
+                               class="form-control"
+                               placeholder="Nhập biển số xe..." />
                     </div>
-                </div>
-                <div class="col-md-2">
-                    <button type="submit" class="btn btn-primary w-100 rounded-3 fw-semibold">
-                        <i class="bi bi-search me-1"></i> Tìm kiếm
-                    </button>
-                </div>
-                <div class="col-md-2">
-                    <a asp-action="Index" class="btn btn-outline-secondary w-100 rounded-3 fw-semibold">
-                        <i class="bi bi-arrow-clockwise me-1"></i> Làm mới
-                    </a>
+
+                    <!-- Chủ phương tiện (chỉ Admin) -->
+                    @if (isAdmin)
+                    {
+                        <div class="col-md-3">
+                            <label class="form-label font-weight-bold">Chủ phương tiện:</label>
+                            <input type="text"
+                                   name="searchChuXe"
+                                   value="@currentChuXe"
+                                   class="form-control"
+                                   placeholder="Nhập tên chủ phương tiện..." />
+                        </div>
+                    }
+
+                    <!-- Nhãn hiệu -->
+                    <div class="@(isAdmin ? "col-md-3" : "col-md-4")">
+                        <label class="form-label font-weight-bold">Nhãn hiệu:</label>
+                        <select name="nhanHieu" class="form-select">
+                            <option value="">-- Tất cả --</option>
+                            @foreach (var nh in dsNhanHieu)
+                            {
+                                <option value="@nh" selected="@(currentNhanHieu == nh)">@nh</option>
+                            }
+                        </select>
+                    </div>
+
+                    <!-- Trạng thái -->
+                    <div class="@(isAdmin ? "col-md-3" : "col-md-4")">
+                        <label class="form-label font-weight-bold">Trạng thái:</label>
+                        <select name="trangThai" class="form-select">
+                            <option value="">-- Tất cả --</option>
+                            <option value="hoatDong" selected="@(currentTrangThai == "hoatDong")">Hoạt động</option>
+                            <option value="dangGui" selected="@(currentTrangThai == "dangGui")">Đang gửi</option>
+                            <option value="ngungHoatDong" selected="@(currentTrangThai == "ngungHoatDong")">Ngừng hoạt động</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-12 text-end mt-3">
+                        <button type="submit" class="btn btn-success me-1"><i class="bi bi-funnel"></i> Tìm/Lọc</button>
+                        <a asp-action="Index" class="btn btn-secondary">Đặt lại</a>
+                    </div>
                 </div>
             </form>
         </div>
@@ -309,7 +356,7 @@
         </div>
     </div>
 
-    <!-- Phân trang chuẩn mẫu bo tròn -->
+    <!-- Phân trang (giữ nguyên bộ lọc khi chuyển trang) -->
     @if (totalPages > 1)
     {
         <nav class="mt-4 custom-pagination">
@@ -318,7 +365,10 @@
                     <a class="page-link"
                        asp-action="Index"
                        asp-route-page="@(currentPage - 1)"
-                       asp-route-searchString="@currentFilter">
+                       asp-route-searchBienSo="@currentBienSo"
+                       asp-route-searchChuXe="@currentChuXe"
+                       asp-route-nhanHieu="@currentNhanHieu"
+                       asp-route-trangThai="@currentTrangThai">
                         <i class="bi bi-chevron-left"></i> Trước
                     </a>
                 </li>
@@ -329,7 +379,10 @@
                         <a class="page-link"
                            asp-action="Index"
                            asp-route-page="@i"
-                           asp-route-searchString="@currentFilter">
+                           asp-route-searchBienSo="@currentBienSo"
+                           asp-route-searchChuXe="@currentChuXe"
+                           asp-route-nhanHieu="@currentNhanHieu"
+                           asp-route-trangThai="@currentTrangThai">
                             @i
                         </a>
                     </li>
@@ -339,7 +392,10 @@
                     <a class="page-link"
                        asp-action="Index"
                        asp-route-page="@(currentPage + 1)"
-                       asp-route-searchString="@currentFilter">
+                       asp-route-searchBienSo="@currentBienSo"
+                       asp-route-searchChuXe="@currentChuXe"
+                       asp-route-nhanHieu="@currentNhanHieu"
+                       asp-route-trangThai="@currentTrangThai">
                         Sau <i class="bi bi-chevron-right"></i>
                     </a>
                 </li>
