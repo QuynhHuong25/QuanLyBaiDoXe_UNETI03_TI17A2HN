@@ -1,11 +1,15 @@
-@* Lương Thị Quỳnh Hương - 23103100064 *@
+
 @model IEnumerable<QuanLyBaiDoXe_UNETI03_TI17A2HN.Models.ChuPhuongTien>
 
 @{
     bool isAdmin = (ViewBag.UserRole as string) == "Admin";
     ViewData["Title"] = isAdmin ? "Danh sách chủ phương tiện" : "Thông tin cá nhân";
 
-    string? keyword = ViewBag.CurrentFilter as string;
+    string currentMaTK = ViewBag.CurrentMaTK as string ?? "";
+    string currentHoTen = ViewBag.CurrentHoTen as string ?? "";
+    string currentSdt = ViewBag.CurrentSdt as string ?? "";
+    string currentTrangThai = ViewBag.CurrentTrangThai as string ?? "";
+
     int currentPage = ViewBag.CurrentPage ?? 1;
     int totalPages = ViewBag.TotalPages ?? 1;
     int total = ViewBag.Total ?? 0;
@@ -26,34 +30,34 @@
         width: 100%;
     }
 
-    .custom-table thead th {
-        background-color: #f8fafc !important;
-        color: #475569 !important;
-        border-bottom: 2px solid #e2e8f0;
-        border-top: none;
-        padding: 14px 16px;
-        font-weight: 700;
-        font-size: 13px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        vertical-align: middle;
-    }
+        .custom-table thead th {
+            background-color: #f8fafc !important;
+            color: #475569 !important;
+            border-bottom: 2px solid #e2e8f0;
+            border-top: none;
+            padding: 14px 16px;
+            font-weight: 700;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            vertical-align: middle;
+        }
 
-    .custom-table tbody td {
-        padding: 16px;
-        vertical-align: middle;
-        border-bottom: 1px solid #f1f5f9;
-        color: #1e293b;
-        font-size: 14px;
-    }
+        .custom-table tbody td {
+            padding: 16px;
+            vertical-align: middle;
+            border-bottom: 1px solid #f1f5f9;
+            color: #1e293b;
+            font-size: 14px;
+        }
 
-    .custom-table tbody tr:nth-child(even) td {
-        background-color: #fafbfc !important;
-    }
+        .custom-table tbody tr:nth-child(even) td {
+            background-color: #fafbfc !important;
+        }
 
-    .custom-table tbody tr:hover td {
-        background-color: #f1f5f9 !important;
-    }
+        .custom-table tbody tr:hover td {
+            background-color: #f1f5f9 !important;
+        }
 
     /* Cụm nút thao tác liền viền chuẩn mẫu ParkSmart */
     .action-group {
@@ -79,24 +83,49 @@
         cursor: pointer;
     }
 
-    .action-btn:last-child {
-        border-right: none;
-    }
+        .action-btn:last-child {
+            border-right: none;
+        }
 
-    .action-btn.view { color: #0ea5e9; }
-    .action-btn.view:hover { background-color: #e0f2fe; }
+        .action-btn.view {
+            color: #0ea5e9;
+        }
 
-    .action-btn.edit { color: #d97706; }
-    .action-btn.edit:hover { background-color: #fef3c7; }
+            .action-btn.view:hover {
+                background-color: #e0f2fe;
+            }
 
-    .action-btn.lock { color: #f59e0b; }
-    .action-btn.lock:hover { background-color: #fef3c7; }
+        .action-btn.edit {
+            color: #d97706;
+        }
 
-    .action-btn.unlock { color: #10b981; }
-    .action-btn.unlock:hover { background-color: #d1fae5; }
+            .action-btn.edit:hover {
+                background-color: #fef3c7;
+            }
 
-    .action-btn.delete { color: #ef4444; }
-    .action-btn.delete:hover { background-color: #fee2e2; }
+        .action-btn.lock {
+            color: #f59e0b;
+        }
+
+            .action-btn.lock:hover {
+                background-color: #fef3c7;
+            }
+
+        .action-btn.unlock {
+            color: #10b981;
+        }
+
+            .action-btn.unlock:hover {
+                background-color: #d1fae5;
+            }
+
+        .action-btn.delete {
+            color: #ef4444;
+        }
+
+            .action-btn.delete:hover {
+                background-color: #fee2e2;
+            }
 </style>
 
 <div class="container-fluid px-0">
@@ -125,33 +154,55 @@
         </div>
     }
 
-    <!-- Bộ lọc & Lọc tìm kiếm cho Admin -->
+    <!-- Khung tìm kiếm & lọc (giống trang Vị trí đỗ xe) - chỉ Admin -->
     @if (isAdmin)
     {
-        <div class="card shadow-sm mb-4 border-0 rounded-4">
-            <div class="card-body bg-light p-3 rounded-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
-                <div class="text-secondary small">
-                    Tổng số: <strong class="text-dark fs-6">@total</strong> chủ phương tiện
-                </div>
+        <div class="card shadow-sm mb-4">
+            <div class="card-body bg-light">
+                <form asp-action="Index" method="get">
+                    <div class="row g-2">
+                        <!-- Mã tài khoản -->
+                        <div class="col-md-3">
+                            <label class="form-label font-weight-bold">Mã tài khoản:</label>
+                            <input type="number" min="1" name="searchMaTK" value="@currentMaTK"
+                                   class="form-control" placeholder="Nhập mã tài khoản..." />
+                        </div>
 
-                <form asp-action="Index" method="get" class="d-flex gap-2 m-0">
-                    <div class="input-group">
-                        <span class="input-group-text bg-white border-end-0 text-muted rounded-start-3">
-                            <i class="bi bi-search"></i>
-                        </span>
-                        <input type="text" name="searchString" value="@keyword" class="form-control border-start-0 ps-0 rounded-0"
-                               placeholder="Tìm theo họ tên hoặc SĐT..." style="min-width: 260px;" />
-                        
-                        <!-- Nút Tìm kiếm phẳng góc (rounded-0) màu xanh dương -->
-                        <button class="btn btn-primary px-3 fw-semibold rounded-0" type="submit">
-                            <i class="bi bi-search me-1"></i> Tìm kiếm
-                        </button>
-                        
-                        <!-- Nút Đặt lại bo tròn góc phải -->
-                        <a asp-action="Index" class="btn btn-outline-secondary rounded-end-3 rounded-start-0">Đặt lại</a>
+                        <!-- Họ tên -->
+                        <div class="col-md-3">
+                            <label class="form-label font-weight-bold">Họ tên:</label>
+                            <input type="text" name="searchHoTen" value="@currentHoTen"
+                                   class="form-control" placeholder="Nhập họ tên..." />
+                        </div>
+
+                        <!-- Số điện thoại -->
+                        <div class="col-md-3">
+                            <label class="form-label font-weight-bold">Số điện thoại:</label>
+                            <input type="text" name="searchSdt" value="@currentSdt"
+                                   class="form-control" placeholder="Nhập số điện thoại..." />
+                        </div>
+
+                        <!-- Trạng thái -->
+                        <div class="col-md-3">
+                            <label class="form-label font-weight-bold">Trạng thái:</label>
+                            <select name="locTrangThai" class="form-select">
+                                <option value="">-- Tất cả --</option>
+                                <option value="hoatDong" selected="@(currentTrangThai == "hoatDong")">Hoạt động</option>
+                                <option value="biKhoa" selected="@(currentTrangThai == "biKhoa")">Đã khóa</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-12 text-end mt-3">
+                            <button type="submit" class="btn btn-success me-1"><i class="bi bi-funnel"></i> Lọc</button>
+                            <a asp-action="Index" class="btn btn-secondary">Đặt lại</a>
+                        </div>
                     </div>
                 </form>
             </div>
+        </div>
+
+        <div class="mb-3 text-secondary small">
+            Tổng số: <strong class="text-dark">@total</strong> chủ phương tiện
         </div>
     }
 
@@ -214,9 +265,12 @@
                                                   onsubmit="return confirm('@(item.TrangThai ? "Bạn có chắc muốn khóa chủ phương tiện này?" : "Bạn có muốn kích hoạt lại chủ phương tiện này?");');">
                                                 <input type="hidden" name="id" value="@item.MaChuPhuongTien" />
                                                 <input type="hidden" name="trangThai" value="@((!item.TrangThai).ToString().ToLower())" />
-                                                <input type="hidden" name="searchString" value="@keyword" />
+                                                <input type="hidden" name="searchMaTK" value="@currentMaTK" />
+                                                <input type="hidden" name="searchHoTen" value="@currentHoTen" />
+                                                <input type="hidden" name="searchSdt" value="@currentSdt" />
+                                                <input type="hidden" name="locTrangThai" value="@currentTrangThai" />
                                                 <input type="hidden" name="page" value="@currentPage" />
-                                                
+
                                                 @if (item.TrangThai)
                                                 {
                                                     <button type="submit" class="action-btn lock" title="Khóa tài khoản">
@@ -264,22 +318,28 @@
         </div>
     </div>
 
-    <!-- Phân trang dành cho Admin -->
+    <!-- Phân trang dành cho Admin (giữ nguyên bộ lọc khi chuyển trang) -->
     @if (isAdmin && totalPages > 1)
     {
         <nav aria-label="Page navigation" class="mt-4">
             <ul class="pagination justify-content-center mb-0">
                 <li class="page-item @(currentPage <= 1 ? "disabled" : "")">
-                    <a class="page-link rounded-start-3" asp-action="Index" asp-route-page="@(currentPage - 1)" asp-route-searchString="@keyword">Trước</a>
+                    <a class="page-link rounded-start-3" asp-action="Index" asp-route-page="@(currentPage - 1)"
+                       asp-route-searchMaTK="@currentMaTK" asp-route-searchHoTen="@currentHoTen"
+                       asp-route-searchSdt="@currentSdt" asp-route-locTrangThai="@currentTrangThai">Trước</a>
                 </li>
                 @for (int i = 1; i <= totalPages; i++)
                 {
                     <li class="page-item @(currentPage == i ? "active" : "")">
-                        <a class="page-link" asp-action="Index" asp-route-page="@i" asp-route-searchString="@keyword">@i</a>
+                        <a class="page-link" asp-action="Index" asp-route-page="@i"
+                           asp-route-searchMaTK="@currentMaTK" asp-route-searchHoTen="@currentHoTen"
+                           asp-route-searchSdt="@currentSdt" asp-route-locTrangThai="@currentTrangThai">@i</a>
                     </li>
                 }
                 <li class="page-item @(currentPage >= totalPages ? "disabled" : "")">
-                    <a class="page-link rounded-end-3" asp-action="Index" asp-route-page="@(currentPage + 1)" asp-route-searchString="@keyword">Sau</a>
+                    <a class="page-link rounded-end-3" asp-action="Index" asp-route-page="@(currentPage + 1)"
+                       asp-route-searchMaTK="@currentMaTK" asp-route-searchHoTen="@currentHoTen"
+                       asp-route-searchSdt="@currentSdt" asp-route-locTrangThai="@currentTrangThai">Sau</a>
                 </li>
             </ul>
         </nav>
