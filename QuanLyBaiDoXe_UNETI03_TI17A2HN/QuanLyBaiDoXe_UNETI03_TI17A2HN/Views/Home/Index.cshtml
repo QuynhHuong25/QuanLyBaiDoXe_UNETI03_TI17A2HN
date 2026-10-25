@@ -7,6 +7,8 @@
 @{
     ViewData["Title"] = "Trang chủ - Quản lý bãi đỗ xe";
     string? vaiTro = Context.Session?.GetString("VaiTro");
+    bool isAdmin = vaiTro == "Admin";
+    string tenChao = Context.Session?.GetString("HoTen") ?? "bạn";
 }
 
 <div class="container-fluid p-0">
@@ -26,37 +28,38 @@
         </div>
     }
 
-    @{
-        string tenChao = Context.Session?.GetString("HoTen") ?? "bạn";
-    }
-
     <!-- 1. BANNER CHÀO MỪNG (giống demo) -->
     <div class="ps-welcome">
         <div>
             <h2>Xin chào, @tenChao 👋</h2>
             <p>
-                @(vaiTro == "Admin"
+                @(isAdmin
                     ? $"Hiện có {Model.SoDangGui} xe đang gửi trong bãi."
                     : $"Bạn đang có {Model.SoDangGui} xe gửi trong bãi. Chúc bạn một ngày thuận lợi!")
             </p>
         </div>
-        <a asp-controller="PhieuGuiXes" asp-action="Create" class="btn btn-ac">Đăng ký gửi xe →</a>
+
+        @* Admin không đăng ký gửi xe -> ẩn nút *@
+        @if (!isAdmin)
+        {
+            <a asp-controller="PhieuGuiXes" asp-action="Create" class="btn btn-ac">Đăng ký gửi xe →</a>
+        }
     </div>
 
     <!-- 2. BỐN Ô SỐ LIỆU -->
     <div class="ps-kp">
-        <div class="card"><div class="ps-ico">🚗</div><div><b>@Model.SoXeCuaToi</b><span>@(vaiTro == "Admin" ? "Phương tiện" : "Xe của tôi")</span></div></div>
+        <div class="card"><div class="ps-ico">🚗</div><div><b>@Model.SoXeCuaToi</b><span>@(isAdmin ? "Phương tiện" : "Xe của tôi")</span></div></div>
         <div class="card"><div class="ps-ico">🕘</div><div><b>@Model.SoLuotGui</b><span>Lượt gửi</span></div></div>
         <div class="card"><div class="ps-ico">⏳</div><div><b>@Model.SoDangGui</b><span>Đang gửi</span></div></div>
         <div class="card"><div class="ps-ico">🅿️</div><div><b>@Model.TongViTriTrong</b><span>Chỗ trống</span></div></div>
     </div>
 
-    <!-- 3. PHẦN DƯỚI: HOẠT ĐỘNG GẦN ĐÂY & FORM ĐĂNG KÝ NHANH -->
+    <!-- 3. PHẦN DƯỚI: HOẠT ĐỘNG GẦN ĐÂY (+ FORM ĐĂNG KÝ NHANH CHO KHÁCH HÀNG) -->
     <div class="row g-4">
-        <!-- CỘT TRÁI: HOẠT ĐỘNG GẦN ĐÂY -->
-        <div class="col-lg-8">
+        <!-- CỘT TRÁI: HOẠT ĐỘNG GẦN ĐÂY (admin: rộng hết hàng) -->
+        <div class="@(isAdmin ? "col-12" : "col-lg-8")">
             <div class="dashboard-card">
-                <h5 class="fw-bold text-dark mb-3">@(vaiTro == "Admin" ? "Hoạt động gần đây" : "Lượt gửi gần đây của bạn")</h5>
+                <h5 class="fw-bold text-dark mb-3">@(isAdmin ? "Hoạt động gần đây" : "Lượt gửi gần đây của bạn")</h5>
 
                 <div class="table-responsive">
                     <table class="table align-middle table-borderless table-hover mb-0">
@@ -123,80 +126,83 @@
 
                 <div class="mt-3 pt-2">
                     <a asp-controller="PhieuGuiXes" asp-action="Index" class="text-primary text-decoration-none fw-semibold small d-inline-flex align-items-center gap-1">
-                        <span>@(vaiTro == "Khách hàng" ? "Xem lịch sử gửi xe" : "Xem tất cả")</span>
+                        <span>@(isAdmin ? "Xem tất cả" : "Xem lịch sử gửi xe")</span>
                         <i class="bi bi-arrow-right"></i>
                     </a>
                 </div>
             </div>
         </div>
 
-        <!-- CỘT PHẢI: ĐĂNG KÝ GỬI XE NHANH -->
-        <div class="col-lg-4">
-            <div class="dashboard-card">
-                <h5 class="fw-bold text-dark mb-3">Đăng ký gửi xe nhanh</h5>
+        @* CỘT PHẢI: ĐĂNG KÝ GỬI XE NHANH - chỉ dành cho khách hàng, admin không thấy *@
+        @if (!isAdmin)
+        {
+            <div class="col-lg-4">
+                <div class="dashboard-card">
+                    <h5 class="fw-bold text-dark mb-3">Đăng ký gửi xe nhanh</h5>
 
-                <form asp-controller="Home" asp-action="DangKyNhanh" method="post">
-                    @Html.AntiForgeryToken()
+                    <form asp-controller="Home" asp-action="DangKyNhanh" method="post">
+                        @Html.AntiForgeryToken()
 
-                    <div class="mb-3">
-                        <label class="form-label small fw-semibold text-secondary mb-1">
-                            Biển số xe <span class="text-danger">*</span>
-                        </label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-light border-end-0 text-muted" style="border-radius: 10px 0 0 10px;">
-                                <i class="bi bi-car-front"></i>
-                            </span>
-                            <input type="text" name="bienSoXe" class="form-control form-control-dash border-start-0"
-                                   style="border-radius: 0 10px 10px 0;" placeholder="Nhập biển số xe (VD: 30A-123.45)" required />
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold text-secondary mb-1">
+                                Biển số xe <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0 text-muted" style="border-radius: 10px 0 0 10px;">
+                                    <i class="bi bi-car-front"></i>
+                                </span>
+                                <input type="text" name="bienSoXe" class="form-control form-control-dash border-start-0"
+                                       style="border-radius: 0 10px 10px 0;" placeholder="Nhập biển số xe (VD: 30A-123.45)" required />
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="mb-3">
-                        <label class="form-label small fw-semibold text-secondary mb-1">
-                            Loại xe <span class="text-danger">*</span>
-                        </label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-light border-end-0 text-muted" style="border-radius: 10px 0 0 10px;">
-                                <i class="bi bi-truck"></i>
-                            </span>
-                            <select name="maLoaiPhuongTien" class="form-select form-select-dash border-start-0"
-                                    style="border-radius: 0 10px 10px 0;" required>
-                                <option value="">Chọn loại xe</option>
-                                @if (Model.DanhSachLoaiXe != null)
-                                {
-                                    @foreach (var loai in Model.DanhSachLoaiXe)
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold text-secondary mb-1">
+                                Loại xe <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0 text-muted" style="border-radius: 10px 0 0 10px;">
+                                    <i class="bi bi-truck"></i>
+                                </span>
+                                <select name="maLoaiPhuongTien" class="form-select form-select-dash border-start-0"
+                                        style="border-radius: 0 10px 10px 0;" required>
+                                    <option value="">Chọn loại xe</option>
+                                    @if (Model.DanhSachLoaiXe != null)
                                     {
-                                        <option value="@loai.MaLoaiPhuongTien">@loai.TenLoaiPhuongTien</option>
+                                        @foreach (var loai in Model.DanhSachLoaiXe)
+                                        {
+                                            <option value="@loai.MaLoaiPhuongTien">@loai.TenLoaiPhuongTien</option>
+                                        }
                                     }
-                                }
-                            </select>
+                                </select>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="mb-3">
-                        <label class="form-label small fw-semibold text-secondary mb-1">
-                            Thời gian gửi <span class="text-danger">*</span>
-                        </label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-light border-end-0 text-muted" style="border-radius: 10px 0 0 10px;">
-                                <i class="bi bi-calendar3"></i>
-                            </span>
-                            <input type="datetime-local" name="thoiGianVao" class="form-control form-control-dash border-start-0"
-                                   style="border-radius: 0 10px 10px 0;" value="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" required />
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold text-secondary mb-1">
+                                Thời gian gửi <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0 text-muted" style="border-radius: 10px 0 0 10px;">
+                                    <i class="bi bi-calendar3"></i>
+                                </span>
+                                <input type="datetime-local" name="thoiGianVao" class="form-control form-control-dash border-start-0"
+                                       style="border-radius: 0 10px 10px 0;" value="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" required />
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="mb-4">
-                        <label class="form-label small fw-semibold text-secondary mb-1">Ghi chú (nếu có)</label>
-                        <input type="text" name="ghiChu" class="form-control form-control-dash" placeholder="Nhập ghi chú..." />
-                    </div>
+                        <div class="mb-4">
+                            <label class="form-label small fw-semibold text-secondary mb-1">Ghi chú (nếu có)</label>
+                            <input type="text" name="ghiChu" class="form-control form-control-dash" placeholder="Nhập ghi chú..." />
+                        </div>
 
-                    <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold rounded-3 shadow-sm d-flex align-items-center justify-content-center gap-2">
-                        <i class="bi bi-send-fill"></i>
-                        <span>Đăng ký</span>
-                    </button>
-                </form>
+                        <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold rounded-3 shadow-sm d-flex align-items-center justify-content-center gap-2">
+                            <i class="bi bi-send-fill"></i>
+                            <span>Đăng ký</span>
+                        </button>
+                    </form>
+                </div>
             </div>
-        </div>
+        }
     </div>
 </div>
