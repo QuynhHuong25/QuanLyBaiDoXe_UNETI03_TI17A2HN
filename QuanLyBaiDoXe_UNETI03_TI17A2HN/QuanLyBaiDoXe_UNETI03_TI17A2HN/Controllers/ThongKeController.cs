@@ -105,19 +105,34 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                 .OrderByDescending(x => x.SoLuot)
                 .ToListAsync();
 
-            // 2.8 Số lượt gửi và doanh thu theo tháng (từ các phiếu đã lấy xe)
+            // 2.8 Số lượt gửi và doanh thu theo các tháng thực tế có trong SQL (chỉ hiển thị từ tháng 1 đến tháng 10)
+            int currentYear = DateTime.Now.Year;
             viewModel.LuotGuiVaDoanhThuTheoThang = await _context.PhieuGuiXe
-                .Where(p => p.TrangThai == "Đã lấy xe" && p.ThanhTien != null)
-                .GroupBy(p => new { p.NgayDangKy.Year, p.NgayDangKy.Month })
+                .Where(p => p.TrangThai == "Đã lấy xe" && p.ThanhTien != null && p.NgayDangKy.Year == currentYear)
+                .GroupBy(p => p.NgayDangKy.Month)
                 .Select(g => new ThongKeTheoThang
                 {
-                    Nam = g.Key.Year,
-                    Thang = g.Key.Month,
+                    Nam = currentYear,
+                    Thang = g.Key,
                     SoLuot = g.Count(),
                     DoanhThu = g.Sum(p => p.ThanhTien) ?? 0
                 })
-                .OrderByDescending(x => x.Nam).ThenByDescending(x => x.Thang)
+                .OrderBy(x => x.Thang)
                 .ToListAsync();
+
+            // 2.9 Tính tỷ lệ lấp đầy theo từng tầng (dựa trên bảng ViTriDoXe)
+            var danhSachViTri = await _context.ViTriDoXe.ToListAsync();
+            viewModel.TyLeLapDauTheoTang = danhSachViTri
+                .GroupBy(v => $"Tầng {v.Tang}") // Chuyển int thành chuỗi hiển thị
+                .Select(g => new ThongKeTyLeTang
+                {
+                    TenTang = g.Key,
+                    TongSoViTri = g.Count(),
+                    SoViTriSuDung = g.Count(v => v.TrangThai == "Đang sử dụng"),
+                    TyLe = g.Count() > 0 ? (int)Math.Round((double)g.Count(v => v.TrangThai == "Đang sử dụng") * 100.0 / g.Count()) : 0
+                })
+                .OrderBy(x => x.TenTang)
+                .ToList();
 
             return View(viewModel);
         }
