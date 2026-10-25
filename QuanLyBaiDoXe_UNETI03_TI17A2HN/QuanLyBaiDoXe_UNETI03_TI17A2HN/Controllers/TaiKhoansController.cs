@@ -298,20 +298,23 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DangKy(string tenDangNhap, string matKhau, string xacNhanMatKhau)
+        public async Task<IActionResult> DangKy(string tenDangNhap, string email, string matKhau, string xacNhanMatKhau)
         {
-            if (string.IsNullOrEmpty(tenDangNhap) || string.IsNullOrEmpty(matKhau))
+            // Kiểm tra không thiếu thông tin (Tên đăng nhập, Email, Mật khẩu)
+            if (string.IsNullOrEmpty(tenDangNhap) || string.IsNullOrEmpty(email) || string.IsNullOrEmpty(matKhau))
             {
-                ViewBag.Error = "Vui lòng nhập đầy đủ Tên đăng nhập và Mật khẩu!";
+                ViewBag.Error = "Vui lòng nhập đầy đủ Tên đăng nhập, Email và Mật khẩu!";
                 return View();
             }
 
+            // Mật khẩu xác nhận phải khớp
             if (matKhau != xacNhanMatKhau)
             {
                 ViewBag.Error = "Mật khẩu xác nhận không khớp!";
                 return View();
             }
 
+            // Kiểm tra tên đăng nhập chưa tồn tại (dùng AnyAsync)
             var taiKhoanDaTonTai = await _context.TaiKhoan
                 .AnyAsync(t => t.TenDangNhap == tenDangNhap);
 
@@ -321,11 +324,12 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                 return View();
             }
 
+            // Tạo tài khoản mới: vai trò Khách hàng, trạng thái hoạt động (true), họ tên lấy theo tên đăng nhập
             var taiKhoanMoi = new TaiKhoan();
             taiKhoanMoi.TenDangNhap = tenDangNhap;
+            taiKhoanMoi.Email = email.Trim();
             taiKhoanMoi.MatKhau = matKhau;
             taiKhoanMoi.HoTen = tenDangNhap;
-            taiKhoanMoi.Email = $"{tenDangNhap.ToLower().Trim()}@gmail.com";
             taiKhoanMoi.VaiTro = "Khách hàng";
             taiKhoanMoi.TrangThai = true;
 
