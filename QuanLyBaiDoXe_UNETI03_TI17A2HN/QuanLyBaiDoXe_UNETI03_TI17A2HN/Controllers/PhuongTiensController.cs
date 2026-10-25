@@ -17,7 +17,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
         }
 
         // GET: PHUONGTIENS
-        public async Task<IActionResult> Index(int? page, string? searchString)
+        public async Task<IActionResult> Index(int? page, string? searchBienSo, string? searchChuXe, string? nhanHieu, string? trangThai)
         {
             int pageSize = 10;
             int pageNumber = page ?? 1;
@@ -26,7 +26,6 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                 pageNumber = 1;
             }
 
-            ViewBag.CurrentFilter = searchString;
             var query = _context.PhuongTien
                 .Include(p => p.ChuPhuongTien)
                 .Include(p => p.LoaiPhuongTien)
@@ -56,11 +55,54 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                 }
             }
 
-            if (!string.IsNullOrWhiteSpace(searchString))
+            // Danh sách nhãn hiệu cho ô lọc (trong phạm vi quyền của người dùng, trước khi áp bộ lọc)
+            ViewBag.NhanHieuList = await query
+                .Where(p => p.NhanHieu != null && p.NhanHieu != "")
+                .Select(p => p.NhanHieu!)
+                .Distinct()
+                .OrderBy(n => n)
+                .ToListAsync();
+
+            // Xe đang có phiếu gửi hoạt động
+            var listDangGui = await _context.PhieuGuiXe
+                .Where(pg => pg.TrangThai == "Chờ xác nhận" || pg.TrangThai == "Đang gửi")
+                .Select(pg => pg.MaPhuongTien)
+                .Distinct()
+                .ToListAsync();
+
+            // Tìm theo biển số xe
+            if (!string.IsNullOrWhiteSpace(searchBienSo))
             {
-                searchString = searchString.Trim();
-                query = query.Where(p => (p.BienSoXe != null && p.BienSoXe.Contains(searchString)) ||
-                                         (p.NhanHieu != null && p.NhanHieu.Contains(searchString)));
+                searchBienSo = searchBienSo.Trim();
+                query = query.Where(p => p.BienSoXe != null && p.BienSoXe.Contains(searchBienSo));
+            }
+
+            // Tìm theo tên chủ phương tiện (chỉ Admin)
+            if (vaiTro == "Admin" && !string.IsNullOrWhiteSpace(searchChuXe))
+            {
+                searchChuXe = searchChuXe.Trim();
+                query = query.Where(p => p.ChuPhuongTien != null && p.ChuPhuongTien.HoTen != null
+                                         && p.ChuPhuongTien.HoTen.Contains(searchChuXe));
+            }
+
+            // Lọc theo nhãn hiệu
+            if (!string.IsNullOrWhiteSpace(nhanHieu))
+            {
+                query = query.Where(p => p.NhanHieu == nhanHieu);
+            }
+
+            // Lọc theo trạng thái (khớp với huy hiệu hiển thị trong bảng)
+            if (trangThai == "dangGui")
+            {
+                query = query.Where(p => listDangGui.Contains(p.MaPhuongTien));
+            }
+            else if (trangThai == "hoatDong")
+            {
+                query = query.Where(p => p.TrangThai && !listDangGui.Contains(p.MaPhuongTien));
+            }
+            else if (trangThai == "ngungHoatDong")
+            {
+                query = query.Where(p => !p.TrangThai);
             }
 
             int totalItems = await query.CountAsync();
@@ -76,11 +118,10 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                 .Take(pageSize)
                 .ToListAsync();
 
-            var listDangGui = await _context.PhieuGuiXe
-                .Where(pg => pg.TrangThai == "Chờ xác nhận" || pg.TrangThai == "Đang gửi")
-                .Select(pg => pg.MaPhuongTien)
-                .Distinct()
-                .ToListAsync();
+            ViewBag.CurrentBienSo = searchBienSo;
+            ViewBag.CurrentChuXe = searchChuXe;
+            ViewBag.CurrentNhanHieu = nhanHieu;
+            ViewBag.CurrentTrangThai = trangThai;
 
             ViewBag.ListDangGui = listDangGui;
             ViewBag.UserRole = vaiTro;
@@ -89,6 +130,52 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             ViewBag.TotalPages = totalPages;
 
             return View(items);
+        }
+
+        // GET: PHUONGTIENS/Details/5
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var phuongTien = await _context.PhuongTien
+                .Include(p => p.ChuPhuongTien)
+                .Include(p => p.LoaiPhuongTien)
+                .FirstOrDefaultAsync(p => p.MaPhuongTien == id);
+
+            if (phuongTien == null)
+            {
+                return NotFound();
+            }
+
+            string? vaiTro = HttpContext.Session.GetString("VaiTro");
+            string? maTaiKhoanStr = HttpContext.Session.GetString("MaTaiKhoan");
+
+            // Khách hàng chỉ được xem phương tiện của chính mình
+            if (vaiTro == "Khách hàng")
+            {
+                if (!int.TryParse(maTaiKhoanStr, out int maTaiKhoan))
+                {
+                    return RedirectToAction(nameof(Index));
+                }
+
+                var chuPhuongTien = await _context.ChuPhuongTien.FirstOrDefaultAsync(c => c.MaTaiKhoan == maTaiKhoan);
+                if (chuPhuongTien == null || phuongTien.MaChuPhuongTien != chuPhuongTien.MaChuPhuongTien)
+                {
+                    return RedirectToAction(nameof(Index));
+                }
+            }
+
+            // Cùng điều kiện với trang Index để trạng thái "đang gửi" hiển thị nhất quán
+            ViewBag.ListDangGui = await _context.PhieuGuiXe
+                .Where(pg => pg.TrangThai == "Chờ xác nhận" || pg.TrangThai == "Đang gửi")
+                .Select(pg => pg.MaPhuongTien)
+                .Distinct()
+                .ToListAsync();
+
+            return View(phuongTien);
         }
         // GET: PHUONGTIENS/Create
         public async Task<IActionResult> Create()
