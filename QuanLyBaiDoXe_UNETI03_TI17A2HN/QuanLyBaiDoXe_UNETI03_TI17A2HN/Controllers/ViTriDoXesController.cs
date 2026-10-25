@@ -69,9 +69,9 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             // 5. Phân trang bằng Skip và Take
             var items = await PhanTrang(query, page, pageSize).ToListAsync();
             ViewBag.SoDo = await _context.ViTriDoXe
-    .Include(v => v.LoaiPhuongTien)
-    .OrderBy(v => v.TenViTri)
-    .ToListAsync();
+            .Include(v => v.LoaiPhuongTien)
+            .OrderBy(v => v.TenViTri)
+            .ToListAsync();
             return View(items);
         }
         private IQueryable<ViTriDoXe> PhanTrang(IQueryable<ViTriDoXe> query, int page, int pageSize)
@@ -83,7 +83,9 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
         {
             if (!string.IsNullOrEmpty(searchString))
             {
-                query = query.Where(v => v.TenViTri.Contains(searchString) || v.KhuVuc.Contains(searchString));
+                string searchLower = searchString.Trim().ToLower();
+                query = query.Where(v => (v.TenViTri != null && v.TenViTri.ToLower().Contains(searchLower)) ||
+                                         (v.KhuVuc != null && v.KhuVuc.ToLower().Contains(searchLower)));
             }
             return query;
         }
