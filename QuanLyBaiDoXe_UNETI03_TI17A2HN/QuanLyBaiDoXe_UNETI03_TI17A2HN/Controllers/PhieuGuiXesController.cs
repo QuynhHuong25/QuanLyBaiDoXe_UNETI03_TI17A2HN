@@ -278,17 +278,17 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                 {
                     ModelState.AddModelError("MaViTri", "Vị trí đỗ không phù hợp với loại phương tiện.");
                 }
-            }
 
-            bool trungLich = await _context.PhieuGuiXe.AnyAsync(p => p.MaViTri == phieuGuiXe.MaViTri &&
-                                                                     p.TrangThai != "Đã hủy" &&
-                                                                     p.TrangThai != "Đã lấy xe" &&
-                                                                     p.ThoiGianDuKienVao < phieuGuiXe.ThoiGianDuKienRa &&
-                                                                     p.ThoiGianDuKienRa > phieuGuiXe.ThoiGianDuKienVao);
-
-            if (trungLich)
-            {
-                ModelState.AddModelError("MaViTri", "Vị trí này đã có phiếu gửi xe trùng khoảng thời gian.");
+                // Vị trí đang có xe khác sử dụng: báo ngay lúc đăng ký thay vì đợi đến lúc xe vào cổng
+                if (await ViTriDangCoXeAsync(viTri, phieuGuiXe.ThoiGianDuKienVao))
+                {
+                    ModelState.AddModelError(string.Empty, "Vị trí đỗ này hiện đang có xe khác sử dụng!");
+                }
+                // Vị trí không được trùng khoảng thời gian với phiếu gửi xe hợp lệ khác
+                else if (await CoPhieuTrungKhoangThoiGianAsync(viTri.MaViTri, phieuGuiXe.ThoiGianDuKienVao, phieuGuiXe.ThoiGianDuKienRa))
+                {
+                    ModelState.AddModelError("MaViTri", "Vị trí này đã có phiếu gửi xe trùng khoảng thời gian. Vui lòng chọn vị trí hoặc thời gian khác.");
+                }
             }
 
             if (!ModelState.IsValid)
@@ -356,29 +356,40 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                 .ToListAsync();
         }
 
-        // GET: PHIEUGUIXES/Edit/5
-        [PhanQuyen("Admin")]
-        public async Task<IActionResult> Edit(int? id, int? maphieu)
+        // Vị trí đang có xe khác đỗ chưa rời đi (trạng thái "Đang sử dụng"):
+        // xe đó chiếm chỗ đến giờ ra dự kiến của nó, hoặc đến hiện tại nếu đã quá giờ.
+        // Giờ vào đăng ký trước mốc đó thì bị từ chối.
+        private async Task<bool> ViTriDangCoXeAsync(ViTriDoXe viTri, DateTime vao)
         {
-            var targetId = id ?? maphieu;
-            if (targetId == null)
+            if (viTri.TrangThai != "Đang sử dụng")
             {
-                return NotFound();
+                return false;
             }
 
-            var phieuGuiXe = await _context.PhieuGuiXe
-                .Include(p => p.PhuongTien)
-                .Include(p => p.ViTriDoXe)
-                .FirstOrDefaultAsync(m => m.MaPhieu == targetId);
+            var gioRaDuKien = await _context.PhieuGuiXe
+                .Where(p => p.MaViTri == viTri.MaViTri && p.TrangThai == "Đang gửi")
+                .Select(p => (DateTime?)p.ThoiGianDuKienRa)
+                .MaxAsync();
 
-            if (phieuGuiXe == null)
-            {
-                return NotFound();
-            }
+            var bayGio = DateTime.Now;
+            var chiemDen = gioRaDuKien.HasValue && gioRaDuKien.Value > bayGio
+                ? gioRaDuKien.Value
+                : bayGio;
 
-            ViewData["MaPhuongTien"] = new SelectList(_context.PhuongTien, "MaPhuongTien", "BienSoXe", phieuGuiXe.MaPhuongTien);
-            ViewData["MaViTri"] = new SelectList(_context.ViTriDoXe, "MaViTri", "TenViTri", phieuGuiXe.MaViTri);
-            return View(phieuGuiXe);
+            return vao < chiemDen;
+        }
+
+        // Phiếu "hợp lệ" = còn hiệu lực và đang giữ chỗ: "Chờ xác nhận" hoặc "Đang gửi".
+        // Hai phiếu chỉ trùng khi khoảng thời gian CHỒNG LẤN; phiếu này kết thúc đúng lúc
+        // phiếu kia bắt đầu thì không tính là trùng.
+        private async Task<bool> CoPhieuTrungKhoangThoiGianAsync(int maViTri, DateTime vao, DateTime ra, int? boQuaMaPhieu = null)
+        {
+            return await _context.PhieuGuiXe.AnyAsync(p =>
+                p.MaViTri == maViTri &&
+                (p.TrangThai == "Chờ xác nhận" || p.TrangThai == "Đang gửi") &&
+                p.ThoiGianDuKienVao < ra &&
+                p.ThoiGianDuKienRa > vao &&
+                (boQuaMaPhieu == null || p.MaPhieu != boQuaMaPhieu));
         }
 
         // POST: PHIEUGUIXES/Edit/5
