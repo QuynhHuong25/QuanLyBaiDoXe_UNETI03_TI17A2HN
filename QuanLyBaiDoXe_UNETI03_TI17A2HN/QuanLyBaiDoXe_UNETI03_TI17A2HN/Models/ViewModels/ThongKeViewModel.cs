@@ -38,6 +38,14 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Models.ViewModels
         public decimal DoanhThu { get; set; }
     }
 
+    public class ThongKeTyLeTang
+    {
+        public string TenTang { get; set; } = "";
+        public int TongSoViTri { get; set; }
+        public int SoViTriSuDung { get; set; }
+        public int TyLe { get; set; }
+    }
+
     public class ThongKeViewModel
     {
         public DashboardViewModel Dashboard { get; set; } = new DashboardViewModel();
@@ -49,5 +57,8 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Models.ViewModels
         public ThongKeLuotGuiViTri? ViTriDungNhieuNhat { get; set; }
         public List<ThongKeLuotGuiChuXe> LuotGuiTheoChuXe { get; set; } = new List<ThongKeLuotGuiChuXe>();
         public List<ThongKeTheoThang> LuotGuiVaDoanhThuTheoThang { get; set; } = new List<ThongKeTheoThang>();
+
+        // Bổ sung thuộc tính danh sách tầng cho tỷ lệ lấp đầy
+        public List<ThongKeTyLeTang> TyLeLapDauTheoTang { get; set; } = new List<ThongKeTyLeTang>();
     }
 }
