@@ -16,11 +16,10 @@
     var now = DateTime.Now;
     decimal doanhThuThang = Model.LuotGuiVaDoanhThuTheoThang
         .FirstOrDefault(x => x.Thang == now.Month && x.Nam == now.Year)?.DoanhThu ?? 0;
-    var dt7 = Model.LuotGuiVaDoanhThuTheoThang.OrderBy(x => x.Nam).ThenBy(x => x.Thang).TakeLast(7).ToList();
-    decimal maxDt = dt7.Any() ? dt7.Max(x => x.DoanhThu) : 0;
+
+    var dtList = Model.LuotGuiVaDoanhThuTheoThang.OrderBy(x => x.Nam).ThenBy(x => x.Thang).ToList();
+    decimal maxDt = dtList.Any() ? dtList.Max(x => x.DoanhThu) : 0;
     if (maxDt <= 0) maxDt = 1;
-    int tongViTri = Model.Dashboard.TongViTriDo;
-    int tyLe = tongViTri > 0 ? (int)Math.Round(Model.Dashboard.SoViTriDangSuDung * 100.0 / tongViTri) : 0;
 }
 <div class="ps-kp">
     <div class="card"><div class="ps-ico">📋</div><div><b>@Model.Dashboard.TongPhieuGuiXe</b><span>Tổng phiếu gửi xe</span></div></div>
@@ -32,18 +31,36 @@
     <div class="card p-4">
         <h5 class="fw-bold">Doanh thu theo tháng</h5>
         <div class="ps-bars">
-            @foreach (var x in dt7)
+            @foreach (var x in dtList)
             {
                 int cao = (int)Math.Max(4, Math.Round((double)(x.DoanhThu * 100 / maxDt)));
                 <div title="@(x.DoanhThu.ToString("N0", vi))đ"><i style="height:@(cao)%"></i>@(x.Thang)/@(x.Nam % 100)</div>
             }
         </div>
     </div>
+    
+    <!-- TỶ LỆ LẤP ĐẦY THEO TẦNG -->
     <div class="card p-4">
         <h5 class="fw-bold mb-3">Tỷ lệ lấp đầy</h5>
-        <div class="d-flex justify-content-between"><span>Vị trí đang sử dụng</span><b>@tyLe%</b></div>
-        <div class="ps-bar"><i style="width:@(tyLe)%"></i></div>
-        <div class="d-flex justify-content-between text-muted small"><span>Còn trống</span><b>@Model.Dashboard.SoViTriConTrong / @tongViTri</b></div>
+        @if (Model.TyLeLapDauTheoTang != null && Model.TyLeLapDauTheoTang.Any())
+        {
+            @foreach (var tang in Model.TyLeLapDauTheoTang)
+            {
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span class="fw-semibold">@tang.TenTang</span>
+                        <b class="text-primary">@tang.TyLe%</b>
+                    </div>
+                    <div class="ps-bar" style="height: 8px; background-color: #e9ecef; border-radius: 4px; overflow: hidden;">
+                        <div style="width: @(tang.TyLe)%; height: 100%; background-color: #0d6efd; border-radius: 4px;"></div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="text-muted text-center">Chưa có dữ liệu vị trí theo tầng</div>
+        }
     </div>
 </div>
 
@@ -133,12 +150,10 @@
                                         }
                                         else if (item.TrangThai == "Đang sử dụng")
                                         {
-
                                             <span class="badge bg-success">@item.TrangThai</span>
                                         }
                                         else
                                         {
-
                                             <span class="badge bg-secondary">@item.TrangThai</span>
                                         }
                                     </td>
@@ -170,17 +185,14 @@
                                         }
                                         else if (item.TrangThai == "Đang gửi")
                                         {
-
                                             <span class="badge bg-success">@item.TrangThai</span>
                                         }
                                         else if (item.TrangThai == "Đã lấy xe")
                                         {
-
                                             <span class="badge bg-primary">@item.TrangThai</span>
                                         }
                                         else
                                         {
-
                                             <span class="badge bg-danger">@item.TrangThai</span>
                                         }
                                     </td>
