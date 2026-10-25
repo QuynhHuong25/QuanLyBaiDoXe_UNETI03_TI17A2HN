@@ -101,6 +101,13 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DangKyNhanh(string bienSoXe, int? maLoaiPhuongTien, DateTime? thoiGianVao, string? ghiChu)
         {
+            // Admin không sử dụng chức năng đăng ký gửi xe
+            if (HttpContext.Session.GetString("VaiTro") == "Admin")
+            {
+                TempData["ErrorMessage"] = "Quản trị viên không sử dụng chức năng đăng ký gửi xe.";
+                return RedirectToAction(nameof(Index));
+            }
+
             string? maTaiKhoanString = HttpContext.Session.GetString("MaTaiKhoan");
             if (string.IsNullOrEmpty(maTaiKhoanString))
             {
