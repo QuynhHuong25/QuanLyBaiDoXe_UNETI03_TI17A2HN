@@ -72,11 +72,25 @@
                 min-height: 100vh;
             }
 
+            /* CỐ ĐỊNH SIDEBAR TUYỆT ĐỐI KHÔNG THAY ĐỔI KÍCH THƯỚC */
+            aside.ps-side {
+                position: fixed !important;
+                top: 0;
+                left: 0;
+                bottom: 0;
+                width: 260px !important; /* Đặt chiều rộng cố định chuẩn */
+                z-index: 1000;
+                overflow-y: auto;
+                flex-shrink: 0;
+            }
+
+            /* ĐẨY PHẦN NỘI DUNG SANG PHẢI ĐỂ KHÔNG BỊ SIDEBAR CHE */
             .ps-content {
                 display: flex;
                 flex-direction: column;
                 flex-grow: 1;
                 min-width: 0;
+                margin-left: 260px; /* Bằng đúng chiều rộng của sidebar */
             }
 
             .ps-main {
@@ -134,8 +148,8 @@
 
             <!-- ============ THANH TRÊN ============ -->
             <header class="ps-top">
-                <button class="btn btn-gh btn-sm ps-menu-btn" type="button" aria-label="Mở menu"
-                        onclick="document.getElementById('sd').classList.toggle('on')">
+                <!-- Đã ẩn hoặc vô hiệu hóa toggle menu để sidebar luôn hiển thị cố định -->
+                <button class="btn btn-gh btn-sm ps-menu-btn d-none" type="button" aria-label="Mở menu">
                     ☰
                 </button>
 
