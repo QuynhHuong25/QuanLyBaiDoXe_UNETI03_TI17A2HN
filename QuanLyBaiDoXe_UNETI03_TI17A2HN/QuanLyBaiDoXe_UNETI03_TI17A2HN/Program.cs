@@ -7,6 +7,7 @@ builder.Services.AddDbContext<QuanLyBaiDoXe_UNETI03_TI17A2HNContext>(options =>
 builder.Services.AddControllersWithViews();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSingleton<QuanLyBaiDoXe_UNETI03_TI17A2HN.Services.QrVeService>();
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(30); 
