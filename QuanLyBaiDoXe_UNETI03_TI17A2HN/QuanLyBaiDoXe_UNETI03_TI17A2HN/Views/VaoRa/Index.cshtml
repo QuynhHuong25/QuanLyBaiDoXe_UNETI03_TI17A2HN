@@ -10,7 +10,10 @@
 
 <div class="ps-eb">VẬN HÀNH</div>
 <h1 class="ps-big">Điều phối xe vào / ra</h1>
-<p style="color:var(--mu);margin:6px 0 26px">Xác nhận nhanh phương tiện tại cổng kiểm soát.</p>
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-2" style="margin:6px 0 26px">
+    <p style="color:var(--mu);margin:0">Xác nhận nhanh phương tiện tại cổng kiểm soát.</p>
+    <a asp-action="Quet" class="btn btn-primary d-inline-flex align-items-center gap-2"><i class="bi bi-qr-code-scan"></i> Quét mã QR</a>
+</div>
 
 <!-- VÙNG HIỂN THỊ THÔNG BÁO THÀNH CÔNG / LỖI -->
 @if (TempData["SuccessMessage"] != null)
