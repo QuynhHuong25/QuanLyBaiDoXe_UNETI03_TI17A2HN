@@ -265,6 +265,12 @@
                                         <a asp-action="Details" asp-route-maphieu="@item.MaPhieu" class="action-btn view" title="Xem chi tiết">
                                             <i class="bi bi-eye"></i>
                                         </a>
+                                        @if (vaiTro == "Khách hàng" && (item.TrangThai == "Chờ xác nhận" || item.TrangThai == "Đang gửi"))
+                                        {
+                                            <a asp-action="Ve" asp-route-maphieu="@item.MaPhieu" class="action-btn qr" title="Xem mã QR vé" style="color:#7c3aed">
+                                                <i class="bi bi-qr-code"></i>
+                                            </a>
+                                        }
 
                                         @if (item.TrangThai == "Chờ xác nhận")
                                         {
