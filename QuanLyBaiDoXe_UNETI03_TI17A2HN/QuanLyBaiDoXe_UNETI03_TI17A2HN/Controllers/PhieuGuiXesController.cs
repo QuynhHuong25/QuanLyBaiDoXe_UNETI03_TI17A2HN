@@ -161,8 +161,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             return View(phieuguixe);
         }
 
-        // GET: PHIEUGUIXES/Ve/5  – Vé gửi xe kèm mã QR để quét khi vào / ra
-        // CHỈ khách hàng mới có mã QR; Admin không được xem (Admin chỉ quét mã ở trang Điều phối vào/ra)
+        // GET: PHIEUGUIXES/Ve/5 – Vé gửi xe kèm mã QR
         [PhanQuyen("Khách hàng")]
         public async Task<IActionResult> Ve(int? maphieu)
         {
@@ -184,7 +183,6 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                 return NotFound();
             }
 
-            // Khách hàng chỉ xem được vé của chính mình
             var maTaiKhoanStr = HttpContext.Session.GetString("MaTaiKhoan");
             if (!int.TryParse(maTaiKhoanStr, out int maTaiKhoan) ||
                 phieu.PhuongTien?.ChuPhuongTien?.MaTaiKhoan != maTaiKhoan)
@@ -193,7 +191,6 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             }
 
             ViewBag.MaQr = _qr.Tao(phieu.MaPhieu);
-            // Chỉ vé còn hiệu lực mới dùng được
             ViewBag.ConHieuLuc = phieu.TrangThai == "Chờ xác nhận" || phieu.TrangThai == "Đang gửi";
             return View(phieu);
         }
@@ -239,7 +236,6 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
 
             ViewBag.DanhSachXe = danhSachXe;
 
-            // Lấy toàn bộ vị trí (kể cả Tạm ngừng) để vẽ sơ đồ chọn chỗ; giao diện tự khóa ô không dùng được
             ViewBag.DanhSachViTri = await _context.ViTriDoXe
                 .Include(v => v.LoaiPhuongTien)
                 .OrderBy(v => v.Tang).ThenBy(v => v.KhuVuc).ThenBy(v => v.TenViTri)
@@ -296,7 +292,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             }
 
             bool xeDangGui = await _context.PhieuGuiXe.AnyAsync(p => p.MaPhuongTien == phieuGuiXe.MaPhuongTien &&
-                                                                    (p.TrangThai == "Chờ xác nhận" || p.TrangThai == "Đang gửi"));
+                                                                   (p.TrangThai == "Chờ xác nhận" || p.TrangThai == "Đang gửi"));
 
             if (xeDangGui)
             {
@@ -321,12 +317,10 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                     ModelState.AddModelError("MaViTri", "Vị trí đỗ không phù hợp với loại phương tiện.");
                 }
 
-                // Vị trí đang có xe khác sử dụng: báo ngay lúc đăng ký thay vì đợi đến lúc xe vào cổng
                 if (await ViTriDangCoXeAsync(viTri, phieuGuiXe.ThoiGianDuKienVao))
                 {
                     ModelState.AddModelError(string.Empty, "Vị trí đỗ này hiện đang có xe khác sử dụng!");
                 }
-                // Vị trí không được trùng khoảng thời gian với phiếu gửi xe hợp lệ khác
                 else if (await CoPhieuTrungKhoangThoiGianAsync(viTri.MaViTri, phieuGuiXe.ThoiGianDuKienVao, phieuGuiXe.ThoiGianDuKienRa))
                 {
                     ModelState.AddModelError("MaViTri", "Vị trí này đã có phiếu gửi xe trùng khoảng thời gian. Vui lòng chọn vị trí hoặc thời gian khác.");
@@ -357,7 +351,6 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             _context.PhieuGuiXe.Add(phieuGuiXe);
             await _context.SaveChangesAsync();
 
-            // Khách hàng: chuyển sang trang vé có mã QR để lưu / chụp lại. Admin: không có mã QR, về danh sách.
             if (vaiTro == "Khách hàng")
             {
                 TempData["SuccessMessage"] = "Đăng ký gửi xe thành công. Vui lòng đưa mã QR bên dưới cho nhân viên quét khi vào và ra bãi.";
@@ -398,8 +391,6 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             }
 
             ViewBag.DanhSachXe = danhSachXe;
-
-            // Lấy toàn bộ vị trí (kể cả Tạm ngừng) để vẽ sơ đồ chọn chỗ; giao diện tự khóa ô không dùng được
             ViewBag.DanhSachViTri = await _context.ViTriDoXe
                 .Include(v => v.LoaiPhuongTien)
                 .OrderBy(v => v.Tang).ThenBy(v => v.KhuVuc).ThenBy(v => v.TenViTri)
@@ -407,7 +398,6 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             ViewBag.PhieuGiuCho = await LayPhieuGiuChoAsync();
         }
 
-        // Các phiếu đang giữ chỗ (Chờ xác nhận / Đang gửi) để sơ đồ biết ô nào trùng giờ
         private async Task<List<object>> LayPhieuGiuChoAsync()
         {
             var ds = await _context.PhieuGuiXe
@@ -424,9 +414,6 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             }).ToList();
         }
 
-        // Vị trí đang có xe khác đỗ chưa rời đi (trạng thái "Đang sử dụng"):
-        // xe đó chiếm chỗ đến giờ ra dự kiến của nó, hoặc đến hiện tại nếu đã quá giờ.
-        // Giờ vào đăng ký trước mốc đó thì bị từ chối.
         private async Task<bool> ViTriDangCoXeAsync(ViTriDoXe viTri, DateTime vao)
         {
             if (viTri.TrangThai != "Đang sử dụng")
@@ -447,9 +434,6 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             return vao < chiemDen;
         }
 
-        // Phiếu "hợp lệ" = còn hiệu lực và đang giữ chỗ: "Chờ xác nhận" hoặc "Đang gửi".
-        // Hai phiếu chỉ trùng khi khoảng thời gian CHỒNG LẤN; phiếu này kết thúc đúng lúc
-        // phiếu kia bắt đầu thì không tính là trùng.
         private async Task<bool> CoPhieuTrungKhoangThoiGianAsync(int maViTri, DateTime vao, DateTime ra, int? boQuaMaPhieu = null)
         {
             return await _context.PhieuGuiXe.AnyAsync(p =>
@@ -486,7 +470,6 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                         return NotFound();
                     }
 
-                    // Cập nhật các thông tin được phép sửa; Đơn giá, thành tiền và trạng thái giữ nguyên từ hệ thống
                     existingPhieu.MaPhuongTien = phieuGuiXe.MaPhuongTien;
                     existingPhieu.MaViTri = phieuGuiXe.MaViTri;
                     existingPhieu.ThoiGianDuKienVao = phieuGuiXe.ThoiGianDuKienVao;
@@ -541,9 +524,18 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
         [PhanQuyen("Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var phieuGuiXe = await _context.PhieuGuiXe.FindAsync(id);
+            var phieuGuiXe = await _context.PhieuGuiXe
+                .Include(p => p.ViTriDoXe)
+                .FirstOrDefaultAsync(p => p.MaPhieu == id);
+
             if (phieuGuiXe != null)
             {
+                // Nếu xóa phiếu đang gửi, giải phóng ô đỗ
+                if (phieuGuiXe.TrangThai == "Đang gửi" && phieuGuiXe.ViTriDoXe != null && phieuGuiXe.ViTriDoXe.TrangThai != "Tạm ngừng")
+                {
+                    phieuGuiXe.ViTriDoXe.TrangThai = "Còn trống";
+                }
+
                 _context.PhieuGuiXe.Remove(phieuGuiXe);
                 await _context.SaveChangesAsync();
 
@@ -563,10 +555,12 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> HuyPhieu(int id)
         {
-            var phieu = await _context.PhieuGuiXe.FindAsync(id);
+            var phieu = await _context.PhieuGuiXe
+                .Include(p => p.ViTriDoXe)
+                .FirstOrDefaultAsync(p => p.MaPhieu == id);
+
             if (phieu == null) return NotFound();
 
-            // Phân quyền: Đảm bảo Khách hàng KHÔNG thể dùng Inspect HTML để sửa ID và hủy phiếu của người khác
             var vaiTro = HttpContext.Session.GetString("VaiTro");
             var maTaiKhoanStr = HttpContext.Session.GetString("MaTaiKhoan");
             if (vaiTro == "Khách hàng" && int.TryParse(maTaiKhoanStr, out int maTaiKhoan))
@@ -581,15 +575,24 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                 }
             }
 
-            // Chỉ phiếu chưa được xác nhận vào bãi mới được hủy
             if (phieu.TrangThai != "Chờ xác nhận")
             {
                 TempData["ErrorMessage"] = "Chỉ có thể hủy phiếu đang ở trạng thái 'Chờ xác nhận'.";
                 return RedirectToAction(nameof(Index));
             }
 
-            // Thực hiện đổi trạng thái thành Đã hủy (Soft delete)
+            // Thực hiện đổi trạng thái thành Đã hủy
             phieu.TrangThai = "Đã hủy";
+
+            // Nếu vị trí đỗ bị ràng buộc bởi phiếu này, đảm bảo giữ vị trí ở trạng thái Còn trống (nếu không Tạm ngừng)
+            if (phieu.ViTriDoXe != null && phieu.ViTriDoXe.TrangThai != "Tạm ngừng")
+            {
+                bool xeKhacDangDo = await _context.PhieuGuiXe
+                    .AnyAsync(p => p.MaViTri == phieu.MaViTri && p.MaPhieu != phieu.MaPhieu && p.TrangThai == "Đang gửi");
+
+                phieu.ViTriDoXe.TrangThai = xeKhacDangDo ? "Đang sử dụng" : "Còn trống";
+            }
+
             _context.Update(phieu);
             await _context.SaveChangesAsync();
 
