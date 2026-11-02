@@ -2,11 +2,6 @@
 
 @{
     ViewData["Title"] = "Chi tiết phương tiện";
-
-    var listDangGui = ViewBag.ListDangGui as IEnumerable<int>
-                      ?? Enumerable.Empty<int>();
-
-    bool dangGui = listDangGui.Contains(Model.MaPhuongTien);
 }
 
 <div class="container py-4">
@@ -119,29 +114,6 @@
                     </div>
                 </div>
 
-                <!-- TRẠNG THÁI GỬI XE -->
-                <div class="col-md-6">
-                    <label class="text-muted">
-                        Trạng thái gửi xe
-                    </label>
-                    <div class="mt-1">
-                        @if (dangGui)
-                        {
-                            <span class="badge bg-warning text-dark fs-6">
-                                <i class="bi bi-car-front-fill me-1"></i>
-                                Đang gửi
-                            </span>
-                        }
-                        else
-                        {
-                            <span class="badge bg-light text-dark border fs-6">
-                                <i class="bi bi-p-square me-1"></i>
-                                Không gửi trong bãi
-                            </span>
-                        }
-                    </div>
-                </div>
-
                 <!-- MÔ TẢ -->
                 <div class="col-12">
                     <label class="text-muted">
@@ -168,13 +140,13 @@
         <div class="card-footer bg-white">
             <div class="d-flex gap-2">
                 <a asp-action="Edit"
-                       asp-route-id="@Model.MaPhuongTien"
-                       class="btn btn-warning">
+                   asp-route-id="@Model.MaPhuongTien"
+                   class="btn btn-warning">
                     <i class="bi bi-pencil me-1"></i>
                     Chỉnh sửa
                 </a>
                 <a asp-action="Index"
-                       class="btn btn-secondary">
+                   class="btn btn-secondary">
                     <i class="bi bi-arrow-left me-1"></i>
                     Quay lại
                 </a>
