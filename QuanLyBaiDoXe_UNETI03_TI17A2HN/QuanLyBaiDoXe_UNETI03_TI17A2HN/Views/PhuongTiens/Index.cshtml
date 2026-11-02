@@ -231,7 +231,6 @@
                         <select name="trangThai" class="form-select">
                             <option value="">-- Tất cả --</option>
                             <option value="hoatDong" selected="@(currentTrangThai == "hoatDong")">Hoạt động</option>
-                            <option value="dangGui" selected="@(currentTrangThai == "dangGui")">Đang gửi</option>
                             <option value="ngungHoatDong" selected="@(currentTrangThai == "ngungHoatDong")">Ngừng hoạt động</option>
                         </select>
                     </div>
@@ -272,6 +271,7 @@
 
                         foreach (var item in Model)
                         {
+                            // Chỉ dùng để khóa nút Xóa khi xe còn phiếu gửi hoạt động
                             bool dangGui = listDangGui.Contains(item.MaPhuongTien);
 
                             <tr>
@@ -288,13 +288,7 @@
                                     <span class="text-secondary">@(string.IsNullOrWhiteSpace(item.MauSac) ? "---" : item.MauSac)</span>
                                 </td>
                                 <td class="text-center">
-                                    @if (dangGui)
-                                    {
-                                        <span class="badge bg-warning bg-opacity-10 text-warning px-3 py-2 rounded-pill fw-semibold">
-                                            <i class="bi bi-car-front-fill me-1"></i> Đang gửi
-                                        </span>
-                                    }
-                                    else if (item.TrangThai)
+                                    @if (item.TrangThai)
                                     {
                                         <span class="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill fw-semibold">
                                             <i class="bi bi-check-circle me-1"></i> Hoạt động
@@ -332,7 +326,7 @@
                                         }
                                         else
                                         {
-                                            <span class="action-btn disabled-btn" title="Xe đang gửi, không thể xóa">
+                                            <span class="action-btn disabled-btn" title="Xe đang có lượt gửi, không thể xóa">
                                                 <i class="bi bi-lock"></i>
                                             </span>
                                         }
