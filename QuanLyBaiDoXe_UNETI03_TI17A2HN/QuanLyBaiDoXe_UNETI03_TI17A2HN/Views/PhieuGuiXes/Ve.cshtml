@@ -1,0 +1,92 @@
+﻿@model QuanLyBaiDoXe_UNETI03_TI17A2HN.Models.PhieuGuiXe
+
+@{
+    ViewData["Title"] = "Vé gửi xe";
+    string maQr = ViewBag.MaQr as string ?? "";
+    bool conHieuLuc = ViewBag.ConHieuLuc is bool b && b;
+    bool dangGui = Model.TrangThai == "Đang gửi";
+}
+
+<div class="tk-wrap">
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success d-print-none" role="alert">
+            <i class="bi bi-check-circle-fill me-1"></i> @TempData["SuccessMessage"]
+        </div>
+    }
+
+    <div class="tk-ticket">
+        <div class="tk-head">
+            <div>
+                <div class="tk-brand"><i>P</i> ParkSmart</div>
+                <div class="tk-title">VÉ GỬI XE</div>
+            </div>
+            <span class="tk-pill @(Model.TrangThai == "Chờ xác nhận" ? "w" : dangGui ? "p" : Model.TrangThai == "Đã lấy xe" ? "o" : "x")">@Model.TrangThai</span>
+        </div>
+
+        <div class="tk-qrbox @(conHieuLuc ? "" : "off")">
+            <canvas id="qrCanvas" aria-label="Mã QR vé gửi xe"></canvas>
+            @if (!conHieuLuc)
+            {
+                <div class="tk-off">VÉ HẾT HIỆU LỰC</div>
+            }
+        </div>
+        <div class="tk-code">@maQr</div>
+        <div class="tk-hint">
+            @if (conHieuLuc)
+            {
+                @(dangGui ? "Đưa mã này cho nhân viên quét khi lấy xe ra khỏi bãi." : "Đưa mã này cho nhân viên quét khi vào bãi và khi lấy xe ra.")
+            }
+            else
+            {
+                <text>Vé này đã @(Model.TrangThai == "Đã hủy" ? "bị hủy" : "sử dụng xong"), không thể dùng để vào / ra.</text>
+            }
+        </div>
+
+        <div class="tk-plate">@Model.PhuongTien?.BienSoXe</div>
+
+        <div class="tk-tear"></div>
+
+        <div class="tk-grid">
+            <div><small>Mã phiếu</small><b>#@Model.MaPhieu</b></div>
+            <div><small>Loại xe</small><b>@(Model.PhuongTien?.LoaiPhuongTien?.TenLoaiPhuongTien ?? "—")</b></div>
+            <div>
+                <small>Vị trí đỗ</small>
+                <b>@(Model.ViTriDoXe?.TenViTri ?? "—")</b>
+            </div>
+            <div>
+                <small>Khu / Tầng</small>
+                <b>@(Model.ViTriDoXe != null ? $"{Model.ViTriDoXe.KhuVuc} · Tầng {Model.ViTriDoXe.Tang}" : "—")</b>
+            </div>
+            <div><small>Dự kiến vào</small><b>@Model.ThoiGianDuKienVao.ToString("dd/MM/yyyy HH:mm")</b></div>
+            <div><small>Dự kiến ra</small><b>@Model.ThoiGianDuKienRa.ToString("dd/MM/yyyy HH:mm")</b></div>
+            <div><small>Chủ xe</small><b>@(Model.PhuongTien?.ChuPhuongTien?.HoTen ?? "—")</b></div>
+            <div><small>Đơn giá</small><b>@Model.DonGiaTheoGio.ToString("N0") đ/giờ</b></div>
+        </div>
+    </div>
+
+    <div class="tk-actions d-print-none">
+        @if (conHieuLuc)
+        {
+            <button type="button" class="btn btn-primary" id="btnTai"><i class="bi bi-download me-1"></i> Tải ảnh QR</button>
+            <button type="button" class="btn btn-outline-secondary" onclick="window.print()"><i class="bi bi-printer me-1"></i> In vé</button>
+        }
+        <a asp-action="Details" asp-route-maphieu="@Model.MaPhieu" class="btn btn-outline-secondary">Chi tiết phiếu</a>
+        <a asp-action="Index" class="btn btn-secondary"><i class="bi bi-arrow-left me-1"></i> Danh sách phiếu</a>
+    </div>
+
+    <p class="tk-note d-print-none">
+        <i class="bi bi-shield-lock"></i> Mã QR này chỉ dành riêng cho phiếu của bạn. Vui lòng không chia sẻ cho người khác.
+    </p>
+</div>
+
+<script src="~/lib/qrcode/qrcode.js"></script>
+<script src="~/js/qrve.js"></script>
+<script>
+    (function () {
+        var canvas = document.getElementById('qrCanvas');
+        qrVe.ve(canvas, @Html.Raw(System.Text.Json.JsonSerializer.Serialize(maQr)), 300);
+        var btn = document.getElementById('btnTai');
+        if (btn) btn.addEventListener('click', function () { qrVe.taiAnh(canvas, 've-gui-xe-@(Model.MaPhieu).png'); });
+    })();
+</script>
