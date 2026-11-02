@@ -63,7 +63,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                 .OrderBy(n => n)
                 .ToListAsync();
 
-            // Xe đang có phiếu gửi hoạt động
+            // Xe đang có phiếu gửi hoạt động (chỉ dùng để chặn nút Xóa trong view)
             var listDangGui = await _context.PhieuGuiXe
                 .Where(pg => pg.TrangThai == "Chờ xác nhận" || pg.TrangThai == "Đang gửi")
                 .Select(pg => pg.MaPhuongTien)
@@ -91,14 +91,10 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                 query = query.Where(p => p.NhanHieu == nhanHieu);
             }
 
-            // Lọc theo trạng thái (khớp với huy hiệu hiển thị trong bảng)
-            if (trangThai == "dangGui")
+            // Lọc theo trạng thái phương tiện (Hoạt động / Ngừng hoạt động)
+            if (trangThai == "hoatDong")
             {
-                query = query.Where(p => listDangGui.Contains(p.MaPhuongTien));
-            }
-            else if (trangThai == "hoatDong")
-            {
-                query = query.Where(p => p.TrangThai && !listDangGui.Contains(p.MaPhuongTien));
+                query = query.Where(p => p.TrangThai);
             }
             else if (trangThai == "ngungHoatDong")
             {
@@ -168,15 +164,9 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                 }
             }
 
-            // Cùng điều kiện với trang Index để trạng thái "đang gửi" hiển thị nhất quán
-            ViewBag.ListDangGui = await _context.PhieuGuiXe
-                .Where(pg => pg.TrangThai == "Chờ xác nhận" || pg.TrangThai == "Đang gửi")
-                .Select(pg => pg.MaPhuongTien)
-                .Distinct()
-                .ToListAsync();
-
             return View(phuongTien);
         }
+
         // GET: PHUONGTIENS/Create
         public async Task<IActionResult> Create()
         {
