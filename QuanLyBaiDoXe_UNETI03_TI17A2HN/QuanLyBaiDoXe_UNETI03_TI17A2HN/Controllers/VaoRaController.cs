@@ -1,7 +1,6 @@
 // Họ và tên: Tăng Hoàng Giang
 // Mã sinh viên: 23103100031
 // Nội dung thực hiện: Xử lý Xác nhận xe vào, xe ra và tính tiền tự động (Module 4)
-
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QuanLyBaiDoXe_UNETI03_TI17A2HN.Lọc;
@@ -21,6 +20,9 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
 
         public async Task<IActionResult> Index(string searchBienSo)
         {
+            // TỰ ĐỘNG ĐỒNG BỘ TRẠNG THÁI VỊ TRÍ ĐỖ THEO PHIẾU GỬI ĐANG HOẠT ĐỘNG
+            await DongBoTrangThaiViTriAsync();
+
             ViewData["searchBienSo"] = searchBienSo;
 
             // Chỉ lấy các phiếu Chờ xác nhận hoặc Đang gửi để xử lý VÀO/RA
@@ -105,7 +107,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             phieu.ThoiGianVaoThucTe = DateTime.Now;
             phieu.TrangThai = "Đang gửi";
 
-            // Đổi trạng thái vị trí đỗ thành Đang sử dụng
+            // Cập nhật trạng thái vị trí đỗ thành "Đang sử dụng"
             if (phieu.ViTriDoXe != null)
             {
                 phieu.ViTriDoXe.TrangThai = "Đang sử dụng";
@@ -144,16 +146,15 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                 TimeSpan duration = phieu.ThoiGianRaThucTe.Value - phieu.ThoiGianVaoThucTe.Value;
 
                 // TÍNH TIỀN THEO BLOCK 30 PHÚT (Module 4)
-                // Ví dụ: đỗ 40 phút -> làm tròn lên thành 2 block (60 phút = 1.0 giờ)
-                // đỗ 1h15p (75 phút) -> làm tròn lên thành 3 block (90 phút = 1.5 giờ)
                 double totalBlocks = Math.Ceiling(duration.TotalMinutes / 30.0);
 
                 // Tối thiểu thu phí 1 block 30 phút (0.5 giờ)
                 if (totalBlocks < 1) totalBlocks = 1;
 
+                // Quy đổi ra giờ (Đã sửa lỗi cú pháp)
                 totalHours = totalBlocks * 0.5;
 
-                // Tính thành tiền = Số giờ quy đổi x Đơn giá theo giờ
+                // Tính thành tiền = Số giờ quy đổi x Đơn giá theo giờ (Đã sửa lỗi cú pháp)
                 phieu.ThanhTien = (decimal)totalHours * phieu.DonGiaTheoGio;
             }
             else
@@ -162,7 +163,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            // Giải phóng vị trí đỗ: Chỉ trả về "Còn trống" nếu vị trí không ở trạng thái "Tạm ngừng"
+            // Giải phóng vị trí đỗ: Trả về "Còn trống" nếu vị trí không bị "Tạm ngừng"
             if (phieu.ViTriDoXe != null && phieu.ViTriDoXe.TrangThai != "Tạm ngừng")
             {
                 phieu.ViTriDoXe.TrangThai = "Còn trống";
@@ -176,6 +177,50 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
 
             TempData["SuccessMessage"] = $"Xe {phieu.PhuongTien?.BienSoXe} ra khỏi bãi. Thời gian gửi: {totalHours} giờ (tính theo block 30 phút). Số tiền thu: {phieu.ThanhTien?.ToString("N0")} VNĐ.";
             return RedirectToAction(nameof(Index));
+        }
+
+        /// <summary>
+        /// Hàm phụ trợ: Tự động quét và đồng bộ lại trạng thái của bảng ViTriDoXe theo phiếu gửi đang hoạt động
+        /// </summary>
+        private async Task DongBoTrangThaiViTriAsync()
+        {
+            // Lấy danh sách mã các vị trí đang thực sự có xe gửi (TrangThai == "Đang gửi")
+            var maViTriDangCoXe = await _context.PhieuGuiXe
+                .Where(p => p.TrangThai == "Đang gửi")
+                .Select(p => p.MaViTri)
+                .Distinct()
+                .ToListAsync();
+
+            // Lấy danh sách vị trí đỗ xe hiện tại (trừ những ô đang bị Tạm ngừng)
+            var danhSachViTri = await _context.ViTriDoXe
+                .Where(v => v.TrangThai != "Tạm ngừng")
+                .ToListAsync();
+
+            bool coThayDoi = false;
+            foreach (var vt in danhSachViTri)
+            {
+                if (maViTriDangCoXe.Contains(vt.MaViTri))
+                {
+                    if (vt.TrangThai != "Đang sử dụng")
+                    {
+                        vt.TrangThai = "Đang sử dụng";
+                        coThayDoi = true;
+                    }
+                }
+                else
+                {
+                    if (vt.TrangThai != "Còn trống")
+                    {
+                        vt.TrangThai = "Còn trống";
+                        coThayDoi = true;
+                    }
+                }
+            }
+
+            if (coThayDoi)
+            {
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }
