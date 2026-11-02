@@ -1,0 +1,63 @@
+﻿@{
+    ViewData["Title"] = "Quét QR xe vào / ra";
+}
+
+<div class="ps-eb">VẬN HÀNH</div>
+<h1 class="ps-big">Quét QR xe vào / ra</h1>
+<p style="color:var(--mu);margin:6px 0 22px">Quét mã QR trên vé của khách để xác nhận xe vào bãi hoặc ra khỏi bãi.</p>
+
+<div id="qrApp" class="qs-grid"
+     data-url-tracuu="@Url.Action("TraCuuQr", "VaoRa")"
+     data-url-xacnhan="@Url.Action("XacNhanQr", "VaoRa")">
+    @Html.AntiForgeryToken()
+
+    <!-- CỘT TRÁI: CAMERA + NHẬP MÃ -->
+    <div class="card p-3 p-md-4">
+        <div class="qs-cam" id="qsCam">
+            <video id="qsVideo" playsinline muted></video>
+            <div class="qs-frame"></div>
+            <div class="qs-idle" id="qsIdle">
+                <i class="bi bi-camera-video-off"></i>
+                <span>Camera đang tắt</span>
+            </div>
+        </div>
+        <canvas id="qsCanvas" hidden></canvas>
+
+        <div class="d-flex flex-wrap gap-2 mt-3">
+            <button type="button" class="btn btn-primary" id="qsBtnCam"><i class="bi bi-camera me-1"></i> Bật camera</button>
+            <select id="qsCamList" class="form-select" style="max-width:220px" hidden></select>
+            <label class="form-check ms-auto d-flex align-items-center gap-2 m-0" style="cursor:pointer">
+                <input type="checkbox" class="form-check-input m-0" id="qsAuto" />
+                <span class="small">Tự động xác nhận khi vé hợp lệ</span>
+            </label>
+        </div>
+        <div class="small text-danger mt-2" id="qsCamErr" hidden></div>
+
+        <hr class="my-3" />
+        <label class="form-label small fw-semibold text-secondary">Hoặc nhập / dùng máy quét mã vạch:</label>
+        <form id="qsManual" class="d-flex gap-2">
+            <input type="text" class="form-control" id="qsInput" placeholder="PK-12-xxxxxxxxxxxx" autocomplete="off" />
+            <button type="submit" class="btn btn-outline-primary text-nowrap">Kiểm tra</button>
+        </form>
+    </div>
+
+    <!-- CỘT PHẢI: KẾT QUẢ -->
+    <div>
+        <div class="card p-3 p-md-4 qs-result" id="qsResult">
+            <div class="qs-empty" id="qsEmpty">
+                <i class="bi bi-qr-code-scan"></i>
+                <b>Chưa quét mã nào</b>
+                <span>Đưa mã QR của khách vào khung camera.</span>
+            </div>
+            <div id="qsBody" hidden></div>
+        </div>
+
+        <div class="card p-3 p-md-4 mt-3">
+            <div class="fw-bold mb-2">Lượt quét gần đây</div>
+            <div id="qsLog" class="qs-log"><span class="small text-secondary">Chưa có lượt quét.</span></div>
+        </div>
+    </div>
+</div>
+
+<script src="~/lib/jsqr/jsQR.js"></script>
+<script src="~/js/quetqr.js" asp-append-version="true"></script>
