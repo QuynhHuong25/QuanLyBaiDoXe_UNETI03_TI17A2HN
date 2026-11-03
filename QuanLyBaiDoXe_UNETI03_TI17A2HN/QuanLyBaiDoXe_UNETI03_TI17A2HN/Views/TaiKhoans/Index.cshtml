@@ -24,34 +24,34 @@
         width: 100%;
     }
 
-    .custom-table thead th {
-        background-color: #f8fafc !important;
-        color: #475569 !important;
-        border-bottom: 2px solid #e2e8f0;
-        border-top: none;
-        padding: 14px 16px;
-        font-weight: 700;
-        font-size: 13px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        vertical-align: middle;
-    }
+        .custom-table thead th {
+            background-color: #f8fafc !important;
+            color: #475569 !important;
+            border-bottom: 2px solid #e2e8f0;
+            border-top: none;
+            padding: 14px 16px;
+            font-weight: 700;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            vertical-align: middle;
+        }
 
-    .custom-table tbody td {
-        padding: 16px;
-        vertical-align: middle;
-        border-bottom: 1px solid #f1f5f9;
-        color: #1e293b;
-        font-size: 14px;
-    }
+        .custom-table tbody td {
+            padding: 16px;
+            vertical-align: middle;
+            border-bottom: 1px solid #f1f5f9;
+            color: #1e293b;
+            font-size: 14px;
+        }
 
-    .custom-table tbody tr:nth-child(even) td {
-        background-color: #fafbfc !important;
-    }
+        .custom-table tbody tr:nth-child(even) td {
+            background-color: #fafbfc !important;
+        }
 
-    .custom-table tbody tr:hover td {
-        background-color: #f1f5f9 !important;
-    }
+        .custom-table tbody tr:hover td {
+            background-color: #f1f5f9 !important;
+        }
 
     /* Cụm nút thao tác nhóm ô vuông chuẩn mẫu ParkSmart */
     .action-group {
@@ -74,18 +74,17 @@
         font-size: 15px;
     }
 
-    .action-btn:last-child {
-        border-right: none;
-    }
+        .action-btn:last-child {
+            border-right: none;
+        }
 
-    .action-btn.view { color: #0ea5e9; }
-    .action-btn.view:hover { background-color: #e0f2fe; }
+        .action-btn.view {
+            color: #0ea5e9;
+        }
 
-    .action-btn.edit { color: #d97706; }
-    .action-btn.edit:hover { background-color: #fef3c7; }
-
-    .action-btn.delete { color: #ef4444; }
-    .action-btn.delete:hover { background-color: #fee2e2; }
+            .action-btn.view:hover {
+                background-color: #e0f2fe;
+            }
 
     /* CSS tinh chỉnh giao diện phân trang rời từng nút bo tròn giống mẫu */
     .custom-pagination .pagination {
@@ -103,11 +102,11 @@
         transition: all 0.2s;
     }
 
-    .custom-pagination .page-item .page-link:hover {
-        background-color: #f1f5f9;
-        color: #1e293b;
-        border-color: #cbd5e1;
-    }
+        .custom-pagination .page-item .page-link:hover {
+            background-color: #f1f5f9;
+            color: #1e293b;
+            border-color: #cbd5e1;
+        }
 
     .custom-pagination .page-item.active .page-link {
         background-color: #2563eb !important;
@@ -144,11 +143,8 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h2 class="text-dark fw-bold m-0 fs-3">Danh sách tài khoản</h2>
-            <p class="text-secondary small mb-0 mt-1">Quản lý quyền truy cập hệ thống và thông tin tài khoản người dùng</p>
+            <p class="text-secondary small mb-0 mt-1">Quản lý và xem danh sách tài khoản khách hàng trong hệ thống</p>
         </div>
-        <a asp-action="Create" class="btn btn-primary px-3 py-2 fw-semibold shadow-sm d-inline-flex align-items-center gap-2 rounded-3">
-            <i class="bi bi-plus-circle"></i> Tạo mới tài khoản
-        </a>
     </div>
 
     <!-- Table Dữ Liệu -->
@@ -164,7 +160,7 @@
                         <th class="text-center">Vai trò</th>
                         <th class="text-center">Trạng thái</th>
                         <th>Chủ phương tiện</th>
-                        <th style="width: 130px; text-align: center;">Thao tác</th>
+                        <th style="width: 100px; text-align: center;">Thao tác</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -186,14 +182,7 @@
                                     <span class="text-secondary">@Html.DisplayFor(modelItem => item.Email)</span>
                                 </td>
                                 <td class="text-center">
-                                    @if (item.VaiTro == "Admin")
-                                    {
-                                        <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill fw-semibold">Admin</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge bg-secondary bg-opacity-10 text-secondary px-3 py-2 rounded-pill fw-semibold">@item.VaiTro</span>
-                                    }
+                                    <span class="badge bg-secondary bg-opacity-10 text-secondary px-3 py-2 rounded-pill fw-semibold">@item.VaiTro</span>
                                 </td>
                                 <td class="text-center">
                                     @if (item.TrangThai == true || item.TrangThai.ToString() == "True" || item.TrangThai.ToString() == "1")
@@ -210,14 +199,8 @@
                                 </td>
                                 <td class="text-center">
                                     <div class="action-group">
-                                        <a asp-action="Details" asp-route-mataikhoan="@item.MaTaiKhoan" class="action-btn view" title="Chi tiết">
+                                        <a asp-action="Details" asp-route-mataikhoan="@item.MaTaiKhoan" class="action-btn view" title="Xem chi tiết">
                                             <i class="bi bi-eye"></i>
-                                        </a>
-                                        <a asp-action="Edit" asp-route-mataikhoan="@item.MaTaiKhoan" class="action-btn edit" title="Sửa">
-                                            <i class="bi bi-pencil"></i>
-                                        </a>
-                                        <a asp-action="Delete" asp-route-mataikhoan="@item.MaTaiKhoan" class="action-btn delete" title="Xóa">
-                                            <i class="bi bi-trash"></i>
                                         </a>
                                     </div>
                                 </td>
@@ -229,7 +212,7 @@
                         <tr>
                             <td colspan="8" class="text-center py-5 text-muted">
                                 <i class="bi bi-inbox fs-2 d-block mb-2 text-secondary"></i>
-                                Chưa có dữ liệu tài khoản nào trong hệ thống.
+                                Chưa có dữ liệu tài khoản khách hàng nào trong hệ thống.
                             </td>
                         </tr>
                     }
