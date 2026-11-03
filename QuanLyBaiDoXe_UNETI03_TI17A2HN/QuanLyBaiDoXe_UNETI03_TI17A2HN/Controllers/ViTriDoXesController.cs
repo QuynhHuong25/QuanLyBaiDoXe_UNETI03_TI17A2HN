@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using QuanLyBaiDoXe_UNETI03_TI17A2HN.Models;
-using System.Net.Http.Headers;
 using QuanLyBaiDoXe_UNETI03_TI17A2HN.Lọc;
 
 namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
@@ -73,18 +72,28 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             var items = await PhanTrang(query, page, pageSize).ToListAsync();
 
             // Sơ đồ đỗ xe
-            ViewBag.SoDo = await _context.ViTriDoXe
+            var soDoList = await _context.ViTriDoXe
                 .Include(v => v.LoaiPhuongTien)
                 .OrderBy(v => v.Tang)
                 .ThenBy(v => v.KhuVuc)
                 .ThenBy(v => v.TenViTri)
                 .ToListAsync();
 
-            // Lấy danh sách phiếu gửi xe đang hoạt động để lấy biển số hiển thị lên sơ đồ
-            ViewBag.PhieuDangGui = await _context.PhieuGuiXe
+            ViewBag.SoDo = soDoList;
+
+            // Xác định tầng mặc định hiển thị trên tab sơ đồ
+            ViewBag.ActiveTang = tang.HasValue ? tang.Value : (soDoList.Select(s => s.Tang).FirstOrDefault());
+
+            // LẤY BIỂN SỐ XE CHO CÁC PHIẾU ĐANG GỬI (ĐÃ ÉP KIỂU CHIẾT XUẤT CHÍNH XÁC Dictionary<int, string>)
+            var phieuDangGuiList = await _context.PhieuGuiXe
                 .Include(p => p.PhuongTien)
-                .Where(p => p.TrangThai == "Đang gửi")
-                .ToDictionaryAsync(p => p.MaViTri, p => p.PhuongTien != null ? p.PhuongTien.BienSoXe : "");
+                .Where(p => p.TrangThai == "Đang gửi" && p.MaViTri != null)
+                .Select(p => new { MaViTri = p.MaViTri!.Value, BienSoXe = p.PhuongTien != null ? p.PhuongTien.BienSoXe : "" })
+                .ToListAsync();
+
+            ViewBag.PhieuDangGui = phieuDangGuiList
+                .GroupBy(x => x.MaViTri)
+                .ToDictionary(g => g.Key, g => g.First().BienSoXe ?? "");
 
             return View(items);
         }
@@ -96,8 +105,8 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
         private async Task DongBoTrangThaiViTriAsync()
         {
             var maViTriDangCoXe = await _context.PhieuGuiXe
-                .Where(p => p.TrangThai == "Đang gửi")
-                .Select(p => p.MaViTri)
+                .Where(p => p.TrangThai == "Đang gửi" && p.MaViTri != null)
+                .Select(p => p.MaViTri!.Value)
                 .Distinct()
                 .ToListAsync();
 
@@ -219,6 +228,30 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             return View(vitridoxe);
         }
 
+        // ACTION LAY SO DO DANG PARTIAL VIEW (Load AJAX / Modal Popup)
+        [PhanQuyen("Admin", "Khách hàng")]
+        public async Task<IActionResult> SoDoPartial(int tang = 0)
+        {
+            await DongBoTrangThaiViTriAsync();
+
+            var ds = await _context.ViTriDoXe
+                .Include(v => v.LoaiPhuongTien)
+                .OrderBy(v => v.Tang).ThenBy(v => v.KhuVuc).ThenBy(v => v.TenViTri)
+                .ToListAsync();
+
+            var xeDangGuiList = await _context.PhieuGuiXe
+                .Where(p => p.TrangThai == "Đang gửi" && p.MaViTri != null)
+                .Select(p => new { MaViTri = p.MaViTri!.Value, BienSoXe = p.PhuongTien != null ? p.PhuongTien.BienSoXe : "" })
+                .ToListAsync();
+
+            ViewBag.XeDangGui = xeDangGuiList
+                .GroupBy(x => x.MaViTri)
+                .ToDictionary(g => g.Key, g => g.First().BienSoXe ?? "");
+
+            ViewBag.TangMo = tang;
+            return PartialView("_SoDoBaiDo", ds);
+        }
+
         // GET: VITRIDOXES/Create (Admin)
         [PhanQuyen("Admin")]
         public async Task<IActionResult> Create()
@@ -283,6 +316,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
 
                 _context.Add(vitridoxe);
                 await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = $"Tạo thành công vị trí {vitridoxe.TenViTri}!";
                 return RedirectToAction(nameof(Index));
             }
 
