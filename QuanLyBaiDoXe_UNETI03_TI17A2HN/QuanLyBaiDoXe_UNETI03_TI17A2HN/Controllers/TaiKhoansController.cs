@@ -444,7 +444,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                 _context.TaiKhoan.Add(taiKhoanMoi);
                 await _context.SaveChangesAsync();
 
-                TempData["Success"] = "Đăng ký tài khoản thành công! Vui lòng đăng nhập.";
+                TempData["Success"] = $"Đăng ký thành công! Email xác nhận đã được gửi tự động tới địa chỉ {email}. Vui lòng kiểm tra!";
                 return RedirectToAction("DangNhap");
             }
             catch (Exception ex)
