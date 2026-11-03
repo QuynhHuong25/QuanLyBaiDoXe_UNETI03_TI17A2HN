@@ -1,4 +1,3 @@
-@* Lương Thị Quỳnh Hương - 23103100064 *@
 @using Microsoft.AspNetCore.Http
 @inject IHttpContextAccessor HttpContextAccessor
 @model IEnumerable<QuanLyBaiDoXe_UNETI03_TI17A2HN.Models.ViTriDoXe>
@@ -17,9 +16,220 @@
     int totalItems = ViewBag.TotalItems ?? 0;
     var soDo = ViewBag.SoDo as List<QuanLyBaiDoXe_UNETI03_TI17A2HN.Models.ViTriDoXe>
             ?? new List<QuanLyBaiDoXe_UNETI03_TI17A2HN.Models.ViTriDoXe>();
+
+    // Tính toán chỉ số thống kê
+    int tongSoCho = soDo.Count;
+    int tongConTrong = soDo.Count(v => v.TrangThai == "Còn trống");
+    int tongDangSuDung = soDo.Count(v => v.TrangThai == "Đang sử dụng");
+    int tongTamNgung = soDo.Count(v => v.TrangThai == "Tạm ngừng");
+
+    var phieuDict = ViewBag.PhieuDangGui as Dictionary<int, string> ?? new Dictionary<int, string>();
+    var danhSachTang = soDo.Select(v => v.Tang).Distinct().OrderBy(t => t).ToList();
+    int activeTang = ViewBag.ActiveTang ?? (danhSachTang.FirstOrDefault());
 }
 
 <style>
+    /* THỐNG KÊ TỔNG QUAN (4 BOXES) */
+    .stat-card {
+        background-color: #f8fafc;
+        border-radius: 12px;
+        padding: 16px 20px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        border: 1px solid #f1f5f9;
+    }
+
+    .stat-pill {
+        width: 8px;
+        height: 38px;
+        border-radius: 4px;
+        flex-shrink: 0;
+    }
+
+        .stat-pill.gray {
+            background-color: #94a3b8;
+        }
+
+        .stat-pill.green {
+            background-color: #22c55e;
+        }
+
+        .stat-pill.red {
+            background-color: #ef4444;
+        }
+
+    .stat-number {
+        font-size: 24px;
+        font-weight: 800;
+        line-height: 1;
+        color: #0f172a;
+    }
+
+    .stat-label {
+        font-size: 13px;
+        color: #64748b;
+        margin-top: 4px;
+        font-weight: 500;
+    }
+
+    /* TAB CHỌN TẦNG */
+    .tang-tab-btn {
+        border-radius: 10px;
+        padding: 8px 18px;
+        font-weight: 700;
+        font-size: 13px;
+        border: 1px solid #e2e8f0;
+        background-color: #ffffff;
+        color: #1e293b;
+        text-decoration: none !important;
+        display: inline-block;
+        transition: all 0.2s;
+    }
+
+        .tang-tab-btn.active {
+            background-color: #0b1f4c;
+            color: #ffffff;
+            border-color: #0b1f4c;
+        }
+
+    /* BAR CỔNG VÀO / CỔNG RA */
+    .parking-header-bar {
+        background-color: #0b1f4c;
+        color: #ffffff;
+        border-radius: 20px;
+        padding: 10px 24px;
+        font-weight: 700;
+        font-size: 14px;
+    }
+
+    /* ZONE CARD & SLOTS */
+    .zone-card {
+        border-radius: 14px;
+        border: 1px solid #e2e8f0;
+        background-color: #ffffff;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    }
+
+    .zone-icon-blue {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        background-color: #2563eb;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 16px;
+    }
+
+    /* SƠ ĐỒ Ô ĐỖ XE KIỂU MỚI */
+    .slot-box {
+        width: 68px;
+        height: 82px;
+        border-radius: 6px;
+        text-align: center;
+        padding: 4px 2px;
+        position: relative;
+        cursor: pointer;
+        transition: all 0.15s ease-in-out;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        border: 1px solid #cbd5e1;
+        background: #ffffff;
+        text-decoration: none !important;
+    }
+
+        .slot-box:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+        }
+
+    .slot-name {
+        font-weight: 700;
+        font-size: 11px;
+        color: #475569;
+    }
+
+    /* TRẠNG THÁI TRỐNG */
+    .slot-box.empty {
+        background-color: #f0fdf4;
+        border-color: #bbf7d0;
+    }
+
+        .slot-box.empty .slot-icon-text {
+            color: #4ade80;
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        .slot-box.empty .slot-badge {
+            color: #16a34a;
+            font-weight: 700;
+            font-size: 11px;
+        }
+
+    /* TRẠNG THÁI ĐANG SỬ DỤNG (CÓ XE) */
+    .slot-box.occupied {
+        background-color: #ffffff;
+        border-color: #fca5a5;
+    }
+
+        .slot-box.occupied .slot-icon-text {
+            color: #ef4444;
+            font-size: 18px;
+        }
+
+        .slot-box.occupied .slot-badge-plate {
+            border: 1px solid #f87171;
+            color: #b91c1c;
+            font-weight: 800;
+            font-size: 9px;
+            border-radius: 3px;
+            padding: 0 2px;
+            width: 100%;
+            max-width: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            background: #fff5f5;
+        }
+
+    /* TRẠNG THÁI TẠM NGỪNG */
+    .slot-box.disabled {
+        background-color: #f1f5f9;
+        border-color: #cbd5e1;
+        background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(203, 213, 225, 0.4) 5px, rgba(203, 213, 225, 0.4) 10px);
+    }
+
+        .slot-box.disabled .slot-icon-text {
+            color: #94a3b8;
+            font-size: 16px;
+        }
+
+        .slot-box.disabled .slot-badge {
+            color: #64748b;
+            font-weight: 600;
+            font-size: 10px;
+        }
+
+    /* LỐI ĐI PHÂN CÁCH */
+    .loi-di-bar {
+        background-color: #f1f5f9;
+        color: #94a3b8;
+        font-weight: 800;
+        font-size: 11px;
+        letter-spacing: 3px;
+        text-align: center;
+        padding: 4px 0;
+        border-radius: 4px;
+        margin: 10px 0;
+        border: 1px dashed #cbd5e1;
+    }
+
     /* BẢNG DỮ LIỆU & NÚT THAO TÁC */
     .table-container {
         background-color: #ffffff;
@@ -31,7 +241,6 @@
 
     .custom-table {
         margin-bottom: 0;
-        border-collapse: collapse;
         width: 100%;
     }
 
@@ -39,29 +248,17 @@
             background-color: #f8fafc !important;
             color: #475569 !important;
             border-bottom: 2px solid #e2e8f0;
-            border-top: none;
             padding: 14px 16px;
             font-weight: 700;
             font-size: 13px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            vertical-align: middle;
         }
 
         .custom-table tbody td {
             padding: 16px;
             vertical-align: middle;
             border-bottom: 1px solid #f1f5f9;
-            color: #1e293b;
             font-size: 14px;
-        }
-
-        .custom-table tbody tr:nth-child(even) td {
-            background-color: #fafbfc !important;
-        }
-
-        .custom-table tbody tr:hover td {
-            background-color: #f1f5f9 !important;
         }
 
     .action-group {
@@ -69,23 +266,16 @@
         border: 1px solid #cbd5e1;
         border-radius: 8px;
         overflow: hidden;
-        background: #ffffff;
     }
 
     .action-btn {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        width: 36px;
-        height: 34px;
-        text-decoration: none;
+        width: 34px;
+        height: 32px;
         border-right: 1px solid #cbd5e1;
-        transition: all 0.2s;
-        font-size: 15px;
         background: none;
-        border-top: none;
-        border-bottom: none;
-        border-left: none;
         cursor: pointer;
     }
 
@@ -97,216 +287,18 @@
             color: #0ea5e9;
         }
 
-            .action-btn.view:hover {
-                background-color: #e0f2fe;
-            }
-
         .action-btn.edit {
             color: #d97706;
         }
-
-            .action-btn.edit:hover {
-                background-color: #fef3c7;
-            }
 
         .action-btn.delete {
             color: #ef4444;
         }
 
-            .action-btn.delete:hover {
-                background-color: #fee2e2;
-            }
-
         .action-btn.toggle-btn {
             color: #64748b;
         }
-
-            .action-btn.toggle-btn:hover {
-                background-color: #f1f5f9;
-            }
-
-    /* KHUNG SƠ ĐỒ ĐỖ XE */
-    .parking-header-bar {
-        background-color: #0b1f4c;
-        color: #ffffff;
-        border-radius: 8px;
-        padding: 10px 20px;
-        font-weight: 600;
-    }
-
-    .zone-card {
-        border-radius: 14px;
-        border: 1px solid #e2e8f0;
-        background-color: #ffffff;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.03);
-        height: 100%;
-    }
-
-        .zone-card.zone-a {
-            border-top: 5px solid #2563eb;
-        }
-
-        .zone-card.zone-b {
-            border-top: 5px solid #10b981;
-        }
-
-        .zone-card.zone-c {
-            border-top: 5px solid #8b5cf6;
-        }
-
-        .zone-card.zone-d {
-            border-top: 5px solid #0284c7;
-        }
-
-    .zone-icon {
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 800;
-        font-size: 15px;
-        color: white;
-        flex-shrink: 0;
-    }
-
-    .zone-a .zone-icon {
-        background-color: #2563eb;
-    }
-
-    .zone-b .zone-icon {
-        background-color: #10b981;
-    }
-
-    .zone-c .zone-icon {
-        background-color: #8b5cf6;
-    }
-
-    .zone-d .zone-icon {
-        background-color: #0284c7;
-    }
-
-    /* THẺ Ô ĐỖ THIẾT KẾ GỌN GÀNG */
-    .slot-box {
-        width: 65px;
-        height: 75px;
-        border-radius: 8px;
-        text-align: center;
-        padding: 4px 2px;
-        font-size: 11px;
-        position: relative;
-        cursor: pointer;
-        transition: all 0.15s ease-in-out;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        align-items: center;
-        border: 1px solid transparent;
-        text-decoration: none !important;
-    }
-
-        .slot-box:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.08);
-        }
-
-        /* TRẠNG THÁI Ô ĐỖ */
-        .slot-box.empty {
-            background-color: #f0fdf4;
-            border-color: #dcfce7;
-            color: #166534;
-        }
-
-            .slot-box.empty .slot-name {
-                color: #15803d;
-            }
-
-            .slot-box.empty .slot-icon-text {
-                color: #22c55e;
-                font-weight: 800;
-                font-size: 16px;
-            }
-
-            .slot-box.empty .slot-badge {
-                color: #16a34a;
-                font-weight: 600;
-            }
-
-        .slot-box.occupied {
-            background-color: #fef2f2;
-            border-color: #fee2e2;
-            color: #991b1b;
-        }
-
-            .slot-box.occupied .slot-name {
-                color: #b91c1c;
-            }
-
-            .slot-box.occupied .slot-icon-text {
-                color: #ef4444;
-                font-size: 16px;
-            }
-
-            .slot-box.occupied .slot-badge {
-                background-color: #ef4444;
-                color: white;
-                font-weight: 700;
-                border-radius: 3px;
-                padding: 1px 2px;
-                width: 100%;
-            }
-
-        .slot-box.disabled {
-            background-color: #f8fafc;
-            border-color: #e2e8f0;
-            color: #94a3b8;
-        }
-
-            .slot-box.disabled .slot-name {
-                color: #64748b;
-            }
-
-            .slot-box.disabled .slot-icon-text {
-                color: #94a3b8;
-                font-size: 15px;
-            }
-
-            .slot-box.disabled .slot-badge {
-                color: #94a3b8;
-                font-weight: 500;
-            }
-
-    .slot-name {
-        font-weight: 700;
-        font-size: 10px;
-        line-height: 1;
-        width: 100%;
-        text-align: center;
-    }
-
-    .slot-icon-area {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-grow: 1;
-    }
-
-    .slot-badge {
-        font-size: 9px;
-        line-height: 1.1;
-        width: 100%;
-        text-align: center;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
 </style>
-
-@{
-    var phieuDict = ViewBag.PhieuDangGui as Dictionary<int, string> ?? new Dictionary<int, string>();
-    var danhSachTang = soDo.Select(v => v.Tang).Distinct().OrderBy(t => t).ToList();
-}
 
 <div class="w-100">
     <!-- HIỂN THỊ THÔNG BÁO THÀNH CÔNG / THẤT BẠI -->
@@ -340,130 +332,148 @@
         </div>
     </div>
 
-    <!-- SƠ ĐỒ ĐỖ XE TRỰC QUAN -->
-    <div class="mb-4">
+    <!-- KHUNG TỔNG QUAN TÌNH TRẠNG BÃI XE (4 BOXES) -->
+    <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+        <h5 class="fw-bold text-dark mb-3">Sơ đồ bãi đỗ</h5>
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-md-3">
+                <div class="stat-card">
+                    <div class="stat-pill gray"></div>
+                    <div>
+                        <div class="stat-number">@tongSoCho</div>
+                        <div class="stat-label">Tổng số chỗ</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card">
+                    <div class="stat-pill green"></div>
+                    <div>
+                        <div class="stat-number">@tongConTrong</div>
+                        <div class="stat-label">Còn trống</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card">
+                    <div class="stat-pill red"></div>
+                    <div>
+                        <div class="stat-number">@tongDangSuDung</div>
+                        <div class="stat-label">Đang sử dụng</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card">
+                    <div class="stat-pill gray"></div>
+                    <div>
+                        <div class="stat-number">@tongTamNgung</div>
+                        <div class="stat-label">Tạm ngừng</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB CHỌN TẦNG -->
+        <div class="d-flex gap-2 mb-4">
+            @foreach (var t in danhSachTang)
+            {
+                int trongTang = soDo.Count(v => v.Tang == t && v.TrangThai == "Còn trống");
+                int tongTang = soDo.Count(v => v.Tang == t);
+                bool isActive = (t == activeTang);
+
+                <a href="javascript:void(0);" onclick="switchTangTab(@t)" id="tab-btn-@t" class="tang-tab-btn @(isActive ? "active" : "")">
+                    Tầng @t <span class="fw-normal ms-1 opacity-75">@trongTang / @tongTang chỗ trống</span>
+                </a>
+            }
+        </div>
+
+        <!-- HIỂN THỊ SƠ ĐỒ THEO TẦNG ĐƯỢC CHỌN -->
         @foreach (var tangNum in danhSachTang)
         {
             var vitriTheoTang = soDo.Where(v => v.Tang == tangNum).ToList();
+            bool isDisplay = (tangNum == activeTang);
 
-            <div class="parking-header-bar d-flex justify-content-between align-items-center mb-3 shadow-sm">
-                <span><i class="bi bi-box-arrow-in-right me-2"></i>Cổng vào</span>
-                <span class="fs-6 fw-bold">Tầng @tangNum</span>
-                <span>Cổng ra <i class="bi bi-box-arrow-right ms-2"></i></span>
-            </div>
+            <div class="tang-content-block" id="tang-block-@tangNum" style="display: @(isDisplay ? "block" : "none");">
+                <!-- BAR CỔNG VÀO / CỔNG RA -->
+                <div class="parking-header-bar d-flex justify-content-between align-items-center mb-4 shadow-sm">
+                    <span><i class="bi bi-arrow-right me-2"></i>Cổng vào</span>
+                    <span class="fs-6 fw-bold">Tầng @tangNum</span>
+                    <span>Cổng ra<i class="bi bi-arrow-right ms-2"></i></span>
+                </div>
 
-            <div class="row g-3 mb-4">
-                @foreach (var khuGroup in vitriTheoTang.GroupBy(v => v.KhuVuc).OrderBy(g => g.Key))
-                {
-                    string tenKhuGoc = khuGroup.Key.Trim();
-                    string khuNameHienThi = tenKhuGoc.StartsWith("Khu", StringComparison.OrdinalIgnoreCase) ? tenKhuGoc : "Khu " + tenKhuGoc;
+                <!-- CÁC KHU VỰC TRONG TẦNG -->
+                <div class="row g-4">
+                    @foreach (var khuGroup in vitriTheoTang.GroupBy(v => v.KhuVuc).OrderBy(g => g.Key))
+                    {
+                        string tenKhuGoc = khuGroup.Key.Trim();
+                        string khuNameHienThi = tenKhuGoc.StartsWith("Khu", StringComparison.OrdinalIgnoreCase) ? tenKhuGoc : "Khu " + tenKhuGoc;
 
-                    int tongCho = khuGroup.Count();
-                    int choTrong = khuGroup.Count(v => v.TrangThai == "Còn trống");
+                        int tongChoKhu = khuGroup.Count();
+                        int choTrongKhu = khuGroup.Count(v => v.TrangThai == "Còn trống");
 
-                    string zoneClass = tenKhuGoc.Contains("B") ? "zone-b" : (tenKhuGoc.Contains("C") ? "zone-c" : (tenKhuGoc.Contains("D") ? "zone-d" : "zone-a"));
-                    string zoneLetter = tenKhuGoc.Replace("Khu", "").Trim();
-                    if (string.IsNullOrEmpty(zoneLetter)) { zoneLetter = "A"; }
-                    else if (zoneLetter.Length > 1) { zoneLetter = zoneLetter.Substring(0, 1); }
-
-                    <div class="col-12 col-md-6 col-xl-6">
-                        <div class="zone-card p-3 @zoneClass">
-                            <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
-                                <div class="d-flex align-items-center gap-2">
-                                    <div class="zone-icon">@zoneLetter</div>
+                        <div class="col-12">
+                            <div class="zone-card p-3">
+                                <div class="d-flex justify-content-between align-items-center pb-2 mb-3 border-bottom">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="zone-icon-blue"><i class="bi bi-p-square-fill"></i></div>
+                                        <div>
+                                            <h6 class="fw-bold m-0 text-dark fs-6">@khuNameHienThi</h6>
+                                            <small class="text-secondary">Sức chứa: @tongChoKhu chỗ</small>
+                                        </div>
+                                    </div>
                                     <div>
-                                        <h6 class="fw-bold m-0 text-dark fs-6">@khuNameHienThi</h6>
-                                        <small class="text-secondary">Tổng số: @tongCho chỗ</small>
+                                        <span class="fw-bold text-primary fs-6">@choTrongKhu trống</span>
+                                        <div class="progress mt-1" style="width: 80px; height: 5px;">
+                                            <div class="progress-bar bg-primary" style="width: @(tongChoKhu > 0 ? (choTrongKhu * 100 / tongChoKhu) : 0)%"></div>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="text-end">
-                                    <span class="fw-bold text-primary small">@choTrong trống</span>
-                                    <div class="progress mt-1" style="width: 70px; height: 5px;">
-                                        <div class="progress-bar bg-primary" style="width: @(tongCho > 0 ? (choTrong * 100 / tongCho) : 0)%"></div>
-                                    </div>
-                                </div>
-                            </div>
 
-                            @foreach (var loaiGroup in khuGroup.GroupBy(v => v.LoaiPhuongTien?.TenLoaiPhuongTien ?? "Phương tiện khác"))
-                            {
-                                int subTong = loaiGroup.Count();
-                                int subTrong = loaiGroup.Count(v => v.TrangThai == "Còn trống");
+                                @foreach (var loaiGroup in khuGroup.GroupBy(v => v.LoaiPhuongTien?.TenLoaiPhuongTien ?? "Phương tiện khác"))
+                                {
+                                    int subTong = loaiGroup.Count();
+                                    int subTrong = loaiGroup.Count(v => v.TrangThai == "Còn trống");
+                                    var slotsList = loaiGroup.ToList();
 
-                                <div class="mb-3">
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <span class="fw-semibold small text-secondary">@loaiGroup.Key</span>
-                                        <small class="text-muted fw-semibold">@subTrong / @subTong trống</small>
-                                    </div>
+                                    <!-- Chia slot thành 2 dãy để có LỐI ĐI ở giữa giống ảnh mẫu -->
+                                    int halfCount = (int)Math.Ceiling(slotsList.Count / 2.0);
+                                    var day1 = slotsList.Take(halfCount).ToList();
+                                    var day2 = slotsList.Skip(halfCount).ToList();
 
-                                    <div class="d-flex flex-wrap gap-2">
-                                        @foreach (var slot in loaiGroup)
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="fw-bold small text-secondary">@loaiGroup.Key</span>
+                                            <small class="text-muted fw-bold">@subTrong / @subTong trống</small>
+                                        </div>
+
+                                        <!-- DÃY 1 -->
+                                        <div class="d-flex flex-wrap gap-2">
+                                            @foreach (var slot in day1)
+                                            {
+                                                @await Html.PartialAsync("_SlotBoxItem", slot, new ViewDataDictionary(ViewData) { { "PhieuDict", phieuDict }, { "IsAdmin", isAdmin } })
+                                            }
+                                        </div>
+
+                                        <!-- LỐI ĐI PHÂN CÁCH (NẾU CÓ DÃY 2) -->
+                                        @if (day2.Any())
                                         {
-                                            string statusClass = slot.TrangThai == "Đang sử dụng" ? "occupied" : (slot.TrangThai == "Tạm ngừng" ? "disabled" : "empty");
-                                            string bienSo = phieuDict.ContainsKey(slot.MaViTri) ? phieuDict[slot.MaViTri] : "";
+                                            <div class="loi-di-bar">L Ố I &nbsp; Đ I</div>
 
-                                            if (isAdmin)
-                                            {
-                                                <form asp-action="ToggleTamNgung" asp-route-id="@slot.MaViTri" method="post" class="d-inline">
-                                                    @Html.AntiForgeryToken()
-                                                    <button type="submit"
-                                                            class="slot-box @statusClass btn p-1"
-                                                            title="@slot.TenViTri - @slot.TrangThai @(string.IsNullOrEmpty(bienSo) ? "" : $"({bienSo})")"
-                                                            onclick="@(slot.TrangThai == "Đang sử dụng"
-                                                                ? "alert('Không thể tạm ngừng vị trí này vì đang có xe đỗ!'); return false;"
-                                                                : (slot.TrangThai == "Tạm ngừng"
-                                                                    ? $"return confirm('Mở lại hoạt động vị trí {slot.TenViTri}?');"
-                                                                    : $"return confirm('Xác nhận Tạm ngừng vị trí {slot.TenViTri}?');"))">
-                                                        <div class="slot-name">@slot.TenViTri</div>
-                                                        <div class="slot-icon-area">
-                                                            @if (slot.TrangThai == "Đang sử dụng")
-                                                            {
-                                                                <i class="bi bi-geo-fill slot-icon-text"></i>
-                                                            }
-                                                            else if (slot.TrangThai == "Tạm ngừng")
-                                                            {
-                                                                <i class="bi bi-slash-circle slot-icon-text"></i>
-                                                            }
-                                                            else
-                                                            {
-                                                                <span class="slot-icon-text">P</span>
-                                                            }
-                                                        </div>
-                                                        <div class="slot-badge">
-                                                            @(slot.TrangThai == "Đang sử dụng" ? (string.IsNullOrEmpty(bienSo) ? "Có xe" : bienSo) : (slot.TrangThai == "Tạm ngừng" ? "Ngừng" : "Trống"))
-                                                        </div>
-                                                    </button>
-                                                </form>
-                                            }
-                                            else
-                                            {
-                                                <div class="slot-box @statusClass" title="@slot.TenViTri - @slot.TrangThai">
-                                                    <div class="slot-name">@slot.TenViTri</div>
-                                                    <div class="slot-icon-area">
-                                                        @if (slot.TrangThai == "Đang sử dụng")
-                                                        {
-                                                            <i class="bi bi-geo-fill slot-icon-text"></i>
-                                                        }
-                                                        else if (slot.TrangThai == "Tạm ngừng")
-                                                        {
-                                                            <i class="bi bi-slash-circle slot-icon-text"></i>
-                                                        }
-                                                        else
-                                                        {
-                                                            <span class="slot-icon-text">P</span>
-                                                        }
-                                                    </div>
-                                                    <div class="slot-badge">
-                                                        @(slot.TrangThai == "Đang sử dụng" ? (string.IsNullOrEmpty(bienSo) ? "Có xe" : bienSo) : (slot.TrangThai == "Tạm ngừng" ? "Ngừng" : "Trống"))
-                                                    </div>
-                                                </div>
-                                            }
+                                            <!-- DÃY 2 -->
+                                            <div class="d-flex flex-wrap gap-2">
+                                                @foreach (var slot in day2)
+                                                {
+                                                    @await Html.PartialAsync("_SlotBoxItem", slot, new ViewDataDictionary(ViewData) { { "PhieuDict", phieuDict }, { "IsAdmin", isAdmin } })
+                                                }
+                                            </div>
                                         }
                                     </div>
-                                </div>
-                            }
+                                }
+                            </div>
                         </div>
-                    </div>
-                }
+                    }
+                </div>
             </div>
         }
     </div>
@@ -670,3 +680,19 @@
         </nav>
     }
 </div>
+
+<script>
+    function switchTangTab(tangNum) {
+        // Hide all blocks
+        document.querySelectorAll('.tang-content-block').forEach(el => el.style.display = 'none');
+        // Remove active class
+        document.querySelectorAll('.tang-tab-btn').forEach(el => el.classList.remove('active'));
+
+        // Show selected
+        const selectedBlock = document.getElementById('tang-block-' + tangNum);
+        if (selectedBlock) selectedBlock.style.display = 'block';
+
+        const selectedBtn = document.getElementById('tab-btn-' + tangNum);
+        if (selectedBtn) selectedBtn.classList.add('active');
+    }
+</script>
