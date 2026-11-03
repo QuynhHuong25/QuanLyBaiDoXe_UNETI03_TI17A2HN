@@ -6,11 +6,18 @@
     string vaiTro = Context.Session?.GetString("VaiTro") ?? "";
     string tenDangNhapSession = Context.Session?.GetString("TenDangNhap") ?? "";
     int? maTaiKhoanSession = Context.Session?.GetInt32("MaTaiKhoan");
-    bool isHoatDong = Model.TrangThai;
+    if (maTaiKhoanSession == null)
+    {
+        var strId = Context.Session?.GetString("MaTaiKhoan");
+        if (int.TryParse(strId, out int parsedId)) maTaiKhoanSession = parsedId;
+    }
 
+    bool isHoatDong = Model.TrangThai;
+    bool isAdmin = (vaiTro == "Admin");
+
+    // Khách hàng chính chủ đang xem tài khoản của chính mình
     bool isChinhToi = (maTaiKhoanSession != null && Model.MaTaiKhoan == maTaiKhoanSession)
-                   || (!string.IsNullOrEmpty(tenDangNhapSession) && Model.TenDangNhap == tenDangNhapSession)
-                   || (vaiTro == "Admin");
+                   || (!string.IsNullOrEmpty(tenDangNhapSession) && Model.TenDangNhap == tenDangNhapSession);
 }
 
 <style>
@@ -20,6 +27,7 @@
         border-radius: 1rem;
         box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.03);
     }
+
     .info-box {
         background-color: #f8f9fa;
         border: 1px solid #f1f3f5;
@@ -27,11 +35,13 @@
         padding: 1rem;
         transition: all 0.2s ease;
     }
-    .info-box:hover {
-        background-color: #ffffff;
-        border-color: #e2e8f0;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    }
+
+        .info-box:hover {
+            background-color: #ffffff;
+            border-color: #e2e8f0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
     .icon-wrapper {
         width: 44px;
         height: 44px;
@@ -43,12 +53,21 @@
 </style>
 
 <div class="container-fluid px-0">
+    <!-- Thống báo TempData -->
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm mb-4 rounded-3" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
         <div>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-1 small text-muted">
                     <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-decoration-none text-secondary">Trang chủ</a></li>
-                    @if (vaiTro == "Admin")
+                    @if (isAdmin)
                     {
                         <li class="breadcrumb-item"><a asp-controller="TaiKhoans" asp-action="Index" class="text-decoration-none text-secondary">Tài khoản</a></li>
                     }
@@ -59,35 +78,35 @@
         </div>
 
         <div class="d-flex flex-wrap gap-2">
-            @if (vaiTro == "Admin")
+            <!-- Admin xem chỉ có nút Quay lại -->
+            @if (isAdmin)
             {
                 <a asp-action="Index" class="btn btn-light border btn-sm px-3 rounded-pill text-secondary d-inline-flex align-items-center gap-1 shadow-sm">
                     <i class="bi bi-arrow-left"></i> Quay lại
                 </a>
             }
 
-            @if (isChinhToi)
+            <!-- Khách hàng chính chủ có quyền Sửa, Khóa và Xóa tài khoản của chính mình -->
+            @if (!isAdmin && isChinhToi)
             {
                 <a asp-action="Edit" asp-route-id="@Model?.MaTaiKhoan" class="btn btn-warning btn-sm px-3 rounded-pill text-dark d-inline-flex align-items-center gap-1 shadow-sm fw-medium">
                     <i class="bi bi-pencil-square"></i> Sửa tài khoản
                 </a>
-            }
 
-            @if (vaiTro == "Admin")
-            {
-                <form asp-action="ToggleStatus" asp-route-id="@Model?.MaTaiKhoan" method="post" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn thay đổi trạng thái tài khoản này?');">
-                    @if (isHoatDong)
-                    {
-                        <button type="submit" class="btn btn-outline-danger btn-sm px-3 rounded-pill d-inline-flex align-items-center gap-1 shadow-sm fw-medium">
-                            <i class="bi bi-lock-fill"></i> Khóa tài khoản
-                        </button>
-                    }
-                    else
-                    {
-                        <button type="submit" class="btn btn-outline-success btn-sm px-3 rounded-pill d-inline-flex align-items-center gap-1 shadow-sm fw-medium">
-                            <i class="bi bi-unlock-fill"></i> Mở khóa
-                        </button>
-                    }
+                <!-- Nút Tự Khóa Tài Khoản -->
+                <form asp-action="KhoaTaiKhoan" asp-route-id="@Model?.MaTaiKhoan" method="post" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn khóa tài khoản này? Sau khi khóa bạn sẽ bị đăng xuất khỏi hệ thống.');">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-outline-danger btn-sm px-3 rounded-pill d-inline-flex align-items-center gap-1 shadow-sm fw-medium">
+                        <i class="bi bi-lock-fill"></i> Khóa tài khoản
+                    </button>
+                </form>
+
+                <!-- Nút Tự Xóa Tài Khoản -->
+                <form asp-action="XoaTaiKhoan" asp-route-id="@Model?.MaTaiKhoan" method="post" class="d-inline" onsubmit="return confirm('CẢNH BÁO: Bạn có chắc chắn muốn XÓA VĨNH VIỄN tài khoản của mình? Dữ liệu này sẽ không thể khôi phục!');">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger btn-sm px-3 rounded-pill text-white d-inline-flex align-items-center gap-1 shadow-sm fw-medium">
+                        <i class="bi bi-trash-fill"></i> Xóa tài khoản
+                    </button>
                 </form>
             }
         </div>
