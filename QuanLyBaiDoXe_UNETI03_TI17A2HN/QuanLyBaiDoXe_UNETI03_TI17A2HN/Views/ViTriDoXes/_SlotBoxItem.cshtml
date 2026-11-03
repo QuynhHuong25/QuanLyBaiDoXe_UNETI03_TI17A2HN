@@ -1,0 +1,78 @@
+﻿@model QuanLyBaiDoXe_UNETI03_TI17A2HN.Models.ViTriDoXe
+
+@{
+    var phieuDict = ViewData["PhieuDict"] as Dictionary<int, string> ?? new Dictionary<int, string>();
+    bool isAdmin = ViewData["IsAdmin"] != null && (bool)ViewData["IsAdmin"];
+
+    string statusClass = Model.TrangThai == "Đang sử dụng" ? "occupied" : (Model.TrangThai == "Tạm ngừng" ? "disabled" : "empty");
+
+    // Lấy biển số xe an toàn từ Dictionary
+    string bienSo = phieuDict.TryGetValue(Model.MaViTri, out var bs) ? bs : "";
+}
+
+@if (isAdmin)
+{
+    <form asp-action="ToggleTamNgung" asp-route-id="@Model.MaViTri" method="post" class="d-inline">
+        @Html.AntiForgeryToken()
+        <button type="submit"
+                class="slot-box @statusClass btn p-1"
+                title="@Model.TenViTri - @Model.TrangThai @(string.IsNullOrEmpty(bienSo) ? "" : $"({bienSo})")"
+                onclick="@(Model.TrangThai == "Đang sử dụng"
+                    ? "alert('Không thể tạm ngừng vị trí này vì đang có xe đỗ!'); return false;"
+                    : (Model.TrangThai == "Tạm ngừng"
+                        ? $"return confirm('Mở lại hoạt động vị trí {Model.TenViTri}?');"
+                        : $"return confirm('Xác nhận Tạm ngừng vị trí {Model.TenViTri}?');"))">
+            <div class="slot-name">@Model.TenViTri</div>
+            <div class="slot-icon-area">
+                @if (Model.TrangThai == "Đang sử dụng")
+                {
+                    <i class="bi bi-geo-fill slot-icon-text"></i>
+                }
+                else if (Model.TrangThai == "Tạm ngừng")
+                {
+                    <i class="bi bi-slash-circle slot-icon-text"></i>
+                }
+                else
+                {
+                    <span class="slot-icon-text">P</span>
+                }
+            </div>
+            @if (Model.TrangThai == "Đang sử dụng")
+            {
+                <div class="slot-badge-plate">@(string.IsNullOrEmpty(bienSo) ? "Có xe" : bienSo)</div>
+            }
+            else
+            {
+                <div class="slot-badge">@(Model.TrangThai == "Tạm ngừng" ? "Ngừng" : "Trống")</div>
+            }
+        </button>
+    </form>
+}
+else
+{
+    <div class="slot-box @statusClass" title="@Model.TenViTri - @Model.TrangThai @(string.IsNullOrEmpty(bienSo) ? "" : $"({bienSo})")">
+        <div class="slot-name">@Model.TenViTri</div>
+        <div class="slot-icon-area">
+            @if (Model.TrangThai == "Đang sử dụng")
+            {
+                <i class="bi bi-geo-fill slot-icon-text"></i>
+            }
+            else if (Model.TrangThai == "Tạm ngừng")
+            {
+                <i class="bi bi-slash-circle slot-icon-text"></i>
+            }
+            else
+            {
+                <span class="slot-icon-text">P</span>
+            }
+        </div>
+        @if (Model.TrangThai == "Đang sử dụng")
+        {
+            <div class="slot-badge-plate">@(string.IsNullOrEmpty(bienSo) ? "Có xe" : bienSo)</div>
+        }
+        else
+        {
+            <div class="slot-badge">@(Model.TrangThai == "Tạm ngừng" ? "Ngừng" : "Trống")</div>
+        }
+    </div>
+}
