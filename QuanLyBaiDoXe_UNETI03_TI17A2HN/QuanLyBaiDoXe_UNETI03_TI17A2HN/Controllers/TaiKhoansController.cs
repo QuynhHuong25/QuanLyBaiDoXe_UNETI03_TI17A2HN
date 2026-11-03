@@ -42,16 +42,14 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             }
         }
 
-        // GET: TAIKHOANS (Admin xem danh sách tài khoản KHÁCH HÀNG)
+        // GET: TAIKHOANS (Admin xem danh sách tài khoản)
         [PhanQuyen("Admin")]
         public async Task<IActionResult> Index(string? searchString, int page = 1)
         {
             int pageSize = 10; // Số lượng tài khoản hiển thị trên mỗi trang
 
-            // Lọc chỉ lấy tài khoản Khách hàng (Admin chỉ được xem tài khoản Khách hàng)
             var query = _context.TaiKhoan
                 .Include(t => t.ChuPhuongTien)
-                .Where(t => t.VaiTro == "Khách hàng" || t.VaiTro == "Khach")
                 .AsQueryable();
 
             // Tìm kiếm theo tên đăng nhập, họ tên hoặc email nếu có nhập
@@ -79,6 +77,48 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             ViewBag.CurrentSearch = searchString;
 
             return View(taiKhoans);
+        }
+
+        // GET: TAIKHOANS/Create (Admin khởi tạo tài khoản mới)
+        [PhanQuyen("Admin")]
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        // POST: TAIKHOANS/Create (Admin tạo tài khoản Admin hoặc Khách hàng)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [PhanQuyen("Admin")]
+        public async Task<IActionResult> Create([Bind("TenDangNhap,MatKhau,HoTen,Email,VaiTro,TrangThai")] TaiKhoan taikhoan)
+        {
+            if (string.IsNullOrEmpty(taikhoan.TenDangNhap) || string.IsNullOrEmpty(taikhoan.MatKhau))
+            {
+                ModelState.AddModelError("", "Vui lòng nhập đầy đủ Tên đăng nhập và Mật khẩu!");
+                return View(taikhoan);
+            }
+
+            // Kiểm tra tên đăng nhập trùng lặp
+            bool daTonTai = await _context.TaiKhoan.AnyAsync(t => t.TenDangNhap == taikhoan.TenDangNhap);
+            if (daTonTai)
+            {
+                ModelState.AddModelError("TenDangNhap", "Tên đăng nhập này đã tồn tại trong hệ thống!");
+                return View(taikhoan);
+            }
+
+            if (ModelState.IsValid)
+            {
+                // Băm mật khẩu bằng BCrypt trước khi lưu
+                taikhoan.MatKhau = BamMatKhau(taikhoan.MatKhau!);
+
+                _context.Add(taikhoan);
+                await _context.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = "Tạo mới tài khoản thành công!";
+                return RedirectToAction(nameof(Index));
+            }
+
+            return View(taikhoan);
         }
 
         // GET: TAIKHOANS/Details
@@ -143,7 +183,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                 if (int.TryParse(strId, out int parsedId)) maTaiKhoanSession = parsedId;
             }
 
-            // Chỉ chính tài khoản đó mới được phép chỉnh sửa
+            // Chỉ cho phép sửa nếu ĐÚNG LÀ TÀI KHOẢN CỦA CHÍNH MÌNH (bất kể Admin hay Khách)
             bool isChinhToi = (maTaiKhoanSession != null && taiKhoan.MaTaiKhoan == maTaiKhoanSession)
                            || (!string.IsNullOrEmpty(tenDangNhapSession) && taiKhoan.TenDangNhap == tenDangNhapSession);
 
@@ -169,7 +209,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             var strId = HttpContext.Session.GetString("MaTaiKhoan");
             if (!int.TryParse(strId, out int myId) || myId != id)
             {
-                TempData["ErrorMessage"] = "Bạn không có quyền chỉnh sửa tài khoản này!";
+                TempData["ErrorMessage"] = "Bạn chỉ có quyền chỉnh sửa tài khoản của chính mình!";
                 return RedirectToAction(nameof(Details), new { mataikhoan = id });
             }
 
@@ -180,7 +220,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                     var userInDb = await _context.TaiKhoan.FindAsync(id);
                     if (userInDb == null) return NotFound();
 
-                    // Cập nhật các thông tin cơ bản
+                    // Cập nhật thông tin cơ bản
                     userInDb.HoTen = taiKhoan.HoTen;
                     userInDb.Email = taiKhoan.Email;
 
@@ -196,7 +236,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                     // Cập nhật lại Session Họ Tên nếu có thay đổi
                     HttpContext.Session.SetString("HoTen", userInDb.HoTen ?? userInDb.TenDangNhap);
 
-                    TempData["SuccessMessage"] = "Cập nhật thông tin thành công!";
+                    TempData["SuccessMessage"] = "Cập nhật thông tin tài khoản thành công!";
                     return RedirectToAction(nameof(Details), new { mataikhoan = userInDb.MaTaiKhoan });
                 }
                 catch (DbUpdateConcurrencyException)
