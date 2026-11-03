@@ -16,6 +16,33 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             _context = context;
         }
 
+        // ===== HÀM HỖ TRỢ MÃ HÓA MẬT KHẨU (BCrypt) =====
+
+        // Băm mật khẩu (có salt ngẫu nhiên, kết quả 60 ký tự dạng $2a$11$...)
+        private static string BamMatKhau(string matKhau)
+        {
+            return BCrypt.Net.BCrypt.HashPassword(matKhau);
+        }
+
+        // Kiểm tra mật khẩu nhập vào có khớp với chuỗi hash đang lưu không.
+        // Nếu chuỗi lưu không phải hash BCrypt (tài khoản cũ còn mật khẩu thô) thì trả về false thay vì ném lỗi.
+        private static bool KiemTraMatKhau(string matKhau, string? matKhauDaLuu)
+        {
+            if (string.IsNullOrEmpty(matKhauDaLuu) || !matKhauDaLuu.StartsWith("$2"))
+            {
+                return false;
+            }
+
+            try
+            {
+                return BCrypt.Net.BCrypt.Verify(matKhau, matKhauDaLuu);
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         // GET: TAIKHOANS
         [PhanQuyen("Admin")]
         public async Task<IActionResult> Index(string? searchString, int page = 1)
@@ -105,6 +132,9 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
         {
             if (ModelState.IsValid)
             {
+                // Mã hóa mật khẩu trước khi lưu vào CSDL
+                taikhoan.MatKhau = BamMatKhau(taikhoan.MatKhau!);
+
                 _context.Add(taikhoan);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -166,10 +196,10 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                     userInDb.HoTen = taiKhoan.HoTen;
                     userInDb.Email = taiKhoan.Email;
 
-                    // Đổi mật khẩu nếu người dùng nhập mật khẩu mới
+                    // Đổi mật khẩu nếu người dùng nhập mật khẩu mới (mã hóa trước khi lưu)
                     if (!string.IsNullOrEmpty(MatKhauMoi))
                     {
-                        userInDb.MatKhau = MatKhauMoi;
+                        userInDb.MatKhau = BamMatKhau(MatKhauMoi);
                     }
 
                     _context.Update(userInDb);
@@ -243,10 +273,30 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                 return View();
             }
 
+            // Chỉ tìm theo tên đăng nhập, sau đó mới kiểm tra mật khẩu bằng BCrypt
             var taiKhoan = await _context.TaiKhoan
-                .FirstOrDefaultAsync(t => t.TenDangNhap == tenDangNhap && t.MatKhau == matKhau);
+                .FirstOrDefaultAsync(t => t.TenDangNhap == tenDangNhap);
 
-            if (taiKhoan == null)
+            bool hopLe = false;
+            if (taiKhoan != null)
+            {
+                if (!string.IsNullOrEmpty(taiKhoan.MatKhau) && !taiKhoan.MatKhau.StartsWith("$2"))
+                {
+                    // Tài khoản cũ còn lưu mật khẩu thô: so sánh thường rồi tự động mã hóa lại
+                    hopLe = taiKhoan.MatKhau == matKhau;
+                    if (hopLe)
+                    {
+                        taiKhoan.MatKhau = BamMatKhau(matKhau);
+                        await _context.SaveChangesAsync();
+                    }
+                }
+                else
+                {
+                    hopLe = KiemTraMatKhau(matKhau, taiKhoan.MatKhau);
+                }
+            }
+
+            if (taiKhoan == null || !hopLe)
             {
                 ViewBag.Error = "Tên đăng nhập hoặc mật khẩu không chính xác!";
                 return View();
@@ -300,6 +350,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DangKy(string tenDangNhap, string email, string matKhau, string xacNhanMatKhau)
         {
+
             // Kiểm tra không thiếu thông tin (Tên đăng nhập, Email, Mật khẩu)
             if (string.IsNullOrEmpty(tenDangNhap) || string.IsNullOrEmpty(email) || string.IsNullOrEmpty(matKhau))
             {
@@ -328,7 +379,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             var taiKhoanMoi = new TaiKhoan();
             taiKhoanMoi.TenDangNhap = tenDangNhap;
             taiKhoanMoi.Email = email.Trim();
-            taiKhoanMoi.MatKhau = matKhau;
+            taiKhoanMoi.MatKhau = BamMatKhau(matKhau); // Mã hóa mật khẩu
             taiKhoanMoi.HoTen = tenDangNhap;
             taiKhoanMoi.VaiTro = "Khách hàng";
             taiKhoanMoi.TrangThai = true;
@@ -379,12 +430,17 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                 return View();
             }
 
-            if (taiKhoan.MatKhau == matKhauMoi)
+            // So sánh mật khẩu mới với mật khẩu cũ (cả trường hợp cũ còn lưu dạng thô)
+            bool trungMatKhauCu = (!string.IsNullOrEmpty(taiKhoan.MatKhau) && !taiKhoan.MatKhau.StartsWith("$2"))
+                ? taiKhoan.MatKhau == matKhauMoi
+                : KiemTraMatKhau(matKhauMoi, taiKhoan.MatKhau);
+
+            if (trungMatKhauCu)
             {
                 ViewBag.Error = "Mật khẩu mới không được trùng với mật khẩu cũ!";
                 return View();
             }
-            taiKhoan.MatKhau = matKhauMoi;
+            taiKhoan.MatKhau = BamMatKhau(matKhauMoi); // Mã hóa mật khẩu mới
 
             try
             {
