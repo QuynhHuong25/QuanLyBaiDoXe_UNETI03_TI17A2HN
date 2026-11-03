@@ -1,66 +1,122 @@
+@* Lương Thị Quỳnh Hương - 23103100064 *@
 @model QuanLyBaiDoXe_UNETI03_TI17A2HN.Models.TaiKhoan
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Tạo mới tài khoản";
 }
 
-<h1>Create</h1>
+<style>
+    .form-card {
+        max-width: 650px;
+        margin: 20px auto;
+        background: #ffffff;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(11, 31, 77, 0.06);
+        border: 1px solid #e2e8f0;
+        overflow: hidden;
+    }
 
-<h4>TaiKhoan</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    .form-card-header {
+        background-color: #2563eb;
+        color: #ffffff;
+        padding: 20px 28px;
+    }
 
-            <div class="form-group">
-                <label asp-for="TenDangNhap" class="control-label"></label>
-                <input asp-for="TenDangNhap" class="form-control" />
-                <span asp-validation-for="TenDangNhap" class="text-danger"></span>
-            </div>
+    .form-card-header h4 {
+        margin: 0;
+        font-weight: 700;
+        font-size: 20px;
+    }
 
-            <div class="form-group">
-                <label asp-for="MatKhau" class="control-label"></label>
-                <input asp-for="MatKhau" class="form-control" />
-                <span asp-validation-for="MatKhau" class="text-danger"></span>
-            </div>
+    .form-card-body {
+        padding: 28px 32px;
+    }
 
-            <div class="form-group">
-                <label asp-for="HoTen" class="control-label"></label>
-                <input asp-for="HoTen" class="form-control" />
-                <span asp-validation-for="HoTen" class="text-danger"></span>
-            </div>
+    .form-label {
+        font-weight: 600;
+        color: #334155;
+        font-size: 14px;
+        margin-bottom: 6px;
+    }
 
-            <div class="form-group">
-                <label asp-for="Email" class="control-label"></label>
-                <input asp-for="Email" class="form-control" />
-                <span asp-validation-for="Email" class="text-danger"></span>
-            </div>
+    .form-control, .form-select {
+        border-radius: 10px;
+        border: 1px solid #cbd5e1;
+        padding: 10px 14px;
+        font-size: 14px;
+    }
 
-            <div class="form-group">
-                <label asp-for="VaiTro" class="control-label"></label>
-                <input asp-for="VaiTro" class="form-control" />
-                <span asp-validation-for="VaiTro" class="text-danger"></span>
-            </div>
+    .form-control:focus, .form-select:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+</style>
 
-            <div class="form-group">
-                <label asp-for="TrangThai" class="control-label"></label>
-                <input asp-for="TrangThai" class="form-check-input" />
-                <span asp-validation-for="TrangThai" class="text-danger"></span>
-            </div>
+<div class="container-fluid px-0">
+    <div class="form-card">
+        <div class="form-card-header d-flex align-items-center gap-2">
+            <i class="bi bi-person-plus-fill fs-4"></i>
+            <h4>Tạo mới tài khoản người dùng</h4>
+        </div>
 
-            <div class="form-group">
-                <label asp-for="ChuPhuongTien" class="control-label"></label>
-                <input asp-for="ChuPhuongTien" class="form-control" />
-                <span asp-validation-for="ChuPhuongTien" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+        <div class="form-card-body">
+            <form asp-action="Create" method="post">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4 rounded-3 text-start small"></div>
+
+                <div class="mb-3">
+                    <label asp-for="TenDangNhap" class="form-label">Tên đăng nhập <span class="text-danger">*</span></label>
+                    <input asp-for="TenDangNhap" class="form-control" placeholder="Nhập tên đăng nhập..." required />
+                    <span asp-validation-for="TenDangNhap" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="MatKhau" class="form-label">Mật khẩu <span class="text-danger">*</span></label>
+                    <input asp-for="MatKhau" type="password" class="form-control" placeholder="Nhập mật khẩu..." required />
+                    <span asp-validation-for="MatKhau" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="HoTen" class="form-label">Họ và tên</label>
+                    <input asp-for="HoTen" class="form-control" placeholder="Nhập họ và tên..." />
+                    <span asp-validation-for="HoTen" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Email" class="form-label">Email liên hệ</label>
+                    <input asp-for="Email" type="email" class="form-control" placeholder="example@gmail.com" />
+                    <span asp-validation-for="Email" class="text-danger small"></span>
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label asp-for="VaiTro" class="form-label">Vai trò <span class="text-danger">*</span></label>
+                        <select asp-for="VaiTro" class="form-select">
+                            <option value="Khách hàng">Khách hàng</option>
+                            <option value="Admin">Admin (Quản trị viên)</option>
+                        </select>
+                        <span asp-validation-for="VaiTro" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="TrangThai" class="form-label">Trạng thái <span class="text-danger">*</span></label>
+                        <select asp-for="TrangThai" class="form-select">
+                            <option value="true">Hoạt động</option>
+                            <option value="false">Khóa</option>
+                        </select>
+                        <span asp-validation-for="TrangThai" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                    <a asp-action="Index" class="btn btn-outline-secondary px-4 py-2 rounded-3 fw-semibold">
+                        <i class="bi bi-arrow-left me-1"></i> Trở về
+                    </a>
+                    <button type="submit" class="btn btn-primary px-4 py-2 rounded-3 fw-semibold shadow-sm">
+                        <i class="bi bi-check-circle me-1"></i> Lưu tài khoản
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
 </div>
