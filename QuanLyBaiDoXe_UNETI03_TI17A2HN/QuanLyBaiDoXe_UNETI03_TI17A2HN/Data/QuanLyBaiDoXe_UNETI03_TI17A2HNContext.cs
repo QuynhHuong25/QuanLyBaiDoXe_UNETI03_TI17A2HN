@@ -26,12 +26,14 @@ public class QuanLyBaiDoXe_UNETI03_TI17A2HNContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
+        const string HASH_123456 = "$2a$11$BEP17I3E0q9D.9iEQ16ZvOzfJOER5ju5Km7wNf49pOTEZgp4Pm6VO";
+
         modelBuilder.Entity<TaiKhoan>().HasData(
-            new TaiKhoan { MaTaiKhoan = 1, TenDangNhap = "admin", MatKhau = "123456", HoTen = "Quản Trị Viên", Email = "admin@gmail.com", VaiTro = "Admin", TrangThai = true },
-            new TaiKhoan { MaTaiKhoan = 2, TenDangNhap = "huong", MatKhau = "123456", HoTen = "Lương Thị Quỳnh Hương", Email = "huong@gmail.com", VaiTro = "Khách hàng", TrangThai = true },
-            new TaiKhoan { MaTaiKhoan = 3, TenDangNhap = "hay", MatKhau = "123456", HoTen = "Trịnh Thị Hay", Email = "hay@gmail.com", VaiTro = "Khách hàng", TrangThai = true },
-            new TaiKhoan { MaTaiKhoan = 4, TenDangNhap = "diem", MatKhau = "123456", HoTen = "Nguyễn Thị Diễm", Email = "diem@gmail.com", VaiTro = "Khách hàng", TrangThai = true },
-            new TaiKhoan { MaTaiKhoan = 5, TenDangNhap = "giang", MatKhau = "123456", HoTen = "Tăng Hoàng Giang", Email = "giang@gmail.com", VaiTro = "Khách hàng", TrangThai = true }
+            new TaiKhoan { MaTaiKhoan = 1, TenDangNhap = "admin", MatKhau = HASH_123456, HoTen = "Quản Trị Viên", Email = "admin@gmail.com", VaiTro = "Admin", TrangThai = true },
+            new TaiKhoan { MaTaiKhoan = 2, TenDangNhap = "huong", MatKhau = HASH_123456, HoTen = "Lương Thị Quỳnh Hương", Email = "huong@gmail.com", VaiTro = "Khách hàng", TrangThai = true },
+            new TaiKhoan { MaTaiKhoan = 3, TenDangNhap = "hay", MatKhau = HASH_123456, HoTen = "Trịnh Thị Hay", Email = "hay@gmail.com", VaiTro = "Khách hàng", TrangThai = true },
+            new TaiKhoan { MaTaiKhoan = 4, TenDangNhap = "diem", MatKhau = HASH_123456, HoTen = "Nguyễn Thị Diễm", Email = "diem@gmail.com", VaiTro = "Khách hàng", TrangThai = true },
+            new TaiKhoan { MaTaiKhoan = 5, TenDangNhap = "giang", MatKhau = HASH_123456, HoTen = "Tăng Hoàng Giang", Email = "giang@gmail.com", VaiTro = "Khách hàng", TrangThai = true }
         );
 
         modelBuilder.Entity<ChuPhuongTien>().HasData(
