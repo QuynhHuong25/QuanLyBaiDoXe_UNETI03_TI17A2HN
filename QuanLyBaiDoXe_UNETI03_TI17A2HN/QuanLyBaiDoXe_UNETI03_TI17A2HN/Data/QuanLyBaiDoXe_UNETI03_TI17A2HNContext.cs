@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using QuanLyBaiDoXe_UNETI03_TI17A2HN.Models;
 
 
-//Lương Thị Quỳnh Hương - 23103100064
+//Lương Thị Quỳnh Hương - 23103100064                                                                                       
 public class QuanLyBaiDoXe_UNETI03_TI17A2HNContext : DbContext
 {
     public QuanLyBaiDoXe_UNETI03_TI17A2HNContext(DbContextOptions<QuanLyBaiDoXe_UNETI03_TI17A2HNContext> options)
@@ -16,6 +16,7 @@ public class QuanLyBaiDoXe_UNETI03_TI17A2HNContext : DbContext
     public DbSet<PhuongTien> PhuongTien { get; set; } = default!;
     public DbSet<ViTriDoXe> ViTriDoXe { get; set; } = default!;
     public DbSet<PhieuGuiXe> PhieuGuiXe { get; set; } = default!;
+    public DbSet<VeThang> VeThang { get; set; } = default!;
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -25,15 +26,14 @@ public class QuanLyBaiDoXe_UNETI03_TI17A2HNContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-
         const string HASH_123456 = "$2a$11$BEP17I3E0q9D.9iEQ16ZvOzfJOER5ju5Km7wNf49pOTEZgp4Pm6VO";
 
         modelBuilder.Entity<TaiKhoan>().HasData(
-            new TaiKhoan { MaTaiKhoan = 1, TenDangNhap = "admin", MatKhau = HASH_123456, HoTen = "Quản Trị Viên", Email = "admin@gmail.com", VaiTro = "Admin", TrangThai = true },
+                 new TaiKhoan { MaTaiKhoan = 1, TenDangNhap = "admin", MatKhau = HASH_123456, HoTen = "Quản Trị Viên", Email = "admin@gmail.com", VaiTro = "Admin", TrangThai = true },
             new TaiKhoan { MaTaiKhoan = 2, TenDangNhap = "huong", MatKhau = HASH_123456, HoTen = "Lương Thị Quỳnh Hương", Email = "huong@gmail.com", VaiTro = "Khách hàng", TrangThai = true },
             new TaiKhoan { MaTaiKhoan = 3, TenDangNhap = "hay", MatKhau = HASH_123456, HoTen = "Trịnh Thị Hay", Email = "hay@gmail.com", VaiTro = "Khách hàng", TrangThai = true },
             new TaiKhoan { MaTaiKhoan = 4, TenDangNhap = "diem", MatKhau = HASH_123456, HoTen = "Nguyễn Thị Diễm", Email = "diem@gmail.com", VaiTro = "Khách hàng", TrangThai = true },
-            new TaiKhoan { MaTaiKhoan = 5, TenDangNhap = "giang", MatKhau = HASH_123456, HoTen = "Tăng Hoàng Giang", Email = "giang@gmail.com", VaiTro = "Khách hàng", TrangThai = true }
+            new TaiKhoan { MaTaiKhoan = 5, TenDangNhap = "giang", MatKhau = HASH_123456, HoTen = "Tăng Hoàng Giang", Email = "giang@gmail.com", VaiTro = "Khách hàng", TrangThai = true } 
         );
 
         modelBuilder.Entity<ChuPhuongTien>().HasData(
@@ -75,5 +75,6 @@ public class QuanLyBaiDoXe_UNETI03_TI17A2HNContext : DbContext
             new PhieuGuiXe { MaPhieu = 4, MaPhuongTien = 4, MaViTri = 4, NgayDangKy = new DateTime(2026, 9, 22), ThoiGianDuKienVao = new DateTime(2026, 9, 22, 6, 0, 0), ThoiGianDuKienRa = new DateTime(2026, 9, 22, 20, 0, 0), ThoiGianVaoThucTe = new DateTime(2026, 9, 22, 6, 10, 0), ThoiGianRaThucTe = new DateTime(2026, 9, 22, 20, 0, 0), DonGiaTheoGio = 7000, ThanhTien = 98000, TrangThai = "Đã lấy xe" },
             new PhieuGuiXe { MaPhieu = 5, MaPhuongTien = 5, MaViTri = 5, NgayDangKy = new DateTime(2026, 9, 21), ThoiGianDuKienVao = new DateTime(2026, 9, 21, 10, 0, 0), ThoiGianDuKienRa = new DateTime(2026, 9, 21, 15, 0, 0), ThoiGianVaoThucTe = new DateTime(2026, 9, 21, 10, 0, 0), ThoiGianRaThucTe = new DateTime(2026, 9, 21, 10, 30, 0), DonGiaTheoGio = 30000, ThanhTien = 0, TrangThai = "Đã hủy" }
         );
+    
     }
 }
