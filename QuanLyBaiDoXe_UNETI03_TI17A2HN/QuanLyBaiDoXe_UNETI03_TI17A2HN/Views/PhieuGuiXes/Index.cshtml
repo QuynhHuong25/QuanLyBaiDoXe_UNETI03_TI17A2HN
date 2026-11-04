@@ -24,34 +24,34 @@
         width: 100%;
     }
 
-    .custom-table thead th {
-        background-color: #f8fafc !important;
-        color: #475569 !important;
-        border-bottom: 2px solid #e2e8f0;
-        border-top: none;
-        padding: 14px 16px;
-        font-weight: 700;
-        font-size: 13px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        vertical-align: middle;
-    }
+        .custom-table thead th {
+            background-color: #f8fafc !important;
+            color: #475569 !important;
+            border-bottom: 2px solid #e2e8f0;
+            border-top: none;
+            padding: 14px 16px;
+            font-weight: 700;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            vertical-align: middle;
+        }
 
-    .custom-table tbody td {
-        padding: 16px;
-        vertical-align: middle;
-        border-bottom: 1px solid #f1f5f9;
-        color: #1e293b;
-        font-size: 14px;
-    }
+        .custom-table tbody td {
+            padding: 16px;
+            vertical-align: middle;
+            border-bottom: 1px solid #f1f5f9;
+            color: #1e293b;
+            font-size: 14px;
+        }
 
-    .custom-table tbody tr:nth-child(even) td {
-        background-color: #fafbfc !important;
-    }
+        .custom-table tbody tr:nth-child(even) td {
+            background-color: #fafbfc !important;
+        }
 
-    .custom-table tbody tr:hover td {
-        background-color: #f1f5f9 !important;
-    }
+        .custom-table tbody tr:hover td {
+            background-color: #f1f5f9 !important;
+        }
 
     /* Cụm nút thao tác nhóm ô vuông liền viền chuẩn ParkSmart */
     .action-group {
@@ -77,15 +77,25 @@
         cursor: pointer;
     }
 
-    .action-btn:last-child {
-        border-right: none;
-    }
+        .action-btn:last-child {
+            border-right: none;
+        }
 
-    .action-btn.view { color: #0ea5e9; }
-    .action-btn.view:hover { background-color: #e0f2fe; }
+        .action-btn.view {
+            color: #0ea5e9;
+        }
 
-    .action-btn.cancel { color: #ef4444; }
-    .action-btn.cancel:hover { background-color: #fee2e2; }
+            .action-btn.view:hover {
+                background-color: #e0f2fe;
+            }
+
+        .action-btn.cancel {
+            color: #ef4444;
+        }
+
+            .action-btn.cancel:hover {
+                background-color: #fee2e2;
+            }
 </style>
 
 <div class="container-fluid px-0">
@@ -94,12 +104,29 @@
             <h2 class="text-dark fw-bold m-0 fs-3">@((vaiTro == "Khách hàng") ? "Lịch sử gửi xe của tôi" : "Quản lý Phiếu gửi xe")</h2>
             <p class="text-secondary small mb-0 mt-1">Theo dõi danh sách, trạng thái và lịch sử phiếu đăng ký gửi xe</p>
         </div>
-        @if (vaiTro == "Khách hàng")
-        {
-            <a asp-action="Create" class="btn btn-primary px-3 py-2 fw-semibold shadow-sm d-inline-flex align-items-center gap-2 rounded-3">
-                <i class="bi bi-plus-circle"></i> Đăng ký gửi xe mới
+        <div class="d-flex flex-wrap gap-2">
+            <!-- Xuất báo cáo theo đúng bộ lọc đang chọn -->
+            <a asp-action="XuatExcel"
+               asp-route-searchBienSo="@ViewData["searchBienSo"]" asp-route-searchTenChuXe="@ViewData["searchTenChuXe"]"
+               asp-route-filterTrangThai="@ViewData["filterTrangThai"]" asp-route-filterLoaiXe="@ViewData["filterLoaiXe"]"
+               asp-route-filterNgayDangKy="@ViewData["filterNgayDangKy"]"
+               class="btn btn-outline-success px-3 py-2 fw-semibold d-inline-flex align-items-center gap-2 rounded-3">
+                <i class="bi bi-file-earmark-excel"></i> Xuất Excel
             </a>
-        }
+            <a asp-action="XuatPdf"
+               asp-route-searchBienSo="@ViewData["searchBienSo"]" asp-route-searchTenChuXe="@ViewData["searchTenChuXe"]"
+               asp-route-filterTrangThai="@ViewData["filterTrangThai"]" asp-route-filterLoaiXe="@ViewData["filterLoaiXe"]"
+               asp-route-filterNgayDangKy="@ViewData["filterNgayDangKy"]"
+               class="btn btn-outline-danger px-3 py-2 fw-semibold d-inline-flex align-items-center gap-2 rounded-3">
+                <i class="bi bi-file-earmark-pdf"></i> Xuất PDF
+            </a>
+            @if (vaiTro == "Khách hàng")
+            {
+                <a asp-action="Create" class="btn btn-primary px-3 py-2 fw-semibold shadow-sm d-inline-flex align-items-center gap-2 rounded-3">
+                    <i class="bi bi-plus-circle"></i> Đăng ký gửi xe mới
+                </a>
+            }
+        </div>
     </div>
 
     <!-- VÙNG HIỂN THỊ THÔNG BÁO THÀNH CÔNG / LỖI -->
@@ -265,6 +292,7 @@
                                         <a asp-action="Details" asp-route-maphieu="@item.MaPhieu" class="action-btn view" title="Xem chi tiết">
                                             <i class="bi bi-eye"></i>
                                         </a>
+
                                         @if (vaiTro == "Khách hàng" && (item.TrangThai == "Chờ xác nhận" || item.TrangThai == "Đang gửi"))
                                         {
                                             <a asp-action="Ve" asp-route-maphieu="@item.MaPhieu" class="action-btn qr" title="Xem mã QR vé" style="color:#7c3aed">
@@ -274,7 +302,7 @@
 
                                         @if (item.TrangThai == "Chờ xác nhận")
                                         {
-                                            <form asp-action="HuyPhieu" method="post" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn hủy phiếu gửi xe này?');">
+                                            <form asp-action="HuyPhieu" method="post" class="d-inline js-huy-phieu">
                                                 <input type="hidden" name="id" value="@item.MaPhieu" />
                                                 <button type="submit" class="action-btn cancel" title="Hủy phiếu">
                                                     <i class="bi bi-x-circle"></i>
@@ -350,3 +378,41 @@
         </nav>
     }
 </div>
+
+@section Scripts {
+    <script>
+        // AJAX: hủy phiếu gửi xe không cần tải lại trang
+        document.querySelectorAll('form.js-huy-phieu').forEach(function (form) {
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                if (!confirm('Bạn có chắc chắn muốn hủy phiếu gửi xe này?')) return;
+
+                var btn = form.querySelector('button');
+                btn.disabled = true;
+
+                fetch(form.action, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-Requested-With': 'XMLHttpRequest' },
+                    body: new URLSearchParams(new FormData(form)).toString(),
+                    credentials: 'same-origin'
+                }).then(function (r) { return r.json(); }).then(function (kq) {
+                    var tr = form.closest('tr');
+                    if (kq.ok) {
+                        var badge = tr.querySelector('.badge');
+                        badge.textContent = 'Đã hủy';
+                        badge.className = 'badge bg-danger bg-opacity-10 text-danger px-3 py-2 rounded-pill fw-semibold';
+                        var qr = tr.querySelector('.action-btn.qr'); if (qr) qr.remove();
+                        form.remove();
+                    } else { btn.disabled = false; }
+
+                    var tb = document.createElement('div');
+                    tb.className = 'alert alert-' + (kq.ok ? 'success' : 'danger') + ' alert-dismissible fade show shadow-sm mb-4 rounded-3';
+                    tb.textContent = kq.message;
+                    var host = document.querySelector('.container-fluid');
+                    host.insertBefore(tb, host.children[1] || null);
+                    setTimeout(function () { tb.remove(); }, 4000);
+                }).catch(function () { btn.disabled = false; alert('Không kết nối được máy chủ.'); });
+            });
+        });
+    </script>
+}
