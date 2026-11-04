@@ -277,7 +277,17 @@
                             <tr>
                                 <td class="text-center text-secondary">@stt</td>
                                 <td>
-                                    <span class="fw-bold text-dark">@item.BienSoXe</span>
+                                    <div class="d-flex align-items-center gap-2">
+                                        @if (!string.IsNullOrEmpty(item.HinhAnh))
+                                        {
+                                            <img src="@item.HinhAnh" alt="@item.BienSoXe" class="rounded border" style="width:44px;height:44px;object-fit:cover" />
+                                        }
+                                        else
+                                        {
+                                            <span class="d-inline-flex align-items-center justify-content-center rounded bg-light border text-secondary" style="width:44px;height:44px"><i class="bi bi-image"></i></span>
+                                        }
+                                        <span class="fw-bold text-dark">@item.BienSoXe</span>
+                                    </div>
                                 </td>
                                 <td><span class="text-secondary">@(item.ChuPhuongTien?.HoTen ?? "---")</span></td>
                                 <td><span class="text-secondary">@(item.LoaiPhuongTien?.TenLoaiPhuongTien ?? "---")</span></td>
