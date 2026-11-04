@@ -81,10 +81,10 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
 
             ViewBag.SoDo = soDoList;
 
-            // Xác định tầng mặc định hiển thị trên tab sơ đồ
+            // Xác định tầng mặc định hiển thị trên tab sơ đồ (xử lý an toàn khi db trống)
             ViewBag.ActiveTang = tang.HasValue ? tang.Value : (soDoList.Select(s => s.Tang).FirstOrDefault());
 
-            // LẤY BIỂN SỐ XE CHO CÁC PHIẾU ĐANG GỬI (ĐÃ ÉP KIỂU CHIẾT XUẤT CHÍNH XÁC Dictionary<int, string>)
+            // LẤY BIỂN SỐ XE CHO CÁC PHIẾU ĐANG GỬI
             var phieuDangGuiList = await _context.PhieuGuiXe
                 .Include(p => p.PhuongTien)
                 .Where(p => p.TrangThai == "Đang gửi" && p.MaViTri != null)
@@ -98,10 +98,6 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             return View(items);
         }
 
-        /// <summary>
-        /// Tự động đồng bộ lại toàn bộ trạng thái trong bảng ViTriDoXe 
-        /// dựa theo danh sách các phiếu xe thực sự đang đỗ (TrangThai == "Đang gửi")
-        /// </summary>
         private async Task DongBoTrangThaiViTriAsync()
         {
             var maViTriDangCoXe = await _context.PhieuGuiXe
@@ -204,7 +200,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
         private async Task NapDuLieuDropdownLocAsync(int? maLoaiPhuongTien, string khuVuc, int? tang)
         {
             ViewData["MaLoaiPhuongTien"] = new SelectList(await _context.LoaiPhuongTien.ToListAsync(), "MaLoaiPhuongTien", "TenLoaiPhuongTien", maLoaiPhuongTien);
-            ViewData["KhuVucList"] = new SelectList(await _context.ViTriDoXe.Select(v => v.KhuVuc).Distinct().ToListAsync(), khuVuc);
+            ViewData["KhuVucList"] = new SelectList(await _context.ViTriDoXe.Select(v => v.KhuVuc).Distinct().OrderBy(k => k).ToListAsync(), khuVuc);
             ViewData["TangList"] = new SelectList(await _context.ViTriDoXe.Select(v => v.Tang).Distinct().OrderBy(t => t).ToListAsync(), tang);
         }
 
@@ -257,10 +253,11 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
         public async Task<IActionResult> Create()
         {
             ViewData["MaLoaiPhuongTien"] = new SelectList(await _context.LoaiPhuongTien.ToListAsync(), "MaLoaiPhuongTien", "TenLoaiPhuongTien");
+            ViewData["KhuVucList"] = new SelectList(await _context.ViTriDoXe.Select(v => v.KhuVuc).Distinct().OrderBy(k => k).ToListAsync());
             return View();
         }
 
-        // ĐỔI TRẠNG THÁI TẠM NGỪNG (Chỉ cho phép khi vị trí CÒN TRỐNG)
+        // ĐỔI TRẠNG THÁI TẠM NGỪNG
         [HttpPost]
         [ValidateAntiForgeryToken]
         [PhanQuyen("Admin")]
@@ -272,6 +269,8 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                 return NotFound();
             }
 
+            int currentTang = viTri.Tang;
+
             if (viTri.TrangThai == "Tạm ngừng")
             {
                 viTri.TrangThai = "Còn trống";
@@ -279,11 +278,10 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             }
             else
             {
-                // RÀNG BUỘC CHỈ TẠM NGỪNG KHI CÒN TRỐNG
                 if (viTri.TrangThai == "Đang sử dụng")
                 {
                     TempData["ErrorMessage"] = $"Không thể tạm ngừng vị trí {viTri.TenViTri} vì hiện đang có xe đỗ!";
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction(nameof(Index), new { tang = currentTang });
                 }
 
                 viTri.TrangThai = "Tạm ngừng";
@@ -293,7 +291,8 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             _context.Update(viTri);
             await _context.SaveChangesAsync();
 
-            return RedirectToAction(nameof(Index));
+            // Giữ lại Tab Tầng đang thao tác trên sơ đồ
+            return RedirectToAction(nameof(Index), new { tang = currentTang });
         }
 
         // POST: VITRIDOXES/Create
@@ -317,10 +316,11 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                 _context.Add(vitridoxe);
                 await _context.SaveChangesAsync();
                 TempData["SuccessMessage"] = $"Tạo thành công vị trí {vitridoxe.TenViTri}!";
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index), new { tang = vitridoxe.Tang });
             }
 
             ViewData["MaLoaiPhuongTien"] = new SelectList(await _context.LoaiPhuongTien.ToListAsync(), "MaLoaiPhuongTien", "TenLoaiPhuongTien", vitridoxe.MaLoaiPhuongTien);
+            ViewData["KhuVucList"] = new SelectList(await _context.ViTriDoXe.Select(v => v.KhuVuc).Distinct().OrderBy(k => k).ToListAsync(), vitridoxe.KhuVuc);
             return View(vitridoxe);
         }
 
@@ -339,6 +339,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                 return NotFound();
             }
             ViewData["MaLoaiPhuongTien"] = new SelectList(await _context.LoaiPhuongTien.ToListAsync(), "MaLoaiPhuongTien", "TenLoaiPhuongTien", vitridoxe.MaLoaiPhuongTien);
+            ViewData["KhuVucList"] = new SelectList(await _context.ViTriDoXe.Select(v => v.KhuVuc).Distinct().OrderBy(k => k).ToListAsync(), vitridoxe.KhuVuc);
             return View(vitridoxe);
         }
 
@@ -358,11 +359,9 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                 ModelState.AddModelError("TenViTri", "Tên vị trí đỗ xe đã tồn tại trong hệ thống!");
             }
 
-            // Kiểm tra xem vị trí có xe đỗ không
             bool xeDangDo = await _context.PhieuGuiXe
                 .AnyAsync(p => p.MaViTri == vitridoxe.MaViTri && p.TrangThai == "Đang gửi");
 
-            // RÀNG BUỘC KHI SỬA THÔNG TIN: Nếu vị trí đang có xe đỗ thì ép trạng thái giữ nguyên "Đang sử dụng"
             if (xeDangDo)
             {
                 vitridoxe.TrangThai = "Đang sử dụng";
@@ -391,10 +390,11 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index), new { tang = vitridoxe.Tang });
             }
 
             ViewData["MaLoaiPhuongTien"] = new SelectList(await _context.LoaiPhuongTien.ToListAsync(), "MaLoaiPhuongTien", "TenLoaiPhuongTien", vitridoxe.MaLoaiPhuongTien);
+            ViewData["KhuVucList"] = new SelectList(await _context.ViTriDoXe.Select(v => v.KhuVuc).Distinct().OrderBy(k => k).ToListAsync(), vitridoxe.KhuVuc);
             return View(vitridoxe);
         }
 
@@ -426,11 +426,26 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
         public async Task<IActionResult> DeleteConfirmed(int? mavitri)
         {
             var vitridoxe = await _context.ViTriDoXe.FindAsync(mavitri);
-            if (vitridoxe != null)
+
+            if (vitridoxe == null)
+            {
+                TempData["ErrorMessage"] = "Vị trí đỗ xe không tồn tại hoặc đã bị xóa!";
+                return RedirectToAction(nameof(Index));
+            }
+
+            try
             {
                 _context.ViTriDoXe.Remove(vitridoxe);
                 await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Xóa vị trí đỗ xe thành công!";
+                TempData["SuccessMessage"] = $"Xóa thành công vị trí đỗ xe {vitridoxe.TenViTri}!";
+            }
+            catch (DbUpdateException)
+            {
+                TempData["ErrorMessage"] = $"Không thể xóa vị trí '{vitridoxe.TenViTri}' vì dữ liệu này đã được ghi nhận trong phiếu gửi xe!";
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "Đã xảy ra lỗi hệ thống khi xóa: " + ex.Message;
             }
 
             return RedirectToAction(nameof(Index));
