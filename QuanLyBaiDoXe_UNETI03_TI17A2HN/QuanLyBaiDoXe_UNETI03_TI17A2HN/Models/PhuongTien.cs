@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Models
@@ -25,6 +25,8 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Models
         public string? MauSac { get; set; }
 
         public string? MoTa { get; set; }
+        [StringLength(200)]
+        public string? HinhAnh { get; set; }
 
         [Required]
         public bool TrangThai { get; set; } = true;
@@ -32,5 +34,6 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Models
         public virtual ChuPhuongTien? ChuPhuongTien { get; set; }
         public virtual LoaiPhuongTien? LoaiPhuongTien { get; set; }
         public virtual ICollection<PhieuGuiXe>? PhieuGuiXes { get; set; }
+        public virtual ICollection<VeThang>? VeThangs { get; set; }
     }
 }
