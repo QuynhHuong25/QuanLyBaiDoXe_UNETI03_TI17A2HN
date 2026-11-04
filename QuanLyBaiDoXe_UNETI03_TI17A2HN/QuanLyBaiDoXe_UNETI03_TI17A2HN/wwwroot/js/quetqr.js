@@ -95,7 +95,7 @@
 
             if (kq.ok && kq.hanhDong === 'ra' && p.tamTinhTien) {
                 var t = h('div', 'qs-fee');
-                t.appendChild(h('span', null, 'Tạm tính đến lúc này (' + p.tamTinhGio + ' giờ)'));
+                t.appendChild(h('span', null, p.veThang ? 'Xe có VÉ THÁNG – miễn phí (' + p.tamTinhGio + ' giờ)' : 'Tạm tính đến lúc này (' + p.tamTinhGio + ' giờ)'));
                 t.appendChild(h('b', null, p.tamTinhTien + ' VNĐ'));
                 body.appendChild(t);
             }
