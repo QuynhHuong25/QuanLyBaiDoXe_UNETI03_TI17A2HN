@@ -1,10 +1,12 @@
 // Họ và tên: Tăng Hoàng Giang
 // Mã sinh viên: 23103100031
 // Nội dung thực hiện: Xử lý Xác nhận xe vào, xe ra và tính tiền tự động (Module 4)
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QuanLyBaiDoXe_UNETI03_TI17A2HN.Lọc;
 using QuanLyBaiDoXe_UNETI03_TI17A2HN.Models;
+using QuanLyBaiDoXe_UNETI03_TI17A2HN.Services;
 
 namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
 {
@@ -12,17 +14,16 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
     public class VaoRaController : Controller
     {
         private readonly QuanLyBaiDoXe_UNETI03_TI17A2HNContext _context;
+        private readonly QrVeService _qr;
 
-        public VaoRaController(QuanLyBaiDoXe_UNETI03_TI17A2HNContext context)
+        public VaoRaController(QuanLyBaiDoXe_UNETI03_TI17A2HNContext context, QrVeService qr)
         {
             _context = context;
+            _qr = qr;
         }
 
         public async Task<IActionResult> Index(string searchBienSo)
         {
-            // TỰ ĐỘNG ĐỒNG BỘ TRẠNG THÁI VỊ TRÍ ĐỖ THEO PHIẾU GỬI ĐANG HOẠT ĐỘNG
-            await DongBoTrangThaiViTriAsync();
-
             ViewData["searchBienSo"] = searchBienSo;
 
             // Chỉ lấy các phiếu Chờ xác nhận hoặc Đang gửi để xử lý VÀO/RA
@@ -47,9 +48,183 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             return View(await query.ToListAsync());
         }
 
+        // ===== Nút bấm thủ công trên trang Điều phối =====
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> XacNhanVao(int id)
+        {
+            var (ok, msg) = await XuLyVaoAsync(id);
+            TempData[ok ? "SuccessMessage" : "ErrorMessage"] = msg;
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> XacNhanRa(int id)
+        {
+            var (ok, msg) = await XuLyRaAsync(id);
+            TempData[ok ? "SuccessMessage" : "ErrorMessage"] = msg;
+            return RedirectToAction(nameof(Index));
+        }
+
+        // ===== QUÉT MÃ QR TẠI CỔNG =====
+
+        // GET: VaoRa/Quet – trang quét QR bằng camera / máy quét mã vạch
+        public IActionResult Quet()
+        {
+            return View();
+        }
+
+        // POST: VaoRa/TraCuuQr – đọc mã QR, trả thông tin vé và việc cần làm (cho vào / cho ra)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> TraCuuQr(string? ma)
+        {
+            var (phieu, loi) = await TimPhieuTheoQrAsync(ma);
+            if (phieu == null)
+            {
+                return Json(new { ok = false, message = loi });
+            }
+
+            string? hanhDong = phieu.TrangThai switch
+            {
+                "Chờ xác nhận" => "vao",
+                "Đang gửi" => "ra",
+                _ => null
+            };
+
+            if (hanhDong == null)
+            {
+                string lyDo = phieu.TrangThai == "Đã lấy xe"
+                    ? "Vé này đã sử dụng xong (xe đã ra khỏi bãi)."
+                    : phieu.TrangThai == "Đã hủy"
+                        ? "Vé này đã bị hủy."
+                        : "Vé không còn hiệu lực.";
+                return Json(new { ok = false, message = lyDo, phieu = MoTaPhieu(phieu, null, false) });
+            }
+
+            bool coVeThang = await CoVeThangAsync(phieu.MaPhuongTien, DateTime.Now);
+
+            (double soGio, decimal soTien)? tamTinh = null;
+            if (hanhDong == "ra" && phieu.ThoiGianVaoThucTe.HasValue)
+            {
+                tamTinh = TinhTien(phieu, DateTime.Now);
+                if (coVeThang) tamTinh = (tamTinh.Value.soGio, 0m);   // xe có vé tháng: miễn phí
+            }
+
+            return Json(new
+            {
+                ok = true,
+                hanhDong,
+                message = hanhDong == "vao" ? "Vé hợp lệ – xe chờ vào bãi." : "Vé hợp lệ – xe đang gửi, chuẩn bị ra.",
+                phieu = MoTaPhieu(phieu, tamTinh, coVeThang)
+            });
+        }
+
+        // POST: VaoRa/XacNhanQr – nhân viên bấm xác nhận sau khi quét: tự chọn VÀO hoặc RA theo trạng thái vé
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> XacNhanQr(string? ma)
+        {
+            var (phieu, loi) = await TimPhieuTheoQrAsync(ma);
+            if (phieu == null)
+            {
+                return Json(new { ok = false, message = loi });
+            }
+
+            (bool Ok, string Msg) kq;
+            if (phieu.TrangThai == "Chờ xác nhận")
+            {
+                kq = await XuLyVaoAsync(phieu.MaPhieu);
+            }
+            else if (phieu.TrangThai == "Đang gửi")
+            {
+                kq = await XuLyRaAsync(phieu.MaPhieu);
+            }
+            else
+            {
+                kq = (false, "Vé không còn hiệu lực (đã sử dụng hoặc đã hủy).");
+            }
+
+            return Json(new { ok = kq.Ok, message = kq.Msg });
+        }
+
+        // ===== Hàm dùng chung =====
+
+        private async Task<(PhieuGuiXe? Phieu, string Loi)> TimPhieuTheoQrAsync(string? ma)
+        {
+            int? maPhieu = _qr.GiaiMa(ma);
+            if (maPhieu == null)
+            {
+                return (null, "Mã QR không hợp lệ hoặc không thuộc hệ thống.");
+            }
+
+            var phieu = await _context.PhieuGuiXe
+                .Include(p => p.PhuongTien)
+                    .ThenInclude(pt => pt!.ChuPhuongTien)
+                .Include(p => p.PhuongTien)
+                    .ThenInclude(pt => pt!.LoaiPhuongTien)
+                .Include(p => p.ViTriDoXe)
+                .FirstOrDefaultAsync(p => p.MaPhieu == maPhieu.Value);
+
+            if (phieu == null)
+            {
+                return (null, "Không tìm thấy phiếu gửi xe tương ứng với mã QR này.");
+            }
+
+            return (phieu, "");
+        }
+
+        private static object MoTaPhieu(PhieuGuiXe p, (double soGio, decimal soTien)? tamTinh, bool coVeThang)
+        {
+            return new
+            {
+                maPhieu = p.MaPhieu,
+                bienSo = p.PhuongTien?.BienSoXe,
+                loaiXe = p.PhuongTien?.LoaiPhuongTien?.TenLoaiPhuongTien,
+                chuXe = p.PhuongTien?.ChuPhuongTien?.HoTen,
+                viTri = p.ViTriDoXe?.TenViTri,
+                khuVuc = p.ViTriDoXe?.KhuVuc,
+                tang = p.ViTriDoXe?.Tang,
+                trangThai = p.TrangThai,
+                duKienVao = p.ThoiGianDuKienVao.ToString("dd/MM/yyyy HH:mm"),
+                duKienRa = p.ThoiGianDuKienRa.ToString("dd/MM/yyyy HH:mm"),
+                vaoThucTe = p.ThoiGianVaoThucTe?.ToString("dd/MM/yyyy HH:mm"),
+                donGia = p.DonGiaTheoGio.ToString("N0"),
+                veThang = coVeThang,
+                tamTinhGio = tamTinh?.soGio,
+                tamTinhTien = tamTinh?.soTien.ToString("N0")
+            };
+        }
+
+        // Xe có vé tháng còn hạn (chưa hủy) tại thời điểm thu tiền thì miễn phí
+        private async Task<bool> CoVeThangAsync(int maPhuongTien, DateTime luc)
+        {
+            var ngay = luc.Date;
+            return await _context.VeThang.AnyAsync(v =>
+                v.MaPhuongTien == maPhuongTien &&
+                v.TrangThai != "Đã hủy" &&
+                v.NgayBatDau <= ngay && v.NgayKetThuc >= ngay);
+        }
+
+        // TÍNH TIỀN THEO BLOCK 30 PHÚT (Module 4)
+        // Ví dụ: đỗ 40 phút -> 2 block (1.0 giờ); đỗ 1h15p -> 3 block (1.5 giờ). Tối thiểu 1 block.
+        private static (double soGio, decimal soTien) TinhTien(PhieuGuiXe phieu, DateTime ra)
+        {
+            if (!phieu.ThoiGianVaoThucTe.HasValue || ra <= phieu.ThoiGianVaoThucTe.Value)
+            {
+                return (0, 0);
+            }
+
+            TimeSpan duration = ra - phieu.ThoiGianVaoThucTe.Value;
+            double totalBlocks = Math.Ceiling(duration.TotalMinutes / 30.0);
+            if (totalBlocks < 1) totalBlocks = 1;
+
+            double totalHours = totalBlocks * 0.5;
+            return (totalHours, (decimal)totalHours * phieu.DonGiaTheoGio);
+        }
+
+        private async Task<(bool Ok, string Msg)> XuLyVaoAsync(int id)
         {
             var phieu = await _context.PhieuGuiXe
                 .Include(p => p.PhuongTien)
@@ -58,29 +233,25 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
 
             if (phieu == null || phieu.TrangThai != "Chờ xác nhận")
             {
-                TempData["ErrorMessage"] = "Phiếu không hợp lệ hoặc không ở trạng thái Chờ xác nhận.";
-                return RedirectToAction(nameof(Index));
+                return (false, "Phiếu không hợp lệ hoặc không ở trạng thái Chờ xác nhận.");
             }
 
             // 1. Kiểm tra phương tiện có đang bị tạm ngừng hoạt động không
             if (phieu.PhuongTien != null && !phieu.PhuongTien.TrangThai)
             {
-                TempData["ErrorMessage"] = "Phương tiện này hiện đang ở trạng thái ngừng hoạt động!";
-                return RedirectToAction(nameof(Index));
+                return (false, "Phương tiện này hiện đang ở trạng thái ngừng hoạt động!");
             }
 
             // 2. Kiểm tra vị trí đỗ có đang bị Tạm ngừng không
             if (phieu.ViTriDoXe != null && phieu.ViTriDoXe.TrangThai == "Tạm ngừng")
             {
-                TempData["ErrorMessage"] = "Vị trí đỗ này hiện đang Tạm ngừng hoạt động!";
-                return RedirectToAction(nameof(Index));
+                return (false, "Vị trí đỗ này hiện đang Tạm ngừng hoạt động!");
             }
 
             // 3. Kiểm tra loại phương tiện có phù hợp với vị trí đỗ không
             if (phieu.PhuongTien != null && phieu.ViTriDoXe != null && phieu.PhuongTien.MaLoaiPhuongTien != phieu.ViTriDoXe.MaLoaiPhuongTien)
             {
-                TempData["ErrorMessage"] = "Loại phương tiện không phù hợp với vị trí đỗ này!";
-                return RedirectToAction(nameof(Index));
+                return (false, "Loại phương tiện không phù hợp với vị trí đỗ này!");
             }
 
             // 4. Kiểm tra phương tiện này có đang nằm trong bãi (phiếu khác đang gửi) không
@@ -89,8 +260,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
 
             if (xeDangGui)
             {
-                TempData["ErrorMessage"] = "Phương tiện này hiện đang có lượt gửi hoạt động trong bãi!";
-                return RedirectToAction(nameof(Index));
+                return (false, "Phương tiện này hiện đang có lượt gửi hoạt động trong bãi!");
             }
 
             // 5. Kiểm tra vị trí đỗ đã được cấp có bị xe khác chiếm chỗ chưa
@@ -99,15 +269,14 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
 
             if (viTriBan)
             {
-                TempData["ErrorMessage"] = "Vị trí đỗ này hiện đang có xe khác sử dụng!";
-                return RedirectToAction(nameof(Index));
+                return (false, "Vị trí đỗ này hiện đang có xe khác sử dụng!");
             }
 
             // Xác nhận vào: Ghi nhận giờ vào thực tế và đổi trạng thái
             phieu.ThoiGianVaoThucTe = DateTime.Now;
             phieu.TrangThai = "Đang gửi";
 
-            // Cập nhật trạng thái vị trí đỗ thành "Đang sử dụng"
+            // Đổi trạng thái vị trí đỗ thành Đang sử dụng
             if (phieu.ViTriDoXe != null)
             {
                 phieu.ViTriDoXe.TrangThai = "Đang sử dụng";
@@ -116,13 +285,11 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             _context.Update(phieu);
             await _context.SaveChangesAsync();
 
-            TempData["SuccessMessage"] = $"Đã xác nhận cho xe {phieu.PhuongTien?.BienSoXe} vào bãi thành công.";
-            return RedirectToAction(nameof(Index));
+            return (true, $"Đã xác nhận cho xe {phieu.PhuongTien?.BienSoXe} vào bãi thành công" +
+                          (phieu.ViTriDoXe != null ? $" – vị trí {phieu.ViTriDoXe.TenViTri}." : "."));
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> XacNhanRa(int id)
+        private async Task<(bool Ok, string Msg)> XuLyRaAsync(int id)
         {
             var phieu = await _context.PhieuGuiXe
                 .Include(p => p.PhuongTien)
@@ -131,39 +298,24 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
 
             if (phieu == null || phieu.TrangThai != "Đang gửi")
             {
-                TempData["ErrorMessage"] = "Phiếu không hợp lệ hoặc không ở trạng thái Đang gửi.";
-                return RedirectToAction(nameof(Index));
+                return (false, "Phiếu không hợp lệ hoặc không ở trạng thái Đang gửi.");
             }
 
-            phieu.ThoiGianRaThucTe = DateTime.Now;
-
-            double totalHours = 0;
+            var bayGio = DateTime.Now;
 
             // Kiểm tra thời gian ra phải lớn hơn thời gian vào
-            if (phieu.ThoiGianVaoThucTe.HasValue && phieu.ThoiGianRaThucTe > phieu.ThoiGianVaoThucTe)
+            if (!phieu.ThoiGianVaoThucTe.HasValue || bayGio <= phieu.ThoiGianVaoThucTe.Value)
             {
-                // Tính khoảng thời gian đỗ xe
-                TimeSpan duration = phieu.ThoiGianRaThucTe.Value - phieu.ThoiGianVaoThucTe.Value;
-
-                // TÍNH TIỀN THEO BLOCK 30 PHÚT (Module 4)
-                double totalBlocks = Math.Ceiling(duration.TotalMinutes / 30.0);
-
-                // Tối thiểu thu phí 1 block 30 phút (0.5 giờ)
-                if (totalBlocks < 1) totalBlocks = 1;
-
-                // Quy đổi ra giờ (Đã sửa lỗi cú pháp)
-                totalHours = totalBlocks * 0.5;
-
-                // Tính thành tiền = Số giờ quy đổi x Đơn giá theo giờ (Đã sửa lỗi cú pháp)
-                phieu.ThanhTien = (decimal)totalHours * phieu.DonGiaTheoGio;
-            }
-            else
-            {
-                TempData["ErrorMessage"] = "Lỗi thời gian: Thời gian ra phải sau thời gian vào.";
-                return RedirectToAction(nameof(Index));
+                return (false, "Lỗi thời gian: Thời gian ra phải sau thời gian vào.");
             }
 
-            // Giải phóng vị trí đỗ: Trả về "Còn trống" nếu vị trí không bị "Tạm ngừng"
+            phieu.ThoiGianRaThucTe = bayGio;
+            var (totalHours, soTien) = TinhTien(phieu, bayGio);
+            bool coVeThang = await CoVeThangAsync(phieu.MaPhuongTien, bayGio);
+            if (coVeThang) soTien = 0;   // vé tháng: miễn phí lượt gửi
+            phieu.ThanhTien = soTien;
+
+            // Giải phóng vị trí đỗ: Chỉ trả về "Còn trống" nếu vị trí không ở trạng thái "Tạm ngừng"
             if (phieu.ViTriDoXe != null && phieu.ViTriDoXe.TrangThai != "Tạm ngừng")
             {
                 phieu.ViTriDoXe.TrangThai = "Còn trống";
@@ -175,52 +327,12 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             _context.Update(phieu);
             await _context.SaveChangesAsync();
 
-            TempData["SuccessMessage"] = $"Xe {phieu.PhuongTien?.BienSoXe} ra khỏi bãi. Thời gian gửi: {totalHours} giờ (tính theo block 30 phút). Số tiền thu: {phieu.ThanhTien?.ToString("N0")} VNĐ.";
-            return RedirectToAction(nameof(Index));
-        }
-
-        /// <summary>
-        /// Hàm phụ trợ: Tự động quét và đồng bộ lại trạng thái của bảng ViTriDoXe theo phiếu gửi đang hoạt động
-        /// </summary>
-        private async Task DongBoTrangThaiViTriAsync()
-        {
-            // Lấy danh sách mã các vị trí đang thực sự có xe gửi (TrangThai == "Đang gửi")
-            var maViTriDangCoXe = await _context.PhieuGuiXe
-                .Where(p => p.TrangThai == "Đang gửi")
-                .Select(p => p.MaViTri)
-                .Distinct()
-                .ToListAsync();
-
-            // Lấy danh sách vị trí đỗ xe hiện tại (trừ những ô đang bị Tạm ngừng)
-            var danhSachViTri = await _context.ViTriDoXe
-                .Where(v => v.TrangThai != "Tạm ngừng")
-                .ToListAsync();
-
-            bool coThayDoi = false;
-            foreach (var vt in danhSachViTri)
+            if (coVeThang)
             {
-                if (maViTriDangCoXe.Contains(vt.MaViTri))
-                {
-                    if (vt.TrangThai != "Đang sử dụng")
-                    {
-                        vt.TrangThai = "Đang sử dụng";
-                        coThayDoi = true;
-                    }
-                }
-                else
-                {
-                    if (vt.TrangThai != "Còn trống")
-                    {
-                        vt.TrangThai = "Còn trống";
-                        coThayDoi = true;
-                    }
-                }
+                return (true, $"Xe {phieu.PhuongTien?.BienSoXe} ra khỏi bãi. Thời gian gửi: {totalHours} giờ. Xe có VÉ THÁNG nên miễn phí (thu 0 VNĐ).");
             }
 
-            if (coThayDoi)
-            {
-                await _context.SaveChangesAsync();
-            }
+            return (true, $"Xe {phieu.PhuongTien?.BienSoXe} ra khỏi bãi. Thời gian gửi: {totalHours} giờ (tính theo block 30 phút). Số tiền thu: {phieu.ThanhTien?.ToString("N0")} VNĐ.");
         }
     }
 }
