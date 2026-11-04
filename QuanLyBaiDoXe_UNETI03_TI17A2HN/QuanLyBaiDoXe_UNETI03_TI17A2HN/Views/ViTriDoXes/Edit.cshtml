@@ -28,9 +28,12 @@
                         <span asp-validation-for="MaLoaiPhuongTien" class="text-danger small"></span>
                     </div>
 
+                    <!-- Ô CHỌN KHU VỰC DẠNG COMBOBOX -->
                     <div class="form-group mb-3">
                         <label asp-for="KhuVuc" class="form-label fw-semibold">Khu vực (*)</label>
-                        <input asp-for="KhuVuc" class="form-control rounded-3" required placeholder="Ví dụ: Khu A, Khu B..." />
+                        <select asp-for="KhuVuc" class="form-select rounded-3" asp-items="ViewBag.KhuVucList" required>
+                            <option value="">-- Chọn khu vực --</option>
+                        </select>
                         <span asp-validation-for="KhuVuc" class="text-danger small"></span>
                     </div>
 
