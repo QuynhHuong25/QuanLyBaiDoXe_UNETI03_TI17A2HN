@@ -216,20 +216,6 @@
             font-size: 10px;
         }
 
-    /* LỐI ĐI PHÂN CÁCH */
-    .loi-di-bar {
-        background-color: #f1f5f9;
-        color: #94a3b8;
-        font-weight: 800;
-        font-size: 11px;
-        letter-spacing: 3px;
-        text-align: center;
-        padding: 4px 0;
-        border-radius: 4px;
-        margin: 10px 0;
-        border: 1px dashed #cbd5e1;
-    }
-
     /* BẢNG DỮ LIỆU & NÚT THAO TÁC */
     .table-container {
         background-color: #ffffff;
@@ -434,12 +420,7 @@
                                 {
                                     int subTong = loaiGroup.Count();
                                     int subTrong = loaiGroup.Count(v => v.TrangThai == "Còn trống");
-                                    var slotsList = loaiGroup.ToList();
-
-                                    <!-- Chia slot thành 2 dãy để có LỐI ĐI ở giữa giống ảnh mẫu -->
-                                    int halfCount = (int)Math.Ceiling(slotsList.Count / 2.0);
-                                    var day1 = slotsList.Take(halfCount).ToList();
-                                    var day2 = slotsList.Skip(halfCount).ToList();
+                                    var slotsOrdered = loaiGroup.OrderBy(v => v.TenViTri).ToList();
 
                                     <div class="mb-3">
                                         <div class="d-flex justify-content-between align-items-center mb-2">
@@ -447,27 +428,13 @@
                                             <small class="text-muted fw-bold">@subTrong / @subTong trống</small>
                                         </div>
 
-                                        <!-- DÃY 1 -->
+                                        <!-- HIỂN THỊ TẤT CẢ CÁC Ô ĐỖ LIỀN MẠCH TRÊN CÙNG 1 HÀNG -->
                                         <div class="d-flex flex-wrap gap-2">
-                                            @foreach (var slot in day1)
+                                            @foreach (var slot in slotsOrdered)
                                             {
                                                 @await Html.PartialAsync("_SlotBoxItem", slot, new ViewDataDictionary(ViewData) { { "PhieuDict", phieuDict }, { "IsAdmin", isAdmin } })
                                             }
                                         </div>
-
-                                        <!-- LỐI ĐI PHÂN CÁCH (NẾU CÓ DÃY 2) -->
-                                        @if (day2.Any())
-                                        {
-                                            <div class="loi-di-bar">L Ố I &nbsp; Đ I</div>
-
-                                            <!-- DÃY 2 -->
-                                            <div class="d-flex flex-wrap gap-2">
-                                                @foreach (var slot in day2)
-                                                {
-                                                    @await Html.PartialAsync("_SlotBoxItem", slot, new ViewDataDictionary(ViewData) { { "PhieuDict", phieuDict }, { "IsAdmin", isAdmin } })
-                                                }
-                                            </div>
-                                        }
                                     </div>
                                 }
                             </div>
@@ -489,7 +456,7 @@
                                name="searchString"
                                value="@ViewData["CurrentSearch"]"
                                class="form-control rounded-3"
-                               placeholder="Nhập tên vị trí hoặc khu vực..." />
+                               placeholder="Nhập tên vị trí..." />
                     </div>
 
                     <div class="col-md-2">
@@ -499,10 +466,11 @@
                         </select>
                     </div>
 
+                    <!-- Ô KHU VỰC DẠNG DROPDOWN / COMBOBOX -->
                     <div class="col-md-2">
                         <label class="form-label fw-bold small text-secondary">Khu vực:</label>
                         <select name="khuVuc" class="form-select rounded-3" asp-items="ViewBag.KhuVucList">
-                            <option value="">-- Tất cả --</option>
+                            <option value="">-- Tất cả khu vực --</option>
                         </select>
                     </div>
 
