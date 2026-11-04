@@ -26,6 +26,12 @@
 
         <div class="card-body">
             <div class="row g-4">
+                @if (!string.IsNullOrEmpty(Model.HinhAnh))
+                {
+                    <div class="col-12">
+                        <img src="@Model.HinhAnh" alt="Ảnh @Model.BienSoXe" class="rounded border" style="max-height:260px;max-width:100%" />
+                    </div>
+                }
 
                 <!-- MÃ PHƯƠNG TIỆN -->
                 <div class="col-md-6">
