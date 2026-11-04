@@ -4,61 +4,67 @@
     ViewData["Title"] = "Tạo mới Vị trí đỗ xe";
 }
 
-<div class="row justify-content-center mt-0">
+<div class="row justify-content-center mt-3">
     <div class="col-md-8 col-lg-6">
-        <div class="card shadow">
-            <div class="card-header bg-primary text-white text-center">
-                <h3 class="mb-0">Tạo mới Vị trí đỗ xe</h3>
+        <div class="card shadow-sm border-0 rounded-4">
+            <div class="card-header bg-primary text-white text-center py-3 rounded-top-4">
+                <h4 class="mb-0 fw-bold"><i class="bi bi-plus-circle me-2"></i>Tạo mới Vị trí đỗ xe</h4>
             </div>
-            <div class="card-body">
-                <form asp-action="Create">
+            <div class="card-body p-4">
+                <form asp-action="Create" id="formCreateViTri">
                     <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
                     <div class="form-group mb-3">
-                        <label asp-for="TenViTri" class="control-label font-weight-bold">Tên vị trí (*)</label>
-                        <input asp-for="TenViTri" class="form-control" required placeholder="Ví dụ: A1-01, B2-05..." />
-                        <span asp-validation-for="TenViTri" class="text-danger"></span>
+                        <label asp-for="TenViTri" class="form-label fw-semibold">Tên vị trí (*)</label>
+                        <input asp-for="TenViTri" class="form-control rounded-3" required placeholder="Ví dụ: A1-01, B2-05..." />
+                        <span asp-validation-for="TenViTri" class="text-danger small"></span>
                     </div>
 
                     <div class="form-group mb-3">
-                        <label asp-for="MaLoaiPhuongTien" class="control-label font-weight-bold">Loại phương tiện (*)</label>
-                        <select asp-for="MaLoaiPhuongTien" class="form-select" asp-items="ViewBag.MaLoaiPhuongTien">
+                        <label asp-for="MaLoaiPhuongTien" class="form-label fw-semibold">Loại phương tiện (*)</label>
+                        <select asp-for="MaLoaiPhuongTien" class="form-select rounded-3" asp-items="ViewBag.MaLoaiPhuongTien" required>
                             <option value="">-- Chọn loại phương tiện --</option>
                         </select>
-                        <span asp-validation-for="MaLoaiPhuongTien" class="text-danger"></span>
+                        <span asp-validation-for="MaLoaiPhuongTien" class="text-danger small"></span>
                     </div>
 
+                    <!-- KHU VỰC CHUYỂN THÀNH COMBOBOX -->
                     <div class="form-group mb-3">
-                        <label asp-for="KhuVuc" class="control-label font-weight-bold">Khu vực (*)</label>
-                        <input asp-for="KhuVuc" class="form-control" required placeholder="Ví dụ: Khu A, Khu B..." />
-                        <span asp-validation-for="KhuVuc" class="text-danger"></span>
-                    </div>
-
-                    <div class="form-group mb-3">
-                        <label asp-for="Tang" class="control-label font-weight-bold">Tầng (*)</label>
-                        <input asp-for="Tang" type="number" class="form-control" min="1" value="1" required />
-                        <span asp-validation-for="Tang" class="text-danger"></span>
-                    </div>
-
-                    <div class="form-group mb-3">
-                        <label asp-for="TrangThai" class="control-label font-weight-bold">Trạng thái (*)</label>
-                        <select asp-for="TrangThai" class="form-select">
-                            <option value="Còn trống">Còn trống</option>
-                            <option value="Đang sử dụng">Đang sử dụng</option>
-                            <option value="Tạm ngừng">Tạm ngừng</option>
+                        <label asp-for="KhuVuc" class="form-label fw-semibold">Khu vực (*)</label>
+                        <select asp-for="KhuVuc" class="form-select rounded-3" asp-items="ViewBag.KhuVucList" required>
+                            <option value="">-- Chọn khu vực --</option>
                         </select>
-                        <span asp-validation-for="TrangThai" class="text-danger"></span>
+                        <span asp-validation-for="KhuVuc" class="text-danger small"></span>
                     </div>
 
                     <div class="form-group mb-3">
-                        <label asp-for="MoTa" class="control-label font-weight-bold">Mô tả</label>
-                        <textarea asp-for="MoTa" class="form-control" rows="3" placeholder="Ghi chú hoặc mô tả thêm..."></textarea>
-                        <span asp-validation-for="MoTa" class="text-danger"></span>
+                        <label asp-for="Tang" class="form-label fw-semibold">Tầng (*)</label>
+                        <input asp-for="Tang" type="number" class="form-control rounded-3" min="1" value="1" required />
+                        <span asp-validation-for="Tang" class="text-danger small"></span>
                     </div>
 
-                    <div class="d-flex justify-content-between mt-4">
-                        <a asp-action="Index" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Trở về danh sách</a>
-                        <input type="submit" value="Tạo mới" class="btn btn-primary px-4" />
+                    <div class="form-group mb-3">
+                        <label asp-for="TrangThai" class="form-label fw-semibold">Trạng thái (*)</label>
+                        <select asp-for="TrangThai" class="form-select rounded-3">
+                            <option value="Còn trống">Còn trống</option>
+                            <option value="Tạm ngừng">Tạm ngừng (Bảo trì/Sự cố)</option>
+                        </select>
+                        <span asp-validation-for="TrangThai" class="text-danger small"></span>
+                    </div>
+
+                    <div class="form-group mb-4">
+                        <label asp-for="MoTa" class="form-label fw-semibold">Mô tả</label>
+                        <textarea asp-for="MoTa" class="form-control rounded-3" rows="3" placeholder="Ghi chú hoặc mô tả thêm..."></textarea>
+                        <span asp-validation-for="MoTa" class="text-danger small"></span>
+                    </div>
+
+                    <div class="d-flex justify-content-between pt-2">
+                        <a asp-action="Index" class="btn btn-secondary px-3 rounded-3 fw-semibold">
+                            <i class="bi bi-arrow-left me-1"></i> Trở về danh sách
+                        </a>
+                        <button type="submit" class="btn btn-primary px-4 rounded-3 fw-bold">
+                            <i class="bi bi-check-lg me-1"></i> Tạo mới
+                        </button>
                     </div>
                 </form>
             </div>
