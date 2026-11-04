@@ -1,0 +1,116 @@
+@model QuanLyBaiDoXe_UNETI03_TI17A2HN.Models.VeThang
+
+@{
+    ViewData["Title"] = "Đăng ký vé tháng";
+    var dsXe = ViewBag.DanhSachXe as List<QuanLyBaiDoXe_UNETI03_TI17A2HN.Models.PhuongTien> ?? new();
+}
+
+<div class="ps-eb">VÉ THÁNG</div>
+<h1 class="ps-big mb-3">Đăng ký vé tháng</h1>
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="card p-4 border-0 shadow-sm rounded-4">
+            @if (!dsXe.Any())
+            {
+                <div class="alert alert-warning mb-0">Bạn chưa có phương tiện nào đang hoạt động. Hãy thêm phương tiện trước khi đăng ký vé tháng.</div>
+            }
+            else
+            {
+                <form asp-action="Create" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="MaPhuongTien" class="form-label fw-semibold">Phương tiện <span class="text-danger">*</span></label>
+                        <select asp-for="MaPhuongTien" id="MaPhuongTien" class="form-select">
+                            <option value="">-- Chọn phương tiện --</option>
+                            @foreach (var xe in dsXe)
+                            {
+                                <option value="@xe.MaPhuongTien" selected="@(Model.MaPhuongTien == xe.MaPhuongTien)">@xe.BienSoXe - @xe.LoaiPhuongTien?.TenLoaiPhuongTien</option>
+                            }
+                        </select>
+                        <span asp-validation-for="MaPhuongTien" class="text-danger small"></span>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="SoThang" class="form-label fw-semibold">Kỳ hạn <span class="text-danger">*</span></label>
+                            <select asp-for="SoThang" id="SoThang" class="form-select">
+                                <option value="1">1 tháng</option>
+                                <option value="3">3 tháng (giảm 5%)</option>
+                                <option value="6">6 tháng (giảm 10%)</option>
+                                <option value="12">12 tháng (giảm 15%)</option>
+                            </select>
+                            <span asp-validation-for="SoThang" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="NgayBatDau" class="form-label fw-semibold">Ngày bắt đầu <span class="text-danger">*</span></label>
+                            <input asp-for="NgayBatDau" id="NgayBatDau" type="date" class="form-control"
+                                   value="@Model.NgayBatDau.ToString("yyyy-MM-dd")" min="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                            <span asp-validation-for="NgayBatDau" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="GhiChu" class="form-label fw-semibold">Ghi chú</label>
+                        <input asp-for="GhiChu" class="form-control" maxlength="200" placeholder="Không bắt buộc" />
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle me-1"></i> Đăng ký vé tháng</button>
+                        <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+                    </div>
+                </form>
+            }
+        </div>
+    </div>
+
+    <!-- Báo giá cập nhật bằng AJAX -->
+    <div class="col-lg-5">
+        <div class="card p-4 border-0 shadow-sm rounded-4" id="hopBaoGia">
+            <h5 class="fw-bold mb-3">Báo giá</h5>
+            <div id="baoGiaTrong" class="text-secondary small">Chọn phương tiện và kỳ hạn để xem giá.</div>
+            <div id="baoGia" class="d-none">
+                <div class="d-flex justify-content-between mb-2"><span class="text-secondary">Loại xe</span><b id="bgLoai"></b></div>
+                <div class="d-flex justify-content-between mb-2"><span class="text-secondary">Đơn giá theo giờ</span><b id="bgDonGia"></b></div>
+                <div class="d-flex justify-content-between mb-2"><span class="text-secondary">Quy đổi</span><b id="bgQuyDoi"></b></div>
+                <div class="d-flex justify-content-between mb-2"><span class="text-secondary">Giá gốc</span><b id="bgGoc"></b></div>
+                <div class="d-flex justify-content-between mb-2"><span class="text-secondary">Ưu đãi kỳ hạn</span><b id="bgGiam" class="text-success"></b></div>
+                <hr />
+                <div class="d-flex justify-content-between align-items-center"><span class="fw-semibold">Thành tiền</span><b id="bgTong" class="fs-4 text-primary"></b></div>
+                <div class="small text-secondary mt-2">Hiệu lực đến hết ngày <b id="bgKetThuc"></b></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+    <script>
+        (function () {
+            var xe = document.getElementById('MaPhuongTien'), thang = document.getElementById('SoThang'), ngay = document.getElementById('NgayBatDau');
+            if (!xe) return;
+            var trong = document.getElementById('baoGiaTrong'), box = document.getElementById('baoGia');
+            var $ = function (id) { return document.getElementById(id); };
+
+            function capNhat() {
+                if (!xe.value) { trong.classList.remove('d-none'); box.classList.add('d-none'); return; }
+                var url = '@Url.Action("TinhGia", "VeThangs")?maPhuongTien=' + encodeURIComponent(xe.value) +
+                          '&soThang=' + encodeURIComponent(thang.value) + '&ngayBatDau=' + encodeURIComponent(ngay.value);
+                fetch(url, { credentials: 'same-origin' }).then(function (r) { return r.json(); }).then(function (d) {
+                    if (!d.ok) { trong.textContent = d.message; trong.classList.remove('d-none'); box.classList.add('d-none'); return; }
+                    $('bgLoai').textContent = d.loaiXe;
+                    $('bgDonGia').textContent = d.donGia + ' đ/giờ';
+                    $('bgQuyDoi').textContent = d.gioMoiThang + ' giờ × ' + thang.value + ' tháng';
+                    $('bgGoc').textContent = d.gocText + ' đ';
+                    $('bgGiam').textContent = d.giamPhanTram > 0 ? '-' + d.giamPhanTram + '%' : 'Không';
+                    $('bgTong').textContent = d.tongText + ' đ';
+                    $('bgKetThuc').textContent = d.ketThuc;
+                    trong.classList.add('d-none'); box.classList.remove('d-none');
+                }).catch(function () { trong.textContent = 'Không tải được báo giá.'; trong.classList.remove('d-none'); });
+            }
+            [xe, thang, ngay].forEach(function (e) { e.addEventListener('change', capNhat); });
+            capNhat();
+        })();
+    </script>
+}
