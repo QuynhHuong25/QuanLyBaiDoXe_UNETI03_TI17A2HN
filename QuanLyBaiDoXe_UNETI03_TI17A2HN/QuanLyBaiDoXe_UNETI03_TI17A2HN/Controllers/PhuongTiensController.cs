@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using QuanLyBaiDoXe_UNETI03_TI17A2HN.Models;
 using QuanLyBaiDoXe_UNETI03_TI17A2HN.Lọc;
+using QuanLyBaiDoXe_UNETI03_TI17A2HN.Services;
 
 namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
 {
@@ -10,10 +11,12 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
     public class PhuongTiensController : Controller
     {
         private readonly QuanLyBaiDoXe_UNETI03_TI17A2HNContext _context;
+        private readonly AnhPhuongTienService _anh;
 
-        public PhuongTiensController(QuanLyBaiDoXe_UNETI03_TI17A2HNContext context)
+        public PhuongTiensController(QuanLyBaiDoXe_UNETI03_TI17A2HNContext context, AnhPhuongTienService anh)
         {
             _context = context;
+            _anh = anh;
         }
 
         // GET: PHUONGTIENS
@@ -202,7 +205,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
         // POST: PHUONGTIENS/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("MaPhuongTien,MaChuPhuongTien,MaLoaiPhuongTien,BienSoXe,NhanHieu,MauSac,MoTa,TrangThai")] PhuongTien phuongTien)
+        public async Task<IActionResult> Create([Bind("MaPhuongTien,MaChuPhuongTien,MaLoaiPhuongTien,BienSoXe,NhanHieu,MauSac,MoTa,TrangThai")] PhuongTien phuongTien, IFormFile? fileAnh)
         {
             string? vaiTro = HttpContext.Session.GetString("VaiTro");
             string? maTaiKhoanStr = HttpContext.Session.GetString("MaTaiKhoan");
@@ -258,6 +261,14 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             }
 
             phuongTien.TrangThai = true;
+
+            // Upload ảnh phương tiện (chỉ lưu file khi các thông tin khác đã hợp lệ)
+            if (ModelState.IsValid && fileAnh != null)
+            {
+                var (duongDan, loi) = await _anh.LuuAsync(fileAnh);
+                if (loi != null) ModelState.AddModelError("HinhAnh", loi);
+                else phuongTien.HinhAnh = duongDan;
+            }
 
             if (ModelState.IsValid)
             {
@@ -315,7 +326,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
         // POST: PHUONGTIENS/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("MaPhuongTien,MaChuPhuongTien,MaLoaiPhuongTien,BienSoXe,NhanHieu,MauSac,MoTa,TrangThai")] PhuongTien phuongTien)
+        public async Task<IActionResult> Edit(int id, [Bind("MaPhuongTien,MaChuPhuongTien,MaLoaiPhuongTien,BienSoXe,NhanHieu,MauSac,MoTa,TrangThai")] PhuongTien phuongTien, IFormFile? fileAnh, bool xoaAnh = false)
         {
             if (id != phuongTien.MaPhuongTien)
             {
@@ -327,6 +338,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             {
                 return NotFound();
             }
+            phuongTien.HinhAnh = xeCu.HinhAnh;   // giữ ảnh hiện tại để hiển thị lại nếu form báo lỗi
 
             string? vaiTro = HttpContext.Session.GetString("VaiTro");
             string? maTaiKhoanStr = HttpContext.Session.GetString("MaTaiKhoan");
@@ -392,7 +404,25 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                 await LoadEditData(phuongTien, vaiTro, maTaiKhoanStr);
                 return View(phuongTien);
             }
-
+            // Ảnh: thay ảnh mới hoặc xóa ảnh hiện tại
+            string? anhCanXoa = null;
+            if (fileAnh != null)
+            {
+                var (duongDan, loi) = await _anh.LuuAsync(fileAnh);
+                if (loi != null)
+                {
+                    ModelState.AddModelError("HinhAnh", loi);
+                    await LoadEditData(phuongTien, vaiTro, maTaiKhoanStr);
+                    return View(phuongTien);
+                }
+                anhCanXoa = xeCu.HinhAnh;
+                xeCu.HinhAnh = duongDan;
+            }
+            else if (xoaAnh && !string.IsNullOrEmpty(xeCu.HinhAnh))
+            {
+                anhCanXoa = xeCu.HinhAnh;
+                xeCu.HinhAnh = null;
+            }
             xeCu.MaChuPhuongTien = phuongTien.MaChuPhuongTien;
             xeCu.MaLoaiPhuongTien = phuongTien.MaLoaiPhuongTien;
             xeCu.BienSoXe = phuongTien.BienSoXe;
@@ -404,6 +434,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             try
             {
                 await _context.SaveChangesAsync();
+                _anh.Xoa(anhCanXoa);   // xóa file ảnh cũ sau khi lưu CSDL thành công_context.PhuongTien.Remove(phuongTien);
                 TempData["SuccessMessage"] = "Cập nhật phương tiện thành công!";
                 return RedirectToAction(nameof(Index));
             }
@@ -492,6 +523,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             }
 
             _context.PhuongTien.Remove(phuongTien);
+            _anh.Xoa(phuongTien.HinhAnh);
             await _context.SaveChangesAsync();
 
             TempData["SuccessMessage"] = "Xóa phương tiện thành công!";
