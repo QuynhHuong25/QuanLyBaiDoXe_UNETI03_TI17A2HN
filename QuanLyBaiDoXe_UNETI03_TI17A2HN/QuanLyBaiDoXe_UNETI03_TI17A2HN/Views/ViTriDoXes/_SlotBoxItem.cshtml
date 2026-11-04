@@ -1,78 +1,96 @@
-﻿@model QuanLyBaiDoXe_UNETI03_TI17A2HN.Models.ViTriDoXe
+@model QuanLyBaiDoXe_UNETI03_TI17A2HN.Models.ViTriDoXe
 
 @{
     var phieuDict = ViewData["PhieuDict"] as Dictionary<int, string> ?? new Dictionary<int, string>();
-    bool isAdmin = ViewData["IsAdmin"] != null && (bool)ViewData["IsAdmin"];
+    bool isAdmin = ViewData["IsAdmin"] as bool? ?? false;
 
-    string statusClass = Model.TrangThai == "Đang sử dụng" ? "occupied" : (Model.TrangThai == "Tạm ngừng" ? "disabled" : "empty");
+    string plate = phieuDict.ContainsKey(Model.MaViTri) ? phieuDict[Model.MaViTri] : "";
+    bool isOccupied = Model.TrangThai == "Đang sử dụng";
+    bool isDisabled = Model.TrangThai == "Tạm ngừng";
 
-    // Lấy biển số xe an toàn từ Dictionary
-    string bienSo = phieuDict.TryGetValue(Model.MaViTri, out var bs) ? bs : "";
+    string statusClass = "empty";
+    if (isOccupied) { statusClass = "occupied"; }
+    else if (isDisabled) { statusClass = "disabled"; }
 }
 
 @if (isAdmin)
 {
-    <form asp-action="ToggleTamNgung" asp-route-id="@Model.MaViTri" method="post" class="d-inline">
-        @Html.AntiForgeryToken()
-        <button type="submit"
-                class="slot-box @statusClass btn p-1"
-                title="@Model.TenViTri - @Model.TrangThai @(string.IsNullOrEmpty(bienSo) ? "" : $"({bienSo})")"
-                onclick="@(Model.TrangThai == "Đang sử dụng"
-                    ? "alert('Không thể tạm ngừng vị trí này vì đang có xe đỗ!'); return false;"
-                    : (Model.TrangThai == "Tạm ngừng"
-                        ? $"return confirm('Mở lại hoạt động vị trí {Model.TenViTri}?');"
-                        : $"return confirm('Xác nhận Tạm ngừng vị trí {Model.TenViTri}?');"))">
-            <div class="slot-name">@Model.TenViTri</div>
-            <div class="slot-icon-area">
-                @if (Model.TrangThai == "Đang sử dụng")
-                {
-                    <i class="bi bi-geo-fill slot-icon-text"></i>
-                }
-                else if (Model.TrangThai == "Tạm ngừng")
-                {
-                    <i class="bi bi-slash-circle slot-icon-text"></i>
-                }
-                else
-                {
-                    <span class="slot-icon-text">P</span>
-                }
+    @if (isOccupied)
+    {
+        <!-- NẾU ĐANG CÓ XE ĐỖ: Bấm vào cảnh báo không thể tạm ngừng -->
+        <div class="slot-box @statusClass"
+             title="@Model.TenViTri - Đang có xe đỗ (@plate)"
+             onclick="alert('Không thể tạm ngừng vị trí @Model.TenViTri vì hiện đang có xe đỗ!');">
+            <span class="slot-name">@Model.TenViTri</span>
+            <div class="slot-icon-text">
+                <i class="bi bi-pin-map-fill"></i>
             </div>
-            @if (Model.TrangThai == "Đang sử dụng")
+            <div class="slot-badge-plate" title="@plate">
+                @(string.IsNullOrEmpty(plate) ? "Có xe" : plate)
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- NẾU TRỐNG HOẶC TẠM NGỪNG: Click trực tiếp để TOGGLE BẬT/TẮT TẠM NGỪNG NHANH -->
+        <form asp-controller="ViTriDoXes" asp-action="ToggleTamNgung" asp-route-id="@Model.MaViTri" method="post" class="d-inline" id="form-toggle-@Model.MaViTri">
+            @Html.AntiForgeryToken()
+
+            @if (isDisabled)
             {
-                <div class="slot-badge-plate">@(string.IsNullOrEmpty(bienSo) ? "Có xe" : bienSo)</div>
+                <!-- Bấm vào ô Tạm ngừng -> Chuyển về Còn trống -->
+                <div class="slot-box @statusClass"
+                     title="Đang tạm ngừng - Nhấn để mở lại"
+                     onclick="if(confirm('Mở lại hoạt động cho vị trí @Model.TenViTri?')) document.getElementById('form-toggle-@Model.MaViTri').submit();">
+                    <span class="slot-name">@Model.TenViTri</span>
+                    <div class="slot-icon-text">
+                        <i class="bi bi-slash-circle text-secondary"></i>
+                    </div>
+                    <span class="slot-badge text-success fw-bold" style="font-size: 10px;">
+                        <i class="bi bi-play-circle-fill me-1"></i>Mở lại
+                    </span>
+                </div>
             }
             else
             {
-                <div class="slot-badge">@(Model.TrangThai == "Tạm ngừng" ? "Ngừng" : "Trống")</div>
+                <!-- Bấm vào ô Trống -> Chuyển sang Tạm ngừng -->
+                <div class="slot-box @statusClass"
+                     title="Đang trống - Nhấn để tạm ngừng vị trí này"
+                     onclick="if(confirm('Xác nhận TẠM NGỪNG vị trí @Model.TenViTri?')) document.getElementById('form-toggle-@Model.MaViTri').submit();">
+                    <span class="slot-name">@Model.TenViTri</span>
+                    <div class="slot-icon-text">P</div>
+                    <span class="slot-badge">Trống</span>
+                </div>
             }
-        </button>
-    </form>
+        </form>
+    }
 }
 else
 {
-    <div class="slot-box @statusClass" title="@Model.TenViTri - @Model.TrangThai @(string.IsNullOrEmpty(bienSo) ? "" : $"({bienSo})")">
-        <div class="slot-name">@Model.TenViTri</div>
-        <div class="slot-icon-area">
-            @if (Model.TrangThai == "Đang sử dụng")
-            {
-                <i class="bi bi-geo-fill slot-icon-text"></i>
-            }
-            else if (Model.TrangThai == "Tạm ngừng")
-            {
-                <i class="bi bi-slash-circle slot-icon-text"></i>
-            }
-            else
-            {
-                <span class="slot-icon-text">P</span>
-            }
-        </div>
-        @if (Model.TrangThai == "Đang sử dụng")
+    <!-- HIỂN THỊ DÀNH CHO KHÁCH HÀNG (Chỉ xem, không click được) -->
+    <div class="slot-box @statusClass" title="@Model.TenViTri - Trạng thái: @Model.TrangThai">
+        <span class="slot-name">@Model.TenViTri</span>
+
+        @if (isOccupied)
         {
-            <div class="slot-badge-plate">@(string.IsNullOrEmpty(bienSo) ? "Có xe" : bienSo)</div>
+            <div class="slot-icon-text">
+                <i class="bi bi-pin-map-fill"></i>
+            </div>
+            <div class="slot-badge-plate" title="@plate">
+                @(string.IsNullOrEmpty(plate) ? "Có xe" : plate)
+            </div>
+        }
+        else if (isDisabled)
+        {
+            <div class="slot-icon-text">
+                <i class="bi bi-slash-circle"></i>
+            </div>
+            <span class="slot-badge">Ngừng</span>
         }
         else
         {
-            <div class="slot-badge">@(Model.TrangThai == "Tạm ngừng" ? "Ngừng" : "Trống")</div>
+            <div class="slot-icon-text">P</div>
+            <span class="slot-badge">Trống</span>
         }
     </div>
 }
