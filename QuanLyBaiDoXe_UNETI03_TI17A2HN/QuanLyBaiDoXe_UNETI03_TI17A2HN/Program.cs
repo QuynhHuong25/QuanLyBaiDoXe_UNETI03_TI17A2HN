@@ -9,7 +9,9 @@ builder.Services.AddDbContext<QuanLyBaiDoXe_UNETI03_TI17A2HNContext>(options =>
 builder.Services.AddControllersWithViews();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSingleton<QuanLyBaiDoXe_UNETI03_TI17A2HN.Services.QrVeService>();
+builder.Services.AddSingleton<QuanLyBaiDoXe_UNETI03_TI17A2HN.Services.MatKhauService>();      // mã hóa mật khẩu (Identity PasswordHasher)
 builder.Services.Configure<QuanLyBaiDoXe_UNETI03_TI17A2HN.Services.EmailSettings>(builder.Configuration.GetSection("Email"));
+builder.Services.AddSingleton<QuanLyBaiDoXe_UNETI03_TI17A2HN.Services.EmailService>();        // gửi email xác nhận
 builder.Services.AddSingleton<QuanLyBaiDoXe_UNETI03_TI17A2HN.Services.XuatBaoCaoService>();   // xuất Excel / PDF
 builder.Services.AddScoped<QuanLyBaiDoXe_UNETI03_TI17A2HN.Services.AnhPhuongTienService>();   // upload ảnh phương tiện
 builder.Services.AddMemoryCache();                                                              // đếm số lần đăng nhập sai
