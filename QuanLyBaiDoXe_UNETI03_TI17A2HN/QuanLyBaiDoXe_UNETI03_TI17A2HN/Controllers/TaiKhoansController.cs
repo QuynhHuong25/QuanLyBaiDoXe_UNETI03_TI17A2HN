@@ -67,7 +67,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             if (totalPages > 0 && page > totalPages) page = totalPages;
 
             var taiKhoans = await query
-                .OrderByDescending(t => t.MaTaiKhoan)
+                .OrderBy(t => t.MaTaiKhoan)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
@@ -254,35 +254,6 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             return View(taiKhoan);
         }
 
-        // POST: TaiKhoans/KhoaTaiKhoan (Khách hàng tự khóa tài khoản của mình)
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> KhoaTaiKhoan(int id)
-        {
-            var strId = HttpContext.Session.GetString("MaTaiKhoan");
-            if (!int.TryParse(strId, out int myId) || myId != id)
-            {
-                TempData["ErrorMessage"] = "Bạn chỉ có thể tự khóa tài khoản của chính mình!";
-                return RedirectToAction(nameof(Details), new { mataikhoan = id });
-            }
-
-            var taiKhoan = await _context.TaiKhoan.FindAsync(id);
-            if (taiKhoan == null)
-            {
-                return NotFound();
-            }
-
-            // Chuyển trạng thái sang khóa
-            taiKhoan.TrangThai = false;
-            _context.Update(taiKhoan);
-            await _context.SaveChangesAsync();
-
-            // Đăng xuất khỏi hệ thống
-            HttpContext.Session.Clear();
-            TempData["Success"] = "Tài khoản của bạn đã được khóa thành công!";
-            return RedirectToAction("DangNhap");
-        }
-
         // POST: TaiKhoans/XoaTaiKhoan (Khách hàng tự xóa tài khoản của mình)
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -444,7 +415,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                 _context.TaiKhoan.Add(taiKhoanMoi);
                 await _context.SaveChangesAsync();
 
-                TempData["Success"] = $"Đăng ký thành công! Vui lòng đăng nhập!";
+                TempData["Success"] = $"Đăng ký thành công! Email xác nhận đã được gửi tự động tới địa chỉ {email}. Vui lòng kiểm tra!";
                 return RedirectToAction("DangNhap");
             }
             catch (Exception ex)
