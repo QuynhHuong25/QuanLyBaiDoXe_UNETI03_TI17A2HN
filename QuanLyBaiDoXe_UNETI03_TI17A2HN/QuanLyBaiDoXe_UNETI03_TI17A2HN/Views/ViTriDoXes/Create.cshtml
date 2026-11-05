@@ -4,67 +4,74 @@
     ViewData["Title"] = "Tạo mới Vị trí đỗ xe";
 }
 
-<div class="row justify-content-center mt-3">
+<div class="row justify-content-center mt-0">
     <div class="col-md-8 col-lg-6">
-        <div class="card shadow-sm border-0 rounded-4">
-            <div class="card-header bg-primary text-white text-center py-3 rounded-top-4">
-                <h4 class="mb-0 fw-bold"><i class="bi bi-plus-circle me-2"></i>Tạo mới Vị trí đỗ xe</h4>
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white text-center">
+                <h3 class="mb-0">Tạo mới Vị trí đỗ xe</h3>
             </div>
-            <div class="card-body p-4">
-                <form asp-action="Create" id="formCreateViTri">
+            <div class="card-body">
+                <form asp-action="Create">
                     <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
                     <div class="form-group mb-3">
-                        <label asp-for="TenViTri" class="form-label fw-semibold">Tên vị trí (*)</label>
-                        <input asp-for="TenViTri" class="form-control rounded-3" required placeholder="Ví dụ: A1-01, B2-05..." />
-                        <span asp-validation-for="TenViTri" class="text-danger small"></span>
+                        <label asp-for="TenViTri" class="control-label font-weight-bold">Tên vị trí (*)</label>
+                        <input asp-for="TenViTri" class="form-control" required placeholder="Ví dụ: A1-01, B2-05..." />
+                        <span asp-validation-for="TenViTri" class="text-danger"></span>
                     </div>
 
                     <div class="form-group mb-3">
-                        <label asp-for="MaLoaiPhuongTien" class="form-label fw-semibold">Loại phương tiện (*)</label>
-                        <select asp-for="MaLoaiPhuongTien" class="form-select rounded-3" asp-items="ViewBag.MaLoaiPhuongTien" required>
+                        <label asp-for="MaLoaiPhuongTien" class="control-label font-weight-bold">Loại phương tiện (*)</label>
+                        <select asp-for="MaLoaiPhuongTien" class="form-select" asp-items="ViewBag.MaLoaiPhuongTien">
                             <option value="">-- Chọn loại phương tiện --</option>
                         </select>
-                        <span asp-validation-for="MaLoaiPhuongTien" class="text-danger small"></span>
+                        <span asp-validation-for="MaLoaiPhuongTien" class="text-danger"></span>
                     </div>
 
-                    <!-- KHU VỰC CHUYỂN THÀNH COMBOBOX -->
                     <div class="form-group mb-3">
-                        <label asp-for="KhuVuc" class="form-label fw-semibold">Khu vực (*)</label>
-                        <select asp-for="KhuVuc" class="form-select rounded-3" asp-items="ViewBag.KhuVucList" required>
+                        @{
+                            var dsKhu = (ViewBag.DanhSachKhu as List<string>) ?? new List<string>();
+                            var khuHienTai = Model?.KhuVuc;
+                            bool laKhuMoi = !string.IsNullOrWhiteSpace(khuHienTai) && !dsKhu.Contains(khuHienTai);
+                        }
+                        <label asp-for="KhuVuc" class="control-label font-weight-bold">Khu vực (*)</label>
+                        <select id="selKhuVuc" class="form-select">
                             <option value="">-- Chọn khu vực --</option>
+                            @foreach (var khu in dsKhu)
+                            {
+                                <option value="@khu" selected="@(khu == khuHienTai)">@khu</option>
+                            }
+                            <option value="__moi__" selected="@laKhuMoi">+ Thêm khu vực mới...</option>
                         </select>
-                        <span asp-validation-for="KhuVuc" class="text-danger small"></span>
+                        <input asp-for="KhuVuc" id="KhuVuc" class="form-control mt-2 @(laKhuMoi ? "" : "d-none")" placeholder="Nhập tên khu mới, ví dụ: Khu E - Xe khách" />
+                        <span asp-validation-for="KhuVuc" class="text-danger"></span>
                     </div>
 
                     <div class="form-group mb-3">
-                        <label asp-for="Tang" class="form-label fw-semibold">Tầng (*)</label>
-                        <input asp-for="Tang" type="number" class="form-control rounded-3" min="1" value="1" required />
-                        <span asp-validation-for="Tang" class="text-danger small"></span>
+                        <label asp-for="Tang" class="control-label font-weight-bold">Tầng (*)</label>
+                        <input asp-for="Tang" type="number" class="form-control" min="1" value="1" required />
+                        <span asp-validation-for="Tang" class="text-danger"></span>
                     </div>
 
                     <div class="form-group mb-3">
-                        <label asp-for="TrangThai" class="form-label fw-semibold">Trạng thái (*)</label>
-                        <select asp-for="TrangThai" class="form-select rounded-3">
+                        <label asp-for="TrangThai" class="control-label font-weight-bold">Trạng thái (*)</label>
+                        <select asp-for="TrangThai" class="form-select">
                             <option value="Còn trống">Còn trống</option>
-                            <option value="Tạm ngừng">Tạm ngừng (Bảo trì/Sự cố)</option>
+                            <option value="Đang sử dụng">Đang sử dụng</option>
+                            <option value="Tạm ngừng">Tạm ngừng</option>
                         </select>
-                        <span asp-validation-for="TrangThai" class="text-danger small"></span>
+                        <span asp-validation-for="TrangThai" class="text-danger"></span>
                     </div>
 
-                    <div class="form-group mb-4">
-                        <label asp-for="MoTa" class="form-label fw-semibold">Mô tả</label>
-                        <textarea asp-for="MoTa" class="form-control rounded-3" rows="3" placeholder="Ghi chú hoặc mô tả thêm..."></textarea>
-                        <span asp-validation-for="MoTa" class="text-danger small"></span>
+                    <div class="form-group mb-3">
+                        <label asp-for="MoTa" class="control-label font-weight-bold">Mô tả</label>
+                        <textarea asp-for="MoTa" class="form-control" rows="3" placeholder="Ghi chú hoặc mô tả thêm..."></textarea>
+                        <span asp-validation-for="MoTa" class="text-danger"></span>
                     </div>
 
-                    <div class="d-flex justify-content-between pt-2">
-                        <a asp-action="Index" class="btn btn-secondary px-3 rounded-3 fw-semibold">
-                            <i class="bi bi-arrow-left me-1"></i> Trở về danh sách
-                        </a>
-                        <button type="submit" class="btn btn-primary px-4 rounded-3 fw-bold">
-                            <i class="bi bi-check-lg me-1"></i> Tạo mới
-                        </button>
+                    <div class="d-flex justify-content-between mt-4">
+                        <a asp-action="Index" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Trở về danh sách</a>
+                        <input type="submit" value="Tạo mới" class="btn btn-primary px-4" />
                     </div>
                 </form>
             </div>
@@ -76,4 +83,33 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script>
+        (function () {
+            const sel = document.getElementById("selKhuVuc");
+            const inp = document.getElementById("KhuVuc");
+            if (!sel || !inp) return;
+            const form = sel.closest("form");
+
+            function dongBo() {
+                if (sel.value === "__moi__") {
+                    inp.classList.remove("d-none");
+                    inp.focus();
+                } else {
+                    inp.classList.add("d-none");
+                    inp.value = sel.value;
+                }
+            }
+            sel.addEventListener("change", dongBo);
+            if (sel.value !== "__moi__") inp.value = sel.value;
+
+            form.addEventListener("submit", function (e) {
+                if (sel.value === "" || (sel.value === "__moi__" && !inp.value.trim())) {
+                    e.preventDefault();
+                    sel.classList.add("is-invalid");
+                    sel.focus();
+                }
+            });
+            sel.addEventListener("change", function () { sel.classList.remove("is-invalid"); });
+        })();
+    </script>
 }
