@@ -18,13 +18,11 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
 
         // ===== HÀM HỖ TRỢ MÃ HÓA MẬT KHẨU (BCrypt) =====
 
-        // Băm mật khẩu (có salt ngẫu nhiên, kết quả 60 ký tự dạng $2a$11$...)
         private static string BamMatKhau(string matKhau)
         {
             return BCrypt.Net.BCrypt.HashPassword(matKhau);
         }
 
-        // Kiểm tra mật khẩu nhập vào có khớp với chuỗi hash đang lưu không.
         private static bool KiemTraMatKhau(string matKhau, string? matKhauDaLuu)
         {
             if (string.IsNullOrEmpty(matKhauDaLuu) || !matKhauDaLuu.StartsWith("$2"))
@@ -46,18 +44,17 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
         [PhanQuyen("Admin")]
         public async Task<IActionResult> Index(string? searchString, int page = 1)
         {
-            int pageSize = 10; // Số lượng tài khoản hiển thị trên mỗi trang
+            int pageSize = 10;
 
             var query = _context.TaiKhoan
                 .Include(t => t.ChuPhuongTien)
                 .AsQueryable();
 
-            // Tìm kiếm theo tên đăng nhập, họ tên hoặc email nếu có nhập
             if (!string.IsNullOrEmpty(searchString))
             {
                 query = query.Where(t => t.TenDangNhap.Contains(searchString)
-                                      || (t.HoTen != null && t.HoTen.Contains(searchString))
-                                      || (t.Email != null && t.Email.Contains(searchString)));
+                                        || (t.HoTen != null && t.HoTen.Contains(searchString))
+                                        || (t.Email != null && t.Email.Contains(searchString)));
             }
 
             int totalItems = await query.CountAsync();
@@ -79,14 +76,14 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             return View(taiKhoans);
         }
 
-        // GET: TAIKHOANS/Create (Admin khởi tạo tài khoản mới)
+        // GET: TAIKHOANS/Create
         [PhanQuyen("Admin")]
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: TAIKHOANS/Create (Admin tạo tài khoản Admin hoặc Khách hàng)
+        // POST: TAIKHOANS/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         [PhanQuyen("Admin")]
@@ -98,7 +95,6 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                 return View(taikhoan);
             }
 
-            // Kiểm tra tên đăng nhập trùng lặp
             bool daTonTai = await _context.TaiKhoan.AnyAsync(t => t.TenDangNhap == taikhoan.TenDangNhap);
             if (daTonTai)
             {
@@ -108,7 +104,6 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
 
             if (ModelState.IsValid)
             {
-                // Băm mật khẩu bằng BCrypt trước khi lưu
                 taikhoan.MatKhau = BamMatKhau(taikhoan.MatKhau!);
 
                 _context.Add(taikhoan);
@@ -149,8 +144,8 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             var vaiTro = HttpContext.Session.GetString("VaiTro");
             var currentMaTaiKhoanStr = HttpContext.Session.GetString("MaTaiKhoan");
 
-            // Khách hàng chỉ được xem thông tin chi tiết của chính mình
-            if ((vaiTro == "Khách hàng" || vaiTro == "Khach") && int.TryParse(currentMaTaiKhoanStr, out int myId))
+            // Nếu là Khách hàng (không phải Admin), chỉ được xem thông tin chính mình
+            if (vaiTro != "Admin" && int.TryParse(currentMaTaiKhoanStr, out int myId))
             {
                 if (taikhoan.MaTaiKhoan != myId)
                 {
@@ -175,7 +170,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                 return NotFound();
             }
 
-            string tenDangNhapSession = HttpContext.Session.GetString("TenDangNhap") ?? "";
+            var vaiTro = HttpContext.Session.GetString("VaiTro");
             int? maTaiKhoanSession = HttpContext.Session.GetInt32("MaTaiKhoan");
             if (maTaiKhoanSession == null)
             {
@@ -183,13 +178,12 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                 if (int.TryParse(strId, out int parsedId)) maTaiKhoanSession = parsedId;
             }
 
-            // Chỉ cho phép sửa nếu ĐÚNG LÀ TÀI KHOẢN CỦA CHÍNH MÌNH (bất kể Admin hay Khách)
-            bool isChinhToi = (maTaiKhoanSession != null && taiKhoan.MaTaiKhoan == maTaiKhoanSession)
-                           || (!string.IsNullOrEmpty(tenDangNhapSession) && taiKhoan.TenDangNhap == tenDangNhapSession);
+            bool isAdmin = (vaiTro == "Admin");
+            bool isChinhToi = (maTaiKhoanSession != null && taiKhoan.MaTaiKhoan == maTaiKhoanSession);
 
-            if (!isChinhToi)
+            if (!isAdmin && !isChinhToi)
             {
-                TempData["ErrorMessage"] = "Bạn chỉ có thể chỉnh sửa tài khoản của chính mình!";
+                TempData["ErrorMessage"] = "Bạn không có quyền chỉnh sửa tài khoản này!";
                 return RedirectToAction(nameof(Details), new { mataikhoan = id });
             }
 
@@ -206,10 +200,16 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                 return NotFound();
             }
 
+            var vaiTro = HttpContext.Session.GetString("VaiTro");
             var strId = HttpContext.Session.GetString("MaTaiKhoan");
-            if (!int.TryParse(strId, out int myId) || myId != id)
+            int.TryParse(strId, out int myId);
+
+            bool isAdmin = (vaiTro == "Admin");
+            bool isChinhToi = (myId == id);
+
+            if (!isAdmin && !isChinhToi)
             {
-                TempData["ErrorMessage"] = "Bạn chỉ có quyền chỉnh sửa tài khoản của chính mình!";
+                TempData["ErrorMessage"] = "Bạn không có quyền chỉnh sửa tài khoản này!";
                 return RedirectToAction(nameof(Details), new { mataikhoan = id });
             }
 
@@ -220,11 +220,15 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                     var userInDb = await _context.TaiKhoan.FindAsync(id);
                     if (userInDb == null) return NotFound();
 
-                    // Cập nhật thông tin cơ bản
                     userInDb.HoTen = taiKhoan.HoTen;
                     userInDb.Email = taiKhoan.Email;
 
-                    // Đổi mật khẩu nếu người dùng nhập mật khẩu mới
+                    if (isAdmin)
+                    {
+                        userInDb.VaiTro = taiKhoan.VaiTro;
+                        userInDb.TrangThai = taiKhoan.TrangThai;
+                    }
+
                     if (!string.IsNullOrEmpty(MatKhauMoi))
                     {
                         userInDb.MatKhau = BamMatKhau(MatKhauMoi);
@@ -233,8 +237,10 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                     _context.Update(userInDb);
                     await _context.SaveChangesAsync();
 
-                    // Cập nhật lại Session Họ Tên nếu có thay đổi
-                    HttpContext.Session.SetString("HoTen", userInDb.HoTen ?? userInDb.TenDangNhap);
+                    if (isChinhToi)
+                    {
+                        HttpContext.Session.SetString("HoTen", userInDb.HoTen ?? userInDb.TenDangNhap);
+                    }
 
                     TempData["SuccessMessage"] = "Cập nhật thông tin tài khoản thành công!";
                     return RedirectToAction(nameof(Details), new { mataikhoan = userInDb.MaTaiKhoan });
@@ -254,15 +260,59 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             return View(taiKhoan);
         }
 
-        // POST: TaiKhoans/XoaTaiKhoan (Khách hàng tự xóa tài khoản của mình)
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> XoaTaiKhoan(int id)
+        // ==========================================
+        // CÁC ACTION DELETE (CHUYỂN TRANG GIAO DIỆN)
+        // ==========================================
+
+        // GET: TaiKhoans/Delete/5
+        [HttpGet]
+        public async Task<IActionResult> Delete(int? id)
         {
-            var strId = HttpContext.Session.GetString("MaTaiKhoan");
-            if (!int.TryParse(strId, out int myId) || myId != id)
+            if (id == null)
             {
-                TempData["ErrorMessage"] = "Bạn chỉ có thể tự xóa tài khoản của chính mình!";
+                return NotFound();
+            }
+
+            var taiKhoan = await _context.TaiKhoan
+                .Include(t => t.ChuPhuongTien)
+                .FirstOrDefaultAsync(m => m.MaTaiKhoan == id);
+
+            if (taiKhoan == null)
+            {
+                return NotFound();
+            }
+
+            var vaiTro = HttpContext.Session.GetString("VaiTro");
+            var strId = HttpContext.Session.GetString("MaTaiKhoan");
+            int.TryParse(strId, out int myId);
+
+            bool isAdmin = (vaiTro == "Admin");
+            bool isChinhToi = (myId == id);
+
+            if (!isAdmin && !isChinhToi)
+            {
+                TempData["ErrorMessage"] = "Bạn không có quyền xóa tài khoản này!";
+                return RedirectToAction(nameof(Details), new { mataikhoan = id });
+            }
+
+            return View(taiKhoan);
+        }
+
+        // POST: TaiKhoans/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var vaiTro = HttpContext.Session.GetString("VaiTro");
+            var strId = HttpContext.Session.GetString("MaTaiKhoan");
+            int.TryParse(strId, out int myId);
+
+            bool isAdmin = (vaiTro == "Admin");
+            bool isChinhToi = (myId == id);
+
+            if (!isAdmin && !isChinhToi)
+            {
+                TempData["ErrorMessage"] = "Bạn không có quyền xóa tài khoản này!";
                 return RedirectToAction(nameof(Details), new { mataikhoan = id });
             }
 
@@ -273,17 +323,24 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                 await _context.SaveChangesAsync();
             }
 
-            // Xóa session và chuyển về trang đăng nhập
-            HttpContext.Session.Clear();
-            TempData["Success"] = "Tài khoản của bạn đã được xóa vĩnh viễn khỏi hệ thống!";
-            return RedirectToAction("DangNhap");
+            if (isChinhToi && !isAdmin)
+            {
+                HttpContext.Session.Clear();
+                TempData["Success"] = "Tài khoản của bạn đã được xóa vĩnh viễn khỏi hệ thống!";
+                return RedirectToAction("DangNhap");
+            }
+
+            TempData["SuccessMessage"] = "Đã xóa tài khoản thành công!";
+            return RedirectToAction(nameof(Index));
         }
+
+        // ==========================================
 
         // GET: TaiKhoans/DangNhap
         [HttpGet]
         public async Task<IActionResult> DangNhap()
         {
-            if (Request.Cookies.TryGetValue("SavedUsername", out string savedUsername))
+            if (Request.Cookies.TryGetValue("SavedUsername", out string? savedUsername))
             {
                 ViewBag.SavedUsername = savedUsername;
             }
@@ -377,7 +434,6 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
         }
 
         // POST: TaiKhoans/DangKy
-        // POST: TaiKhoans/DangKy
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DangKy(string tenDangNhap, string email, string matKhau, string xacNhanMatKhau)
@@ -401,11 +457,9 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                 return View();
             }
 
-            // SỬ DỤNG TRANSACTION ĐỂ ĐẢM BẢO TÍNH TOÀN VẸN (Lỗi bước nào hủy toàn bộ bước đó)
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                // 1. Tạo tài khoản mới
                 var taiKhoanMoi = new TaiKhoan
                 {
                     TenDangNhap = tenDangNhap,
@@ -417,15 +471,14 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                 };
 
                 _context.TaiKhoan.Add(taiKhoanMoi);
-                await _context.SaveChangesAsync(); // Lưu để sinh ra MaTaiKhoan tự tăng
+                await _context.SaveChangesAsync();
 
-                // 2. Tạo hồ sơ Chủ phương tiện tương ứng (TUYỆT ĐỐI KHÔNG GÁN GIÁ TRỊ CHO MaChuPhuongTien vì đây là cột tự tăng Identity)
                 var chuPhuongTienMoi = new ChuPhuongTien
                 {
-                    MaTaiKhoan = taiKhoanMoi.MaTaiKhoan, // Lấy ID vừa sinh từ bảng TaiKhoan liên kết sang
+                    MaTaiKhoan = taiKhoanMoi.MaTaiKhoan,
                     HoTen = tenDangNhap,
                     Email = email.Trim(),
-                    NgaySinh = new DateTime(2000, 1, 1), // Giá trị mặc định tránh lỗi Not Null
+                    NgaySinh = new DateTime(2000, 1, 1),
                     GioiTinh = true,
                     SoDienThoai = "Chưa cập nhật",
                     DiaChi = "Chưa cập nhật",
@@ -436,7 +489,6 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                 _context.ChuPhuongTien.Add(chuPhuongTienMoi);
                 await _context.SaveChangesAsync();
 
-                // Nếu mọi thứ thành công, commit transaction chính thức lưu vào CSDL
                 await transaction.CommitAsync();
 
                 TempData["Success"] = "Đăng ký tài khoản thành công! Vui lòng đăng nhập.";
@@ -444,7 +496,6 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             }
             catch (Exception ex)
             {
-                // Nếu có bất kỳ lỗi gì xảy ra, Rollback lại toàn bộ (bảng TaiKhoan cũng sẽ KHÔNG bị lưu mới)
                 await transaction.RollbackAsync();
 
                 ViewBag.Error = "Lỗi hệ thống khi đăng ký: " + (ex.InnerException != null ? ex.InnerException.Message : ex.Message);
@@ -494,6 +545,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                 ViewBag.Error = "Mật khẩu mới không được trùng với mật khẩu cũ!";
                 return View();
             }
+
             taiKhoan.MatKhau = BamMatKhau(matKhauMoi);
 
             try
@@ -513,6 +565,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
 
         private bool TaiKhoanExists(int? mataikhoan)
         {
+            if (mataikhoan == null) return false;
             return _context.TaiKhoan.Any(e => e.MaTaiKhoan == mataikhoan);
         }
     }
