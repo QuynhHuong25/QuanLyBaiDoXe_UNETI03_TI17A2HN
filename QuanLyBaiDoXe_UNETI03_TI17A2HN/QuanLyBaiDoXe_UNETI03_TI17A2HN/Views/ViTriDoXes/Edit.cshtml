@@ -28,12 +28,22 @@
                         <span asp-validation-for="MaLoaiPhuongTien" class="text-danger small"></span>
                     </div>
 
-                    <!-- Ô CHỌN KHU VỰC DẠNG COMBOBOX -->
                     <div class="form-group mb-3">
+                        @{
+                            var dsKhu = (ViewBag.DanhSachKhu as List<string>) ?? new List<string>();
+                            var khuHienTai = Model?.KhuVuc;
+                            bool laKhuMoi = !string.IsNullOrWhiteSpace(khuHienTai) && !dsKhu.Contains(khuHienTai);
+                        }
                         <label asp-for="KhuVuc" class="form-label fw-semibold">Khu vực (*)</label>
-                        <select asp-for="KhuVuc" class="form-select rounded-3" asp-items="ViewBag.KhuVucList" required>
+                        <select id="selKhuVuc" class="form-select rounded-3">
                             <option value="">-- Chọn khu vực --</option>
+                            @foreach (var khu in dsKhu)
+                            {
+                                <option value="@khu" selected="@(khu == khuHienTai)">@khu</option>
+                            }
+                            <option value="__moi__" selected="@laKhuMoi">+ Thêm khu vực mới...</option>
                         </select>
+                        <input asp-for="KhuVuc" id="KhuVuc" class="form-control rounded-3 mt-2 @(laKhuMoi ? "" : "d-none")" placeholder="Nhập tên khu mới, ví dụ: Khu E - Xe khách" />
                         <span asp-validation-for="KhuVuc" class="text-danger small"></span>
                     </div>
 
@@ -89,4 +99,33 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script>
+        (function () {
+            const sel = document.getElementById("selKhuVuc");
+            const inp = document.getElementById("KhuVuc");
+            if (!sel || !inp) return;
+            const form = sel.closest("form");
+
+            function dongBo() {
+                if (sel.value === "__moi__") {
+                    inp.classList.remove("d-none");
+                    inp.focus();
+                } else {
+                    inp.classList.add("d-none");
+                    inp.value = sel.value;
+                }
+            }
+            sel.addEventListener("change", dongBo);
+            if (sel.value !== "__moi__") inp.value = sel.value;
+
+            form.addEventListener("submit", function (e) {
+                if (sel.value === "" || (sel.value === "__moi__" && !inp.value.trim())) {
+                    e.preventDefault();
+                    sel.classList.add("is-invalid");
+                    sel.focus();
+                }
+            });
+            sel.addEventListener("change", function () { sel.classList.remove("is-invalid"); });
+        })();
+    </script>
 }
