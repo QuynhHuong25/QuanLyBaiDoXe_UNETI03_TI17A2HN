@@ -377,6 +377,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
         }
 
         // POST: TaiKhoans/DangKy
+        // POST: TaiKhoans/DangKy
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DangKy(string tenDangNhap, string email, string matKhau, string xacNhanMatKhau)
@@ -393,34 +394,60 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                 return View();
             }
 
-            var taiKhoanDaTonTai = await _context.TaiKhoan
-                .AnyAsync(t => t.TenDangNhap == tenDangNhap);
-
+            var taiKhoanDaTonTai = await _context.TaiKhoan.AnyAsync(t => t.TenDangNhap == tenDangNhap);
             if (taiKhoanDaTonTai)
             {
                 ViewBag.Error = "Tên đăng nhập này đã tồn tại!";
                 return View();
             }
 
-            var taiKhoanMoi = new TaiKhoan();
-            taiKhoanMoi.TenDangNhap = tenDangNhap;
-            taiKhoanMoi.Email = email.Trim();
-            taiKhoanMoi.MatKhau = BamMatKhau(matKhau);
-            taiKhoanMoi.HoTen = tenDangNhap;
-            taiKhoanMoi.VaiTro = "Khách hàng";
-            taiKhoanMoi.TrangThai = true;
-
+            // SỬ DỤNG TRANSACTION ĐỂ ĐẢM BẢO TÍNH TOÀN VẸN (Lỗi bước nào hủy toàn bộ bước đó)
+            using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
+                // 1. Tạo tài khoản mới
+                var taiKhoanMoi = new TaiKhoan
+                {
+                    TenDangNhap = tenDangNhap,
+                    Email = email.Trim(),
+                    MatKhau = BamMatKhau(matKhau),
+                    HoTen = tenDangNhap,
+                    VaiTro = "Khách hàng",
+                    TrangThai = true
+                };
+
                 _context.TaiKhoan.Add(taiKhoanMoi);
+                await _context.SaveChangesAsync(); // Lưu để sinh ra MaTaiKhoan tự tăng
+
+                // 2. Tạo hồ sơ Chủ phương tiện tương ứng (TUYỆT ĐỐI KHÔNG GÁN GIÁ TRỊ CHO MaChuPhuongTien vì đây là cột tự tăng Identity)
+                var chuPhuongTienMoi = new ChuPhuongTien
+                {
+                    MaTaiKhoan = taiKhoanMoi.MaTaiKhoan, // Lấy ID vừa sinh từ bảng TaiKhoan liên kết sang
+                    HoTen = tenDangNhap,
+                    Email = email.Trim(),
+                    NgaySinh = new DateTime(2000, 1, 1), // Giá trị mặc định tránh lỗi Not Null
+                    GioiTinh = true,
+                    SoDienThoai = "Chưa cập nhật",
+                    DiaChi = "Chưa cập nhật",
+                    NgayDangKy = DateTime.Now,
+                    TrangThai = true
+                };
+
+                _context.ChuPhuongTien.Add(chuPhuongTienMoi);
                 await _context.SaveChangesAsync();
 
-                TempData["Success"] = $"Đăng ký thành công! Vui lòng đăng nhập!";
+                // Nếu mọi thứ thành công, commit transaction chính thức lưu vào CSDL
+                await transaction.CommitAsync();
+
+                TempData["Success"] = "Đăng ký tài khoản thành công! Vui lòng đăng nhập.";
                 return RedirectToAction("DangNhap");
             }
             catch (Exception ex)
             {
-                ViewBag.Error = "Lỗi lưu dữ liệu: " + (ex.InnerException != null ? ex.InnerException.Message : ex.Message);
+                // Nếu có bất kỳ lỗi gì xảy ra, Rollback lại toàn bộ (bảng TaiKhoan cũng sẽ KHÔNG bị lưu mới)
+                await transaction.RollbackAsync();
+
+                ViewBag.Error = "Lỗi hệ thống khi đăng ký: " + (ex.InnerException != null ? ex.InnerException.Message : ex.Message);
                 return View();
             }
         }
