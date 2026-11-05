@@ -31,6 +31,8 @@ using (var scope = app.Services.CreateScope())
     try
     {
         db.Database.Migrate();
+        // Đảm bảo có sơ đồ Tầng 2 (chỉ ô tô + xe khách, chia theo hàng)
+        QuanLyBaiDoXe_UNETI03_TI17A2HN.Services.QuyDinhBaiXe.DamBaoTangHaiAsync(db).GetAwaiter().GetResult();
     }
     catch (Exception ex)
     {
