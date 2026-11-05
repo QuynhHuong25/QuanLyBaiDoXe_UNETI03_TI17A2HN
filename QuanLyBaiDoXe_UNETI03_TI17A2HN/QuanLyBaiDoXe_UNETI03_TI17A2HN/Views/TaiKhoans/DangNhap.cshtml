@@ -348,14 +348,14 @@
                     <form asp-controller="TaiKhoans" asp-action="DangNhap" method="post">
 
                         <div class="mb-3">
-                            <label class="form-label-custom">Email hoặc số điện thoại <span>*</span></label>
+                            <label class="form-label-custom">Tên đăng nhập <span>*</span></label>
                             <div class="input-icon-wrapper">
-                                <i class="bi bi-envelope input-icon"></i>
+                                <i class="bi bi-person input-icon"></i>
                                 <input type="text" 
                                        name="tenDangNhap" 
                                        value="@(ViewBag.SavedUsername ?? "")" 
                                        class="form-control form-control-custom" 
-                                       placeholder="Nhập email hoặc số điện thoại" 
+                                       placeholder="Nhập tên đăng nhập" 
                                        required />
                             </div>
                         </div>
