@@ -12,6 +12,51 @@
         ?? new List<QuanLyBaiDoXe_UNETI03_TI17A2HN.Models.ViTriDoXe>();
 }
 
+@{
+    var duLieuViTriJson = System.Text.Json.JsonSerializer.Serialize(
+        danhSachViTri.Select(v => new
+        {
+            id = v.MaViTri,
+            ten = v.TenViTri,
+            loai = v.MaLoaiPhuongTien,
+            tenLoai = v.LoaiPhuongTien?.TenLoaiPhuongTien,
+            khu = v.KhuVuc,
+            tang = v.Tang,
+            tt = v.TrangThai
+        }));
+    var phieuGiuChoJson = System.Text.Json.JsonSerializer.Serialize(
+        (ViewBag.PhieuGiuCho as List<object>) ?? new List<object>());
+    int viTriDaChon = Model?.MaViTri ?? 0;
+}
+
+<style>
+    .pick-wrap { border: 1px solid #e2e8f0; border-radius: 14px; background: #fff; padding: 16px; }
+    .pick-tab { border-radius: 10px; padding: 6px 16px; font-weight: 700; font-size: 13px; border: 1px solid #e2e8f0; background: #fff; color: #1e293b; cursor: pointer; }
+    .pick-tab.active { background: #0b1f4c; color: #fff; border-color: #0b1f4c; }
+    .pick-gate { background: #0b1f4c; color: #fff; border-radius: 20px; padding: 8px 20px; font-weight: 700; font-size: 13px; }
+    .pick-zone { border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px; margin-bottom: 14px; }
+    .pick-zone-title { font-weight: 700; font-size: 14px; }
+    .pick-row { display: flex; align-items: center; gap: 10px; }
+    .pick-row-label { min-width: 46px; text-align: center; font-size: 11px; font-weight: 800; color: #0b1f4c; background: #eef2ff; border: 1px solid #c7d2fe; border-radius: 8px; padding: 6px 4px; line-height: 1.3; }
+    .pick-slots { display: flex; flex-wrap: wrap; gap: 8px; }
+    .pick-aisle { background: #f1f5f9; color: #94a3b8; font-weight: 800; font-size: 11px; letter-spacing: 3px; text-align: center; padding: 4px 0; border-radius: 4px; margin: 10px 0; border: 1px dashed #cbd5e1; }
+    .pick-slot { width: 68px; height: 82px; border-radius: 6px; padding: 4px 2px; display: flex; flex-direction: column; justify-content: space-between; align-items: center; border: 1px solid #cbd5e1; background: #fff; text-align: center; font-family: inherit; transition: all .15s; }
+    .pick-slot .n { font-weight: 700; font-size: 11px; color: #475569; }
+    .pick-slot .i { font-size: 20px; font-weight: 800; line-height: 1; }
+    .pick-slot .b { font-size: 10px; font-weight: 700; }
+    .pick-slot.free { background: #f0fdf4; border-color: #bbf7d0; cursor: pointer; }
+    .pick-slot.free .i, .pick-slot.free .b { color: #16a34a; }
+    .pick-slot.free:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,.1); }
+    .pick-slot.busy { background: #fff5f5; border-color: #fca5a5; cursor: not-allowed; }
+    .pick-slot.busy .i, .pick-slot.busy .b { color: #ef4444; }
+    .pick-slot.off { background-color: #f1f5f9; cursor: not-allowed; background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(203,213,225,.4) 5px, rgba(203,213,225,.4) 10px); }
+    .pick-slot.off .i, .pick-slot.off .b { color: #94a3b8; }
+    .pick-slot.selected { background: #2563eb; border-color: #1d4ed8; box-shadow: 0 0 0 3px rgba(37,99,235,.25); }
+    .pick-slot.selected .n, .pick-slot.selected .i, .pick-slot.selected .b { color: #fff; }
+    .pick-legend span { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: #64748b; margin-right: 14px; }
+    .pick-legend i { width: 14px; height: 14px; border-radius: 3px; display: inline-block; border: 1px solid #cbd5e1; }
+</style>
+
 <div class="container py-4 py-lg-5">
 
     <!-- TIÊU ĐỀ -->
@@ -114,7 +159,9 @@
 
                                     @foreach (var xe in danhSachXe)
                                     {
-                                        <option value="@xe.MaPhuongTien">
+                                        <option value="@xe.MaPhuongTien"
+                                                data-loai="@xe.MaLoaiPhuongTien"
+                                                data-tenloai="@(xe.LoaiPhuongTien?.TenLoaiPhuongTien)">
                                             @xe.BienSoXe
                                             @if (xe.LoaiPhuongTien != null)
                                             {
@@ -160,36 +207,45 @@
 
                             @if (danhSachViTri.Any())
                             {
-                                <select asp-for="MaViTri"
-                                        class="form-select"
-                                        id="MaViTri"
-                                        required>
-                                    <option value="">-- Chọn vị trí đỗ --</option>
+                                <input type="hidden" asp-for="MaViTri" id="MaViTri" value="@(viTriDaChon > 0 ? viTriDaChon.ToString() : "")" />
 
-                                    @foreach (var viTri in danhSachViTri)
-                                    {
-                                        <option value="@viTri.MaViTri"
-                                                data-loai="@viTri.MaLoaiPhuongTien">
-                                            @viTri.TenViTri
-                                            @if (viTri.LoaiPhuongTien != null)
-                                            {
-                                                <text> - @viTri.LoaiPhuongTien.TenLoaiPhuongTien</text>
-                                            }
-                                            @if (!string.IsNullOrWhiteSpace(viTri.TrangThai))
-                                            {
-                                                <text> - @viTri.TrangThai</text>
-                                            }
-                                        </option>
-                                    }
-                                </select>
+                                <!-- Gợi ý khi chưa chọn phương tiện -->
+                                <div id="pickHint" class="alert alert-secondary mb-0">
+                                    <i class="bi bi-hand-index-thumb me-2"></i>
+                                    Hãy chọn <b>phương tiện</b> ở bước 1 để xem sơ đồ vị trí đỗ phù hợp.
+                                </div>
+
+                                <!-- Bảng sơ đồ vị trí -->
+                                <div id="pickWrap" class="pick-wrap d-none">
+                                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                                        <div>
+                                            <div class="fw-bold">Sơ đồ vị trí dành cho: <span id="pickLoai" class="text-primary"></span></div>
+                                            <small class="text-secondary" id="pickThongKe"></small>
+                                        </div>
+                                        <div class="pick-legend">
+                                            <span><i style="background:#f0fdf4;border-color:#bbf7d0"></i>Trống</span>
+                                            <span><i style="background:#fff5f5;border-color:#fca5a5"></i>Đã có xe / trùng giờ</span>
+                                            <span><i style="background:#e2e8f0"></i>Tạm ngừng</span>
+                                            <span><i style="background:#2563eb;border-color:#1d4ed8"></i>Đang chọn</span>
+                                        </div>
+                                    </div>
+
+                                    <div id="pickTabs" class="d-flex flex-wrap gap-2 mb-3"></div>
+                                    <div id="pickMap"></div>
+                                </div>
+
+                                <div id="pickChon" class="mt-2 small d-none">
+                                    <i class="bi bi-check-circle-fill text-success me-1"></i>
+                                    Vị trí đã chọn: <b id="pickChonTen"></b>
+                                </div>
+                                <div id="pickLoi" class="text-danger small mt-2 d-none">Vui lòng chọn một vị trí đỗ trên sơ đồ.</div>
 
                                 <span asp-validation-for="MaViTri"
                                       class="text-danger small"></span>
 
                                 <div class="form-text">
-                                    Chọn vị trí phù hợp với loại phương tiện.
-                                    Hệ thống cần kiểm tra trạng thái và lịch sử dụng
-                                    trước khi xác nhận đăng ký.
+                                    Sơ đồ chỉ hiển thị khu vực phù hợp với loại phương tiện bạn chọn.
+                                    Ô đỏ là vị trí đã có xe hoặc trùng giờ gửi bạn đã nhập ở bước 3.
                                 </div>
                             }
                             else
@@ -405,5 +461,167 @@
                 }
             });
         });
+    </script>
+
+    <script>
+        // ===== SƠ ĐỒ CHỌN VỊ TRÍ ĐỖ =====
+        (function () {
+            const TANG_DANH_RIENG = 2; // Tầng 2 trở lên: ô tô / xe khách, chia theo hàng
+            const viTris = @Html.Raw(duLieuViTriJson);
+            const phieuGiuCho = @Html.Raw(phieuGiuChoJson);
+
+            const selXe = document.getElementById("MaPhuongTien");
+            const inpViTri = document.getElementById("MaViTri");
+            const inpVao = document.getElementById("ThoiGianDuKienVao");
+            const inpRa = document.getElementById("ThoiGianDuKienRa");
+            const form = document.getElementById("formDangKy");
+            if (!selXe || !inpViTri || !form) return;
+
+            const elHint = document.getElementById("pickHint");
+            const elWrap = document.getElementById("pickWrap");
+            const elLoai = document.getElementById("pickLoai");
+            const elThongKe = document.getElementById("pickThongKe");
+            const elTabs = document.getElementById("pickTabs");
+            const elMap = document.getElementById("pickMap");
+            const elChon = document.getElementById("pickChon");
+            const elChonTen = document.getElementById("pickChonTen");
+            const elLoi = document.getElementById("pickLoi");
+
+            let tangHienTai = null;
+
+            const esc = (t) => String(t ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+            const layHang = (ten) => { const i = (ten || "").indexOf("-"); return ((i > 0 ? ten.slice(0, i) : ten) || "").trim().toUpperCase(); };
+            const loaiHienTai = () => { const o = selXe.options[selXe.selectedIndex]; return o && o.value ? parseInt(o.dataset.loai) : null; };
+            const tenLoaiHienTai = () => { const o = selXe.options[selXe.selectedIndex]; return o ? (o.dataset.tenloai || "") : ""; };
+
+            // Ô đang bận trong khoảng thời gian khách nhập (cùng quy tắc kiểm tra phía server)
+            function laBan(maViTri) {
+                const vao = inpVao && inpVao.value ? new Date(inpVao.value) : null;
+                const ra = inpRa && inpRa.value ? new Date(inpRa.value) : null;
+                const now = new Date();
+                return phieuGiuCho.some(p => {
+                    if (p.v !== maViTri) return false;
+                    const a = new Date(p.a), b = new Date(p.b);
+                    if (!vao || isNaN(vao)) return p.g;                  // chưa nhập giờ: chỉ khóa ô đang có xe
+                    if (p.g && vao < (b > now ? b : now)) return true;  // xe đang đỗ chưa rời đi
+                    if (ra && !isNaN(ra) && a < ra && b > vao) return true; // chồng lấn giờ
+                    return false;
+                });
+            }
+
+            function trangThaiO(v) {
+                if (v.tt === "Tạm ngừng") return "off";
+                if (laBan(v.id)) return "busy";
+                return "free";
+            }
+
+            function oHtml(v) {
+                const st = trangThaiO(v);
+                const chon = String(v.id) === inpViTri.value && st === "free";
+                const cls = chon ? "selected" : st;
+                let icon = "P", nhan = "Trống";
+                if (chon) { icon = "✓"; nhan = "Đã chọn"; }
+                else if (st === "busy") { icon = "●"; nhan = "Có xe"; }
+                else if (st === "off") { icon = "⊘"; nhan = "Ngừng"; }
+                const dis = (st !== "free") ? "disabled" : "";
+                return `<button type="button" class="pick-slot ${cls}" data-id="${v.id}" ${dis} title="${esc(v.ten)} - ${esc(v.khu)}">
+                            <span class="n">${esc(v.ten)}</span><span class="i">${icon}</span><span class="b">${nhan}</span>
+                        </button>`;
+            }
+
+            // Chia ô thành các dãy theo HÀNG trong tên vị trí (A1, A2...); các hàng cách nhau bằng lối đi
+            function chiaDay(slots, khu, tang) {
+                const m = new Map();
+                slots.forEach(v => { const h = layHang(v.ten); if (!m.has(h)) m.set(h, []); m.get(h).push(v); });
+                return [...m.keys()].sort().map(h => ({ ten: h, slots: m.get(h).sort((a, b) => a.ten.localeCompare(b.ten)) }));
+            }
+
+            function veSoDo() {
+                const loai = loaiHienTai();
+                if (!loai) {
+                    elWrap.classList.add("d-none"); elHint.classList.remove("d-none");
+                    inpViTri.value = ""; capNhatDaChon(); return;
+                }
+                const phuHop = viTris.filter(v => v.loai === loai);
+                elHint.classList.add("d-none"); elWrap.classList.remove("d-none");
+                elLoai.textContent = tenLoaiHienTai();
+
+                if (phuHop.length === 0) {
+                    elThongKe.textContent = "";
+                    elTabs.innerHTML = "";
+                    elMap.innerHTML = '<div class="alert alert-warning mb-0">Chưa có vị trí nào dành cho loại phương tiện này.</div>';
+                    inpViTri.value = ""; capNhatDaChon(); return;
+                }
+
+                const trong = phuHop.filter(v => trangThaiO(v) === "free").length;
+                elThongKe.textContent = `${trong} / ${phuHop.length} chỗ còn trống trong khung giờ đã chọn`;
+
+                // Bỏ chọn nếu ô đã chọn không còn phù hợp / không còn trống
+                const dangChon = viTris.find(v => String(v.id) === inpViTri.value);
+                if (dangChon && (dangChon.loai !== loai || trangThaiO(dangChon) !== "free")) inpViTri.value = "";
+
+                const cacTang = [...new Set(phuHop.map(v => v.tang))].sort((a, b) => a - b);
+                if (tangHienTai === null || !cacTang.includes(tangHienTai)) {
+                    const c = viTris.find(v => String(v.id) === inpViTri.value);
+                    tangHienTai = c ? c.tang : cacTang[0];
+                }
+
+                elTabs.innerHTML = cacTang.map(t => {
+                    const tr = phuHop.filter(v => v.tang === t && trangThaiO(v) === "free").length;
+                    const tong = phuHop.filter(v => v.tang === t).length;
+                    return `<button type="button" class="pick-tab ${t === tangHienTai ? "active" : ""}" data-tang="${t}">Tầng ${t} <span class="fw-normal opacity-75 ms-1">${tr}/${tong} trống</span></button>`;
+                }).join("");
+
+                const slotsTang = phuHop.filter(v => v.tang === tangHienTai);
+                const khus = [...new Set(slotsTang.map(v => v.khu))].sort();
+                let html = `<div class="pick-gate d-flex justify-content-between mb-3"><span>→ Cổng vào</span><span>Tầng ${tangHienTai}</span><span>Cổng ra →</span></div>`;
+                khus.forEach(khu => {
+                    const slotsKhu = slotsTang.filter(v => v.khu === khu);
+                    const days = chiaDay(slotsKhu, khu, tangHienTai);
+                    const theoHang = true;
+                    html += `<div class="pick-zone"><div class="pick-zone-title mb-2">${esc(khu)} <small class="text-secondary fw-normal">· ${slotsKhu.length} chỗ</small></div>`;
+                    days.forEach((d, i) => {
+                        if (i > 0) html += `<div class="pick-aisle">L Ố I &nbsp; Đ I</div>`;
+                        html += `<div class="pick-row">${theoHang ? `<div class="pick-row-label">Hàng<br>${esc(d.ten)}</div>` : ""}<div class="pick-slots">${d.slots.map(oHtml).join("")}</div></div>`;
+                    });
+                    html += `</div>`;
+                });
+                elMap.innerHTML = html;
+                capNhatDaChon();
+            }
+
+            function capNhatDaChon() {
+                const v = viTris.find(x => String(x.id) === inpViTri.value);
+                if (v) { elChon.classList.remove("d-none"); elChonTen.textContent = `${v.ten} - ${v.khu} (Tầng ${v.tang})`; elLoi.classList.add("d-none"); }
+                else { elChon.classList.add("d-none"); }
+            }
+
+            elMap.addEventListener("click", function (e) {
+                const btn = e.target.closest(".pick-slot");
+                if (!btn || btn.disabled) return;
+                inpViTri.value = btn.dataset.id;
+                veSoDo();
+            });
+            elTabs.addEventListener("click", function (e) {
+                const btn = e.target.closest(".pick-tab");
+                if (!btn) return;
+                tangHienTai = parseInt(btn.dataset.tang);
+                veSoDo();
+            });
+
+            selXe.addEventListener("change", function () { inpViTri.value = ""; tangHienTai = null; veSoDo(); });
+            [inpVao, inpRa].forEach(i => i && i.addEventListener("change", veSoDo));
+
+            form.addEventListener("submit", function (e) {
+                if (!inpViTri.value) {
+                    e.preventDefault();
+                    elLoi.classList.remove("d-none");
+                    (elWrap.classList.contains("d-none") ? selXe : elWrap).scrollIntoView({ behavior: "smooth", block: "center" });
+                }
+            });
+
+            // Vẽ lần đầu (sau khi script thời gian mặc định đã điền giờ)
+            document.addEventListener("DOMContentLoaded", function () { setTimeout(veSoDo, 0); });
+        })();
     </script>
 }
