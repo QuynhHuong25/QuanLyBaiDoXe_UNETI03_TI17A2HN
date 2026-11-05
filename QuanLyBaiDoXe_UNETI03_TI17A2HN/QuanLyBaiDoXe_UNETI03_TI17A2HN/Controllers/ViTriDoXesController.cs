@@ -257,6 +257,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
         [PhanQuyen("Admin")]
         public async Task<IActionResult> Create()
         {
+            await NapDanhSachKhuAsync();
             ViewData["MaLoaiPhuongTien"] = new SelectList(await _context.LoaiPhuongTien.ToListAsync(), "MaLoaiPhuongTien", "TenLoaiPhuongTien");
             return View();
         }
@@ -323,6 +324,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
+            await NapDanhSachKhuAsync();
             ViewData["MaLoaiPhuongTien"] = new SelectList(await _context.LoaiPhuongTien.ToListAsync(), "MaLoaiPhuongTien", "TenLoaiPhuongTien", vitridoxe.MaLoaiPhuongTien);
             return View(vitridoxe);
         }
@@ -341,6 +343,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             {
                 return NotFound();
             }
+            await NapDanhSachKhuAsync();
             ViewData["MaLoaiPhuongTien"] = new SelectList(await _context.LoaiPhuongTien.ToListAsync(), "MaLoaiPhuongTien", "TenLoaiPhuongTien", vitridoxe.MaLoaiPhuongTien);
             return View(vitridoxe);
         }
@@ -399,6 +402,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
+            await NapDanhSachKhuAsync();
             ViewData["MaLoaiPhuongTien"] = new SelectList(await _context.LoaiPhuongTien.ToListAsync(), "MaLoaiPhuongTien", "TenLoaiPhuongTien", vitridoxe.MaLoaiPhuongTien);
             return View(vitridoxe);
         }
@@ -439,6 +443,18 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             }
 
             return RedirectToAction(nameof(Index));
+        }
+
+        // Danh sách khu vực hiện có để đổ vào combobox "Khu vực"
+        private async Task NapDanhSachKhuAsync()
+        {
+            ViewBag.DanhSachKhu = (await _context.ViTriDoXe
+                    .Where(v => v.KhuVuc != null && v.KhuVuc != "")
+                    .Select(v => v.KhuVuc!)
+                    .Distinct()
+                    .ToListAsync())
+                .OrderBy(k => k)
+                .ToList();
         }
 
         // Tầng 2 trở lên chỉ dành cho ô tô và xe khách; ô tô / xe khách chỉ đặt từ tầng 2 trở lên
