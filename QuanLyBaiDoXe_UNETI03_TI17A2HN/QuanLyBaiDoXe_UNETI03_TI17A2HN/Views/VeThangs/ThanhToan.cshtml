@@ -1,0 +1,91 @@
+@model QuanLyBaiDoXe_UNETI03_TI17A2HN.Models.VeThang
+
+@{
+    ViewData["Title"] = "Thanh toán vé tháng";
+    bool laAdmin = ViewBag.LaAdmin is bool b && b;
+    string qrUrl = ViewBag.QrUrl as string ?? "";
+    string noiDung = ViewBag.NoiDung as string ?? "";
+}
+
+<div class="ps-eb">VÉ THÁNG</div>
+<h1 class="ps-big mb-3">Thanh toán vé tháng #@Model.MaVeThang</h1>
+
+<div class="row g-4">
+    <!-- Mã QR -->
+    <div class="col-lg-5">
+        <div class="card p-4 border-0 shadow-sm rounded-4 text-center">
+            <div class="fw-semibold mb-2">Quét mã bằng app ngân hàng để thanh toán</div>
+            <img id="qrThanhToan" src="@qrUrl" alt="Mã QR thanh toán" class="img-fluid mx-auto" style="max-width:340px"
+                 onerror="this.onerror=null;this.src='@Url.Content("~/css/Image/qr-bidv.png")';document.getElementById('canhBaoQrTinh').classList.remove('d-none');" />
+            <div id="canhBaoQrTinh" class="alert alert-warning small text-start mt-3 mb-0 d-none">
+                Không tải được mã QR có sẵn số tiền. Đây là mã QR tài khoản — vui lòng tự nhập
+                <b>số tiền @Model.GiaTien.ToString("N0") đ</b> và <b>nội dung @noiDung</b> khi chuyển.
+            </div>
+        </div>
+    </div>
+
+    <!-- Thông tin chuyển khoản -->
+    <div class="col-lg-7">
+        <div class="card p-4 border-0 shadow-sm rounded-4">
+            <h5 class="fw-bold mb-3">Thông tin chuyển khoản</h5>
+            <div class="d-flex justify-content-between mb-2"><span class="text-secondary">Ngân hàng</span><b class="text-end">@ViewBag.NganHang</b></div>
+            <div class="d-flex justify-content-between mb-2"><span class="text-secondary">Chủ tài khoản</span><b>@ViewBag.TenTaiKhoan</b></div>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="text-secondary">Số tài khoản</span>
+                <span><b id="stk">@ViewBag.SoTaiKhoan</b> <button type="button" class="btn btn-sm btn-outline-secondary js-copy" data-target="stk">Sao chép</button></span>
+            </div>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="text-secondary">Số tiền</span>
+                <b class="fs-5 text-primary">@Model.GiaTien.ToString("N0") đ</b>
+            </div>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <span class="text-secondary">Nội dung CK</span>
+                <span><b id="nd">@noiDung</b> <button type="button" class="btn btn-sm btn-outline-secondary js-copy" data-target="nd">Sao chép</button></span>
+            </div>
+            <hr />
+            <div class="d-flex justify-content-between mb-1"><span class="text-secondary">Biển số</span><b>@Model.PhuongTien?.BienSoXe</b></div>
+            <div class="d-flex justify-content-between mb-1"><span class="text-secondary">Kỳ hạn</span><b>@Model.SoThang tháng</b></div>
+            <div class="d-flex justify-content-between mb-3"><span class="text-secondary">Hiệu lực</span><b>@Model.NgayBatDau.ToString("dd/MM/yyyy") – @Model.NgayKetThuc.ToString("dd/MM/yyyy")</b></div>
+
+            <div class="alert alert-info small">
+                Vui lòng giữ <b>nguyên nội dung chuyển khoản</b> để quản trị viên đối chiếu.
+                Vé sẽ được <b>kích hoạt sau khi quản trị viên xác nhận đã nhận tiền</b>; trước đó xe chưa được miễn phí gửi.
+            </div>
+
+            <div class="d-flex flex-wrap gap-2">
+                @if (laAdmin)
+                {
+                    <form asp-action="XacNhanThanhToan" method="post" onsubmit="return confirm('Xác nhận đã nhận đủ tiền cho vé #@Model.MaVeThang?');">
+                        <input type="hidden" name="id" value="@Model.MaVeThang" />
+                        <button class="btn btn-success"><i class="bi bi-check-circle me-1"></i> Xác nhận đã nhận tiền</button>
+                    </form>
+                }
+                @if (laAdmin)
+                {
+                    <a asp-action="Index" class="btn btn-primary">Về danh sách</a>
+                }
+                else
+                {
+                    <form asp-action="HoanTatThanhToan" method="post">
+                        <input type="hidden" name="id" value="@Model.MaVeThang" />
+                        <button class="btn btn-primary"><i class="bi bi-wallet2 me-1"></i> Thanh toán</button>
+                    </form>
+                }
+                <a asp-action="Index" class="btn btn-secondary">Thanh toán sau</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.querySelectorAll('.js-copy').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var text = document.getElementById(btn.dataset.target).textContent.trim();
+                (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject()).then(function () {
+                    var old = btn.textContent; btn.textContent = 'Đã chép'; setTimeout(function () { btn.textContent = old; }, 1500);
+                }).catch(function () { prompt('Sao chép:', text); });
+            });
+        });
+    </script>
+}
