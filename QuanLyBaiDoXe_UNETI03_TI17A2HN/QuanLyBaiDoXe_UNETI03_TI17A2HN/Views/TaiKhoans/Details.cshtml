@@ -91,15 +91,7 @@
             {
                 <a asp-action="Edit" asp-route-id="@Model?.MaTaiKhoan" class="btn btn-warning btn-sm px-3 rounded-pill text-dark d-inline-flex align-items-center gap-1 shadow-sm fw-medium">
                     <i class="bi bi-pencil-square"></i> Sửa tài khoản
-                </a>
-
-                <!-- Nút Xóa Tài Khoản -->
-                <form asp-action="XoaTaiKhoan" asp-route-id="@Model?.MaTaiKhoan" method="post" class="d-inline" onsubmit="return confirm('CẢNH BÁO: Bạn có chắc chắn muốn XÓA VĨNH VIỄN tài khoản của mình? Dữ liệu này sẽ không thể khôi phục!');">
-                    @Html.AntiForgeryToken()
-                    <button type="submit" class="btn btn-outline-danger btn-sm px-3 rounded-pill d-inline-flex align-items-center gap-1 shadow-sm fw-medium">
-                        <i class="bi bi-trash-fill"></i> Xóa tài khoản
-                    </button>
-                </form>
+                </a> 
             }
         </div>
     </div>
