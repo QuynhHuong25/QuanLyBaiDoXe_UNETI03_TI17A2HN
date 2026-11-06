@@ -2,60 +2,94 @@
 
 @{
     ViewData["Title"] = "Quản lý vé tháng";
+
     bool laAdmin = ViewBag.LaAdmin is bool b && b;
-    int trang = ViewBag.CurrentPage;
-    int tongTrang = ViewBag.TotalPages;
+
+    int trang = ViewBag.CurrentPage ?? 1;
+    int tongTrang = ViewBag.TotalPages ?? 1;
+
     string? tim = ViewBag.SearchBienSo as string;
     string? loc = ViewBag.FilterTrangThai as string;
 }
 
-<div class="ps-eb">@(laAdmin ? "QUẢN TRỊ" : "VÉ CỦA TÔI")</div>
+<div class="ps-eb">
+    @(laAdmin ? "QUẢN TRỊ" : "VÉ CỦA TÔI")
+</div>
+
 <div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-3">
     <div>
         <h1 class="ps-big">Vé tháng</h1>
-        <p style="color:var(--mu);margin:6px 0 0">Xe có vé tháng còn hạn được gửi xe <b>miễn phí</b> trong thời hạn vé.</p>
+        <p style="color:var(--mu);margin:6px 0 0">
+            Xe có vé tháng còn hạn được gửi xe <b>miễn phí</b> trong thời hạn vé.
+        </p>
     </div>
+
     <div class="d-flex gap-2">
         @if (laAdmin)
         {
-            <a asp-action="XuatExcel" asp-route-searchBienSo="@tim" asp-route-filterTrangThai="@loc" class="btn btn-outline-success">
+            <a asp-action="XuatExcel"
+               asp-route-searchBienSo="@tim"
+               asp-route-filterTrangThai="@loc"
+               class="btn btn-outline-success">
                 <i class="bi bi-file-earmark-excel me-1"></i> Xuất Excel
             </a>
         }
-        <a asp-action="Create" class="btn btn-primary"><i class="bi bi-plus-circle me-1"></i> Đăng ký vé tháng</a>
+        else
+        {
+            <a asp-action="Create" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-1"></i> Đăng ký vé tháng
+            </a>
+        }
     </div>
 </div>
 
 @if (TempData["SuccessMessage"] != null)
 {
-    <div class="alert alert-success alert-dismissible fade show">@TempData["SuccessMessage"]<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+    <div class="alert alert-success alert-dismissible fade show">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
 }
+
 @if (TempData["ErrorMessage"] != null)
 {
-    <div class="alert alert-danger alert-dismissible fade show">@TempData["ErrorMessage"]<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+    <div class="alert alert-danger alert-dismissible fade show">
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
 }
+
 <div id="thongBaoAjax"></div>
 
+<!-- TÌM KIẾM VÀ LỌC -->
 <form method="get" class="card p-3 border-0 shadow-sm rounded-4 mb-3">
     <div class="row g-2 align-items-end">
         <div class="col-md-4">
             <label class="form-label small fw-semibold text-secondary">Biển số xe</label>
             <input type="text" name="searchBienSo" value="@tim" class="form-control" placeholder="Nhập biển số..." />
         </div>
+
         <div class="col-md-4">
             <label class="form-label small fw-semibold text-secondary">Trạng thái</label>
             <select name="filterTrangThai" class="form-select">
                 <option value="">-- Tất cả --</option>
+                <option value="choThanhToan" selected="@(loc == "choThanhToan")">Chờ thanh toán</option>
                 <option value="dangHieuLuc" selected="@(loc == "dangHieuLuc")">Đang hiệu lực</option>
                 <option value="chuaBatDau" selected="@(loc == "chuaBatDau")">Chưa bắt đầu</option>
                 <option value="hetHan" selected="@(loc == "hetHan")">Hết hạn</option>
                 <option value="daHuy" selected="@(loc == "daHuy")">Đã hủy</option>
             </select>
         </div>
-        <div class="col-md-4"><button class="btn btn-primary w-100"><i class="bi bi-search me-1"></i> Tìm / Lọc</button></div>
+
+        <div class="col-md-4">
+            <button type="submit" class="btn btn-primary w-100">
+                <i class="bi bi-search me-1"></i> Tìm / Lọc
+            </button>
+        </div>
     </div>
 </form>
 
+<!-- DANH SÁCH VÉ THÁNG -->
 <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
     <div class="table-responsive">
         <table class="table align-middle mb-0">
@@ -78,21 +112,58 @@
                 @foreach (var v in Model)
                 {
                     string tt = v.TrangThaiHienThi;
-                    string badge = tt == "Đang hiệu lực" ? "bg-success" : tt == "Chưa bắt đầu" ? "bg-info text-dark" : tt == "Hết hạn" ? "bg-secondary" : "bg-danger";
-                    bool thaoTacDuoc = tt == "Đang hiệu lực" || tt == "Chưa bắt đầu";
+                    string badge = tt == "Đang hiệu lực" ? "bg-success" :
+                                   tt == "Chưa bắt đầu" ? "bg-info text-dark" :
+                                   tt == "Hết hạn" ? "bg-secondary" :
+                                   tt == "Chờ thanh toán" ? "bg-warning text-dark" : "bg-danger";
+
+                    bool choTT = tt == "Chờ thanh toán";
+                    string giaText = v.GiaTien.ToString("N0");
+                    bool thaoTacDuoc = tt == "Đang hiệu lực" || tt == "Chưa bắt đầu" || choTT;
+
                     <tr data-row="@v.MaVeThang">
                         <td class="text-secondary">#@v.MaVeThang</td>
                         <td class="fw-bold">@v.PhuongTien?.BienSoXe</td>
+
                         @if (laAdmin)
                         {
                             <td>@v.PhuongTien?.ChuPhuongTien?.HoTen</td>
                         }
+
                         <td>@v.PhuongTien?.LoaiPhuongTien?.TenLoaiPhuongTien</td>
-                        <td>@v.NgayBatDau.ToString("dd/MM/yyyy") – @v.NgayKetThuc.ToString("dd/MM/yyyy")<div class="small text-secondary">@v.SoThang tháng</div></td>
+                        <td>
+                            @v.NgayBatDau.ToString("dd/MM/yyyy") – @v.NgayKetThuc.ToString("dd/MM/yyyy")
+                            <div class="small text-secondary">@v.SoThang tháng</div>
+                        </td>
                         <td class="text-end fw-semibold">@v.GiaTien.ToString("N0") đ</td>
-                        <td><span class="badge @badge js-badge">@tt</span></td>
+                        <td>
+                            <span class="badge @badge js-badge">@tt</span>
+                        </td>
                         <td class="text-end js-actions">
-                            @if (tt != "Đã hủy")
+                            @* VÉ ĐANG CHỜ THANH TOÁN *@
+                            @if (choTT)
+                            {
+                                @* Chỉ khách hàng được thanh toán QR *@
+                                @if (!laAdmin)
+                                {
+                                    <a asp-action="ThanhToan" asp-route-id="@v.MaVeThang" class="btn btn-sm btn-warning" title="Hiện mã QR thanh toán">
+                                        <i class="bi bi-qr-code me-1"></i> Thanh toán
+                                    </a>
+                                }
+
+                                @* Chỉ Admin được xác nhận đã nhận tiền *@
+                                @if (laAdmin)
+                                {
+                                    <form asp-action="XacNhanThanhToan" method="post" class="d-inline" onsubmit="return confirm('Xác nhận đã nhận đủ @giaText đ cho vé #@v.MaVeThang?');">
+                                        <input type="hidden" name="id" value="@v.MaVeThang" />
+                                        <button type="submit" class="btn btn-sm btn-success" title="Xác nhận đã nhận tiền">
+                                            <i class="bi bi-check-lg"></i>
+                                        </button>
+                                    </form>
+                                }
+                            }
+                            @* CÁC VÉ KHÔNG PHẢI CHỜ THANH TOÁN *@
+                            else if (tt != "Đã hủy")
                             {
                                 <form asp-action="GiaHan" method="post" class="d-inline-flex gap-1 align-items-center">
                                     <input type="hidden" name="id" value="@v.MaVeThang" />
@@ -102,25 +173,37 @@
                                         <option value="6">+6 tháng</option>
                                         <option value="12">+12 tháng</option>
                                     </select>
-                                    <button class="btn btn-sm btn-outline-primary" title="Gia hạn"><i class="bi bi-arrow-repeat"></i></button>
+                                    <button type="submit" class="btn btn-sm btn-outline-primary" title="Gia hạn">
+                                        <i class="bi bi-arrow-repeat"></i>
+                                    </button>
                                 </form>
                             }
+
+                            @* NÚT HỦY VÉ *@
                             @if (thaoTacDuoc)
                             {
-                                <button type="button" class="btn btn-sm btn-outline-danger js-huy-ve" data-id="@v.MaVeThang" data-bien="@v.PhuongTien?.BienSoXe" title="Hủy vé"><i class="bi bi-x-circle"></i></button>
+                                <button type="button" class="btn btn-sm btn-outline-danger js-huy-ve" data-id="@v.MaVeThang" data-bien="@v.PhuongTien?.BienSoXe" title="Hủy vé">
+                                    <i class="bi bi-x-circle"></i>
+                                </button>
                             }
                         </td>
                     </tr>
                 }
+
                 @if (!Model.Any())
                 {
-                    <tr><td colspan="@(laAdmin ? 8 : 7)" class="text-center text-muted py-5">Chưa có vé tháng nào.</td></tr>
+                    <tr>
+                        <td colspan="@(laAdmin ? 8 : 7)" class="text-center text-muted py-5">
+                            Chưa có vé tháng nào.
+                        </td>
+                    </tr>
                 }
             </tbody>
         </table>
     </div>
 </div>
 
+<!-- PHÂN TRANG -->
 @if (tongTrang > 1)
 {
     <nav class="mt-3">
@@ -128,44 +211,75 @@
             @for (int i = 1; i <= tongTrang; i++)
             {
                 <li class="page-item @(i == trang ? "active" : "")">
-                    <a class="page-link" asp-action="Index" asp-route-page="@i" asp-route-searchBienSo="@tim" asp-route-filterTrangThai="@loc">@i</a>
+                    <a class="page-link" asp-action="Index" asp-route-page="@i" asp-route-searchBienSo="@tim" asp-route-filterTrangThai="@loc">
+                        @i
+                    </a>
                 </li>
             }
         </ul>
     </nav>
 }
 
-<form id="formAjax" method="post">@Html.AntiForgeryToken()</form>
+<!-- FORM CHỨA TOKEN CHO AJAX -->
+<form id="formAjax" method="post">
+    @Html.AntiForgeryToken()
+</form>
 
 @section Scripts {
     <script>
-        // AJAX: hủy vé tháng không tải lại trang
+        // AJAX: Hủy vé tháng không cần tải lại trang
         document.querySelectorAll('.js-huy-ve').forEach(function (btn) {
             btn.addEventListener('click', function () {
-                if (!confirm('Hủy vé tháng của xe ' + btn.dataset.bien + '?')) return;
+                if (!confirm('Hủy vé tháng của xe ' + btn.dataset.bien + '?')) {
+                    return;
+                }
+
                 var body = new URLSearchParams();
                 body.append('id', btn.dataset.id);
-                body.append('__RequestVerificationToken', document.querySelector('#formAjax input[name="__RequestVerificationToken"]').value);
+                body.append(
+                    '__RequestVerificationToken',
+                    document.querySelector('#formAjax input[name="__RequestVerificationToken"]').value
+                );
+
                 btn.disabled = true;
 
                 fetch('@Url.Action("Huy", "VeThangs")', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-Requested-With': 'XMLHttpRequest' },
-                    body: body.toString(), credentials: 'same-origin'
-                }).then(function (r) { return r.json(); }).then(function (kq) {
-                    var box = document.getElementById('thongBaoAjax');
-                    box.innerHTML = '';
-                    var a = document.createElement('div');
-                    a.className = 'alert alert-' + (kq.ok ? 'success' : 'danger');
-                    a.textContent = kq.message;
-                    box.appendChild(a);
-                    if (kq.ok) {
-                        var row = document.querySelector('tr[data-row="' + btn.dataset.id + '"]');
-                        var badge = row.querySelector('.js-badge');
-                        badge.textContent = 'Đã hủy'; badge.className = 'badge bg-danger js-badge';
-                        row.querySelector('.js-actions').innerHTML = '';
-                    } else { btn.disabled = false; }
-                }).catch(function () { btn.disabled = false; alert('Không kết nối được máy chủ.'); });
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: body.toString(),
+                    credentials: 'same-origin'
+                })
+                    .then(function (r) {
+                        return r.json();
+                    })
+                    .then(function (kq) {
+                        var box = document.getElementById('thongBaoAjax');
+                        box.innerHTML = '';
+
+                        var a = document.createElement('div');
+                        a.className = 'alert alert-' + (kq.ok ? 'success' : 'danger');
+                        a.textContent = kq.message;
+                        box.appendChild(a);
+
+                        if (kq.ok) {
+                            var row = document.querySelector('tr[data-row="' + btn.dataset.id + '"]');
+                            if (row) {
+                                var badge = row.querySelector('.js-badge');
+                                badge.textContent = 'Đã hủy';
+                                badge.className = 'badge bg-danger js-badge';
+                                row.querySelector('.js-actions').innerHTML = '';
+                            }
+                        } else {
+                            btn.disabled = false;
+                        }
+                    })
+                    .catch(function () {
+                        btn.disabled = false;
+                        alert('Không kết nối được máy chủ.');
+                    });
             });
         });
     </script>
