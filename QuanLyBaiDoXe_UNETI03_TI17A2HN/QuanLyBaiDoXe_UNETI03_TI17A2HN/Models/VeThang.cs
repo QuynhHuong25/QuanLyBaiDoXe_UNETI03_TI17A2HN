@@ -26,7 +26,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Models
         [Column(TypeName = "decimal(18,2)")]
         public decimal GiaTien { get; set; }
 
-        /// <summary>"Hoạt động" hoặc "Đã hủy". Hết hạn được tính theo ngày, không lưu.</summary>
+        /// <summary>"Chờ thanh toán", "Hoạt động" hoặc "Đã hủy". Hết hạn được tính theo ngày, không lưu.</summary>
         [Required]
         [StringLength(20)]
         public string TrangThai { get; set; } = "Hoạt động";
@@ -38,10 +38,11 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Models
 
         public virtual PhuongTien? PhuongTien { get; set; }
 
-        /// <summary>Trạng thái hiển thị: Đã hủy / Chưa bắt đầu / Đang hiệu lực / Hết hạn</summary>
+        /// <summary>Trạng thái hiển thị: Đã hủy / Chờ thanh toán / Chưa bắt đầu / Đang hiệu lực / Hết hạn</summary>
         [NotMapped]
         public string TrangThaiHienThi =>
             TrangThai == "Đã hủy" ? "Đã hủy"
+            : TrangThai == "Chờ thanh toán" ? "Chờ thanh toán"
             : NgayKetThuc.Date < DateTime.Today ? "Hết hạn"
             : NgayBatDau.Date > DateTime.Today ? "Chưa bắt đầu"
             : "Đang hiệu lực";
