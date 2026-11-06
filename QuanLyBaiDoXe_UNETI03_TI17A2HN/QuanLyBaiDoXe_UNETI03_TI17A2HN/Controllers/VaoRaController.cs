@@ -197,13 +197,13 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             };
         }
 
-        // Xe có vé tháng còn hạn (chưa hủy) tại thời điểm thu tiền thì miễn phí
+        // Xe có vé tháng còn hạn (đã thanh toán, chưa hủy) tại thời điểm thu tiền thì miễn phí
         private async Task<bool> CoVeThangAsync(int maPhuongTien, DateTime luc)
         {
             var ngay = luc.Date;
             return await _context.VeThang.AnyAsync(v =>
                 v.MaPhuongTien == maPhuongTien &&
-                v.TrangThai != "Đã hủy" &&
+                v.TrangThai == "Hoạt động" &&
                 v.NgayBatDau <= ngay && v.NgayKetThuc >= ngay);
         }
 
