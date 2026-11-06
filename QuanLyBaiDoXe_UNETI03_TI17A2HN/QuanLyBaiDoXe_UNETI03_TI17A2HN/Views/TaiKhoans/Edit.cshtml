@@ -38,14 +38,14 @@
                     <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
                     <input type="hidden" asp-for="MaTaiKhoan" />
-                    <input type="hidden" asp-for="TenDangNhap" />
                     <input type="hidden" asp-for="MatKhau" />
                     <input type="hidden" asp-for="VaiTro" />
                     <input type="hidden" asp-for="TrangThai" />
 
                     <div class="mb-3">
-                        <label class="form-label text-muted small fw-medium">Tên đăng nhập</label>
-                        <input value="@Model.TenDangNhap" class="form-control bg-light" disabled />
+                        <label asp-for="TenDangNhap" class="form-label fw-medium">Tên đăng nhập <span class="text-danger">*</span></label>
+                        <input asp-for="TenDangNhap" class="form-control" placeholder="Nhập tên đăng nhập" required />
+                        <span asp-validation-for="TenDangNhap" class="text-danger small"></span>
                     </div>
 
                     <div class="mb-3">
