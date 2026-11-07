@@ -471,6 +471,31 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                 (boQuaMaPhieu == null || p.MaPhieu != boQuaMaPhieu));
         }
 
+        // GET: PHIEUGUIXES/Edit/5
+        // Họ và tên: Tăng Hoàng Giang - MSV: 23103100031 - Chức năng: Chỉnh sửa phiếu gửi xe (Module 4)
+        [PhanQuyen("Admin")]
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var phieuGuiXe = await _context.PhieuGuiXe
+                .Include(p => p.PhuongTien)
+                .Include(p => p.ViTriDoXe)
+                .FirstOrDefaultAsync(m => m.MaPhieu == id);
+
+            if (phieuGuiXe == null)
+            {
+                return NotFound();
+            }
+
+            ViewData["MaPhuongTien"] = new SelectList(_context.PhuongTien, "MaPhuongTien", "BienSoXe", phieuGuiXe.MaPhuongTien);
+            ViewData["MaViTri"] = new SelectList(_context.ViTriDoXe, "MaViTri", "TenViTri", phieuGuiXe.MaViTri);
+            return View(phieuGuiXe);
+        }
+
         // POST: PHIEUGUIXES/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
