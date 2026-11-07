@@ -9,7 +9,12 @@
 }
 
 <!-- PHẦN 1: TỔNG QUAN HỆ THỐNG (DASHBOARD) -->
-<h2 class="mb-4">Tổng quan hệ thống (Dashboard)</h2>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0">Tổng quan hệ thống (Dashboard)</h2>
+    <a asp-action="XuatExcel" class="btn btn-success">
+        <i class="bi bi-file-earmark-excel-fill"></i> Xuất Excel thống kê
+    </a>
+</div>
 
 @{
     var vi = new System.Globalization.CultureInfo("vi-VN");

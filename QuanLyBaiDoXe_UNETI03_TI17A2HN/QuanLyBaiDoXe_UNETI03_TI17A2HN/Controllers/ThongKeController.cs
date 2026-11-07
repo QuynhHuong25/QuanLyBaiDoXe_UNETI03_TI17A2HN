@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using QuanLyBaiDoXe_UNETI03_TI17A2HN.Lọc;
 using QuanLyBaiDoXe_UNETI03_TI17A2HN.Models;
 using QuanLyBaiDoXe_UNETI03_TI17A2HN.Models.ViewModels;
+using QuanLyBaiDoXe_UNETI03_TI17A2HN.Services;
 
 namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
 {
@@ -135,6 +136,89 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
                 .ToList();
 
             return View(viewModel);
+        }
+
+        // ---- Chức năng nâng cao: Xuất Excel thống kê ----
+        // Họ và tên: Tăng Hoàng Giang – MSV: 23103100031
+        [HttpGet]
+        public async Task<IActionResult> XuatExcel()
+        {
+            var viewModel = new ThongKeViewModel();
+            int currentYear = DateTime.Now.Year;
+
+            viewModel.SoPhuongTienTheoLoai = await _context.PhuongTien
+                .Include(p => p.LoaiPhuongTien)
+                .GroupBy(p => p.LoaiPhuongTien.TenLoaiPhuongTien)
+                .Select(g => new ThongKeLoaiXe
+                {
+                    TenLoai = g.Key ?? "Không xác định",
+                    SoLuong = g.Count()
+                }).ToListAsync();
+
+            viewModel.LuotGuiTheoLoaiXe = await _context.PhieuGuiXe
+                .Include(p => p.PhuongTien)
+                .ThenInclude(pt => pt.LoaiPhuongTien)
+                .GroupBy(p => p.PhuongTien.LoaiPhuongTien.TenLoaiPhuongTien)
+                .Select(g => new ThongKeLoaiXe
+                {
+                    TenLoai = g.Key ?? "Không xác định",
+                    SoLuong = g.Count()
+                }).ToListAsync();
+
+            viewModel.LuotGuiTheoViTri = await _context.PhieuGuiXe
+                .Include(p => p.ViTriDoXe)
+                .GroupBy(p => p.ViTriDoXe.TenViTri)
+                .Select(g => new ThongKeLuotGuiViTri
+                {
+                    TenViTri = g.Key ?? "Không xác định",
+                    SoLuot = g.Count()
+                })
+                .OrderByDescending(x => x.SoLuot)
+                .ToListAsync();
+
+            viewModel.LuotGuiTheoChuXe = await _context.PhieuGuiXe
+                .Include(p => p.PhuongTien)
+                .ThenInclude(pt => pt.ChuPhuongTien)
+                .GroupBy(p => p.PhuongTien.ChuPhuongTien.HoTen)
+                .Select(g => new ThongKeLuotGuiChuXe
+                {
+                    HoTen = g.Key ?? "Không xác định",
+                    SoLuot = g.Count()
+                })
+                .OrderByDescending(x => x.SoLuot)
+                .ToListAsync();
+
+            viewModel.LuotGuiVaDoanhThuTheoThang = await _context.PhieuGuiXe
+                .Where(p => p.TrangThai == "Đã lấy xe" && p.ThanhTien != null && p.NgayDangKy.Year == currentYear)
+                .GroupBy(p => p.NgayDangKy.Month)
+                .Select(g => new ThongKeTheoThang
+                {
+                    Nam = currentYear,
+                    Thang = g.Key,
+                    SoLuot = g.Count(),
+                    DoanhThu = g.Sum(p => p.ThanhTien) ?? 0
+                })
+                .OrderBy(x => x.Thang)
+                .ToListAsync();
+
+            var danhSachViTri = await _context.ViTriDoXe.ToListAsync();
+            viewModel.TyLeLapDauTheoTang = danhSachViTri
+                .GroupBy(v => $"Tầng {v.Tang}")
+                .Select(g => new ThongKeTyLeTang
+                {
+                    TenTang = g.Key,
+                    TongSoViTri = g.Count(),
+                    SoViTriSuDung = g.Count(v => v.TrangThai == "Đang sử dụng"),
+                    TyLe = g.Count() > 0 ? (int)Math.Round((double)g.Count(v => v.TrangThai == "Đang sử dụng") * 100.0 / g.Count()) : 0
+                })
+                .OrderBy(x => x.TenTang)
+                .ToList();
+
+            var service = new XuatBaoCaoService();
+            byte[] bytes = service.ExcelThongKe(viewModel, currentYear);
+
+            string tenFile = $"ThongKe_{currentYear}_{DateTime.Now:yyyyMMdd_HHmm}.xlsx";
+            return File(bytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", tenFile);
         }
     }
 }
