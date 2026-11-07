@@ -197,9 +197,11 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
 
             if (coPhuongTien || coViTriDo)
             {
-                ModelState.AddModelError(string.Empty, "Không thể xóa loại phương tiện này vì đang có dữ liệu Phương tiện hoặc Vị trí đỗ liên quan.");
-                TempData["ErrorMessage"] = "Không thể xóa do có dữ liệu liên quan!";
-                return View(loaiPhuongTien);
+                // Gán thông báo lỗi vào TempData để trang Index hiển thị banner
+                TempData["ErrorMessage"] = "Không thể xóa loại phương tiện này vì đang có dữ liệu Phương tiện hoặc Vị trí đỗ liên quan!";
+
+                // Tự động chuyển hướng về trang danh sách ngay lập tức
+                return RedirectToAction(nameof(Index));
             }
 
             _context.LoaiPhuongTien.Remove(loaiPhuongTien);
