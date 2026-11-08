@@ -31,8 +31,9 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             string? maTaiKhoanStr = HttpContext.Session.GetString("MaTaiKhoan");
 
             var queryPhieu = _context.PhieuGuiXe
+                .AsNoTracking()
                 .Include(p => p.PhuongTien)
-                    .ThenInclude(pt => pt.LoaiPhuongTien)
+                    .ThenInclude(pt => pt!.LoaiPhuongTien)
                 .Include(p => p.ViTriDoXe)
                 .AsQueryable();
 
@@ -42,7 +43,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             {
                 if (!string.IsNullOrEmpty(maTaiKhoanStr) && int.TryParse(maTaiKhoanStr, out int maTaiKhoan))
                 {
-                    var chuPT = await _context.ChuPhuongTien.FirstOrDefaultAsync(c => c.MaTaiKhoan == maTaiKhoan);
+                    var chuPT = await _context.ChuPhuongTien.AsNoTracking().FirstOrDefaultAsync(c => c.MaTaiKhoan == maTaiKhoan);
                     if (chuPT != null)
                     {
                         queryPhieu = queryPhieu.Where(p => p.PhuongTien != null && p.PhuongTien.MaChuPhuongTien == chuPT.MaChuPhuongTien);
@@ -62,13 +63,13 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             int soXeCuaToi = 0;
             if (vaiTro == "Admin")
             {
-                soXeCuaToi = await _context.PhuongTien.CountAsync();
+                soXeCuaToi = await _context.PhuongTien.AsNoTracking().CountAsync();
             }
             else if (int.TryParse(maTaiKhoanStr, out int mtk))
             {
-                var chu = await _context.ChuPhuongTien.FirstOrDefaultAsync(c => c.MaTaiKhoan == mtk);
+                var chu = await _context.ChuPhuongTien.AsNoTracking().FirstOrDefaultAsync(c => c.MaTaiKhoan == mtk);
                 if (chu != null)
-                    soXeCuaToi = await _context.PhuongTien.CountAsync(x => x.MaChuPhuongTien == chu.MaChuPhuongTien);
+                    soXeCuaToi = await _context.PhuongTien.AsNoTracking().CountAsync(x => x.MaChuPhuongTien == chu.MaChuPhuongTien);
             }
 
             var viewModel = new HomeDashboardViewModel
@@ -84,14 +85,15 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
 
                 // Danh sách loại xe phục vụ form đăng ký gửi xe nhanh
                 DanhSachLoaiXe = await _context.LoaiPhuongTien
+                    .AsNoTracking()
                     .OrderBy(l => l.TenLoaiPhuongTien)
                     .ToListAsync(),
 
                 // Tổng hợp số liệu hiển thị nhanh
-                TongXeDangGui = await _context.PhieuGuiXe.CountAsync(p => p.TrangThai == "Đang gửi"),
-                TongViTriTrong = await _context.ViTriDoXe.CountAsync(v => v.TrangThai == "Còn trống"),
-                TongKhachHang = await _context.ChuPhuongTien.CountAsync(),
-                TongPhuongTien = await _context.PhuongTien.CountAsync()
+                TongXeDangGui = await _context.PhieuGuiXe.AsNoTracking().CountAsync(p => p.TrangThai == "Đang gửi"),
+                TongViTriTrong = await _context.ViTriDoXe.AsNoTracking().CountAsync(v => v.TrangThai == "Còn trống"),
+                TongKhachHang = await _context.ChuPhuongTien.AsNoTracking().CountAsync(),
+                TongPhuongTien = await _context.PhuongTien.AsNoTracking().CountAsync()
             };
 
             return View(viewModel);
