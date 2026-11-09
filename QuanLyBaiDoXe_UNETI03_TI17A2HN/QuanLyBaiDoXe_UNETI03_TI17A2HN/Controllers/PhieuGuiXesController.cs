@@ -636,9 +636,10 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // ===== XUẤT EXCEL / PDF (theo đúng bộ lọc đang chọn; khách hàng chỉ xuất phiếu của mình) =====
+        // ===== XUẤT EXCEL / PDF (Chỉ Admin mới có quyền xuất báo cáo) =====
 
         // GET: PHIEUGUIXES/XuatExcel
+        [PhanQuyen("Admin")]
         public async Task<IActionResult> XuatExcel(string? searchBienSo, string? searchTenChuXe, string? filterTrangThai,
                                                    string? filterLoaiXe, DateTime? filterNgayDangKy)
         {
@@ -651,14 +652,14 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Controllers
         }
 
         // GET: PHIEUGUIXES/XuatPdf
+        [PhanQuyen("Admin")]
         public async Task<IActionResult> XuatPdf(string? searchBienSo, string? searchTenChuXe, string? filterTrangThai,
                                                  string? filterLoaiXe, DateTime? filterNgayDangKy)
         {
             var ds = await LayPhieuDeXuatAsync(searchBienSo, searchTenChuXe, filterTrangThai, filterLoaiXe, filterNgayDangKy);
             if (ds == null) return RedirectToAction("Index", "Home");
 
-            string tieuDe = HttpContext.Session.GetString("VaiTro") == "Admin" ? "Báo cáo phiếu gửi xe" : "Lịch sử gửi xe";
-            return File(_xuat.PdfPhieu(ds, tieuDe), "application/pdf", $"phieu-gui-xe-{DateTime.Now:yyyyMMdd-HHmm}.pdf");
+            return File(_xuat.PdfPhieu(ds, "Báo cáo phiếu gửi xe"), "application/pdf", $"phieu-gui-xe-{DateTime.Now:yyyyMMdd-HHmm}.pdf");
         }
 
         // Lấy danh sách phiếu (tối đa 5000 dòng) theo quyền + bộ lọc; trả null nếu không xác định được tài khoản

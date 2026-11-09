@@ -105,21 +105,24 @@
             <p class="text-secondary small mb-0 mt-1">Theo dõi danh sách, trạng thái và lịch sử phiếu đăng ký gửi xe</p>
         </div>
         <div class="d-flex flex-wrap gap-2">
-            <!-- Xuất báo cáo theo đúng bộ lọc đang chọn -->
-            <a asp-action="XuatExcel"
-               asp-route-searchBienSo="@ViewData["searchBienSo"]" asp-route-searchTenChuXe="@ViewData["searchTenChuXe"]"
-               asp-route-filterTrangThai="@ViewData["filterTrangThai"]" asp-route-filterLoaiXe="@ViewData["filterLoaiXe"]"
-               asp-route-filterNgayDangKy="@ViewData["filterNgayDangKy"]"
-               class="btn btn-outline-success px-3 py-2 fw-semibold d-inline-flex align-items-center gap-2 rounded-3">
-                <i class="bi bi-file-earmark-excel"></i> Xuất Excel
-            </a>
-            <a asp-action="XuatPdf"
-               asp-route-searchBienSo="@ViewData["searchBienSo"]" asp-route-searchTenChuXe="@ViewData["searchTenChuXe"]"
-               asp-route-filterTrangThai="@ViewData["filterTrangThai"]" asp-route-filterLoaiXe="@ViewData["filterLoaiXe"]"
-               asp-route-filterNgayDangKy="@ViewData["filterNgayDangKy"]"
-               class="btn btn-outline-danger px-3 py-2 fw-semibold d-inline-flex align-items-center gap-2 rounded-3">
-                <i class="bi bi-file-earmark-pdf"></i> Xuất PDF
-            </a>
+            @if (vaiTro == "Admin")
+            {
+                <!-- Xuất báo cáo theo đúng bộ lọc đang chọn (Chỉ Admin mới có nút này) -->
+                <a asp-action="XuatExcel"
+                   asp-route-searchBienSo="@ViewData["searchBienSo"]" asp-route-searchTenChuXe="@ViewData["searchTenChuXe"]"
+                   asp-route-filterTrangThai="@ViewData["filterTrangThai"]" asp-route-filterLoaiXe="@ViewData["filterLoaiXe"]"
+                   asp-route-filterNgayDangKy="@ViewData["filterNgayDangKy"]"
+                   class="btn btn-outline-success px-3 py-2 fw-semibold d-inline-flex align-items-center gap-2 rounded-3">
+                    <i class="bi bi-file-earmark-excel"></i> Xuất Excel
+                </a>
+                <a asp-action="XuatPdf"
+                   asp-route-searchBienSo="@ViewData["searchBienSo"]" asp-route-searchTenChuXe="@ViewData["searchTenChuXe"]"
+                   asp-route-filterTrangThai="@ViewData["filterTrangThai"]" asp-route-filterLoaiXe="@ViewData["filterLoaiXe"]"
+                   asp-route-filterNgayDangKy="@ViewData["filterNgayDangKy"]"
+                   class="btn btn-outline-danger px-3 py-2 fw-semibold d-inline-flex align-items-center gap-2 rounded-3">
+                    <i class="bi bi-file-earmark-pdf"></i> Xuất PDF
+                </a>
+            }
             @if (vaiTro == "Khách hàng")
             {
                 <a asp-action="Create" class="btn btn-primary px-3 py-2 fw-semibold shadow-sm d-inline-flex align-items-center gap-2 rounded-3">
