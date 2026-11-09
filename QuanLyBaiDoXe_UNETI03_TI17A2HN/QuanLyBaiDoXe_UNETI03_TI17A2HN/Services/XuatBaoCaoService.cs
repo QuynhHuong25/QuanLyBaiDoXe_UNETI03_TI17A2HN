@@ -82,7 +82,7 @@ namespace QuanLyBaiDoXe_UNETI03_TI17A2HN.Services
                 {
                     page.Size(PageSizes.A4.Landscape());
                     page.Margin(24);
-                    page.DefaultTextStyle(x => x.FontFamily("Arial").FontSize(9));
+                    page.DefaultTextStyle(x => x.FontSize(9));
 
                     page.Header().Column(col =>
                     {
